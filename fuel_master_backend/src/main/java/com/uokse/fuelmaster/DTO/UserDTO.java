@@ -1,33 +1,17 @@
-package com.uokse.fuelmaster;
+package com.uokse.fuelmaster.DTO;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
 
-@Entity
-public class User {
+public class UserDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String firstName;
-
-    @Column(nullable = false, unique = true)
     private String lastName;
-
-    @Column(nullable = false, unique = true, length = 10)
     private String phone;
-
-    @Column(nullable = false, unique = true, length = 12)
     private String nic;
-
-    @Column(nullable = false)
     private String password;
 
-    public User() {
-    }
-
-    public User(Long id, String firstName, String lastName, String phone, String nic, String password) {
+    public UserDTO(Long id, String firstName, String lastName, String phone, String nic, String password) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -36,7 +20,8 @@ public class User {
         this.password = password;
     }
 
-
+    public UserDTO() {
+    }
 
     public Long getId() {
         return id;
@@ -84,17 +69,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", phone='" + phone + '\'' +
-                ", nic='" + nic + '\'' +
-                ", password='" + password + '\'' +
-                '}';
     }
 }

@@ -13,14 +13,14 @@ public class Vehicle {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name="vehicleType_id",nullable = false)
+    private VehicleType vehicleType;
     @Column(nullable = false)
     private String vehicleRegistrationPart1;
 
     @Column(nullable = false)
     private Long vehicleRegistrationPart2;
-
-    @Column(nullable = false)
-    private String vehicleType;
 
     @Column(nullable = false, unique = true)
     private String chassisNumber;
@@ -62,11 +62,11 @@ public class Vehicle {
         this.vehicleRegistrationPart2 = vehicleRegistrationPart2;
     }
 
-    public String getVehicleType() {
+    public VehicleType getVehicleType() {
         return vehicleType;
     }
 
-    public void setVehicleType(String vehicleType) {
+    public void setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
     }
 
