@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class FuelMasterApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(FuelMasterApplication.class, args);
 	}
 

@@ -5,7 +5,9 @@ import com.uokse.fuelmaster.Repo.UserRepo;
 import com.uokse.fuelmaster.Service.UserService;
 import com.uokse.fuelmaster.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserIMPL implements UserService {
 
     @Autowired
