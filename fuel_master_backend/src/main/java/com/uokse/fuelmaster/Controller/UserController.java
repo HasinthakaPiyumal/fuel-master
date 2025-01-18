@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.UserController;
+package com.uokse.fuelmaster.Controller;
 
 
 import com.uokse.fuelmaster.DTO.UserDTO;
