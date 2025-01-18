@@ -5,7 +5,7 @@ import com.uokse.fuelmaster.DTO.UserDTO;
 import com.uokse.fuelmaster.Repo.UserRepo;
 import com.uokse.fuelmaster.Response.LoginResponse;
 import com.uokse.fuelmaster.Service.UserService;
-import com.uokse.fuelmaster.User;
+import com.uokse.fuelmaster.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
