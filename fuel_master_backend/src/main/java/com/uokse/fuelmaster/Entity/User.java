@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster;
+package com.uokse.fuelmaster.Entity;
 
 import jakarta.persistence.*;
 
@@ -15,14 +15,28 @@ public class User {
     @Column(nullable = false, unique = true)
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 10)
     private String phone;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 12)
     private String nic;
 
     @Column(nullable = false)
     private String password;
+
+    public User() {
+    }
+
+    public User(Long id, String firstName, String lastName, String phone, String nic, String password) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.nic = nic;
+        this.password = password;
+    }
+
+
 
     public Long getId() {
         return id;
@@ -70,5 +84,17 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", nic='" + nic + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

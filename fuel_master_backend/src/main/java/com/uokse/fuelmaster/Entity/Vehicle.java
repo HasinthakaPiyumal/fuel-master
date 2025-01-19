@@ -1,8 +1,9 @@
-package com.uokse.fuelmaster;
+package com.uokse.fuelmaster.Entity;
 
 import jakarta.persistence.*;
 
 @Entity
+@Table(name="vehicle")
 public class Vehicle {
 
     @Id
@@ -13,14 +14,14 @@ public class Vehicle {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name="vehicleType_id",nullable = false)
+    private VehicleType vehicleType;
     @Column(nullable = false)
     private String vehicleRegistrationPart1;
 
     @Column(nullable = false)
     private Long vehicleRegistrationPart2;
-
-    @Column(nullable = false)
-    private String vehicleType;
 
     @Column(nullable = false, unique = true)
     private String chassisNumber;
@@ -28,8 +29,22 @@ public class Vehicle {
     @Column(nullable = false)
     private String fuelType;
 
-    // Getters and Setters
+    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, String fuelType) {
+        this.id = id;
+        this.user = user;
+        this.vehicleType = vehicleType;
+        this.vehicleRegistrationPart1 = vehicleRegistrationPart1;
+        this.vehicleRegistrationPart2 = vehicleRegistrationPart2;
+        this.chassisNumber = chassisNumber;
+        this.fuelType = fuelType;
+    }
 
+    public Vehicle() {
+    }
+
+
+
+    // Getters and Setters
     public User getUser() {
         return user;
     }
@@ -62,11 +77,11 @@ public class Vehicle {
         this.vehicleRegistrationPart2 = vehicleRegistrationPart2;
     }
 
-    public String getVehicleType() {
+    public VehicleType getVehicleType() {
         return vehicleType;
     }
 
-    public void setVehicleType(String vehicleType) {
+    public void setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
     }
 
@@ -84,5 +99,18 @@ public class Vehicle {
 
     public void setFuelType(String fuelType) {
         this.fuelType = fuelType;
+    }
+
+    @Override
+    public String toString() {
+        return "Vehicle{" +
+                "id=" + id +
+                ", user=" + user +
+                ", vehicleType=" + vehicleType +
+                ", vehicleRegistrationPart1='" + vehicleRegistrationPart1 + '\'' +
+                ", vehicleRegistrationPart2=" + vehicleRegistrationPart2 +
+                ", chassisNumber='" + chassisNumber + '\'' +
+                ", fuelType='" + fuelType + '\'' +
+                '}';
     }
 }
