@@ -16,4 +16,7 @@ public interface VehicleRepo extends JpaRepository<Vehicle, Long> {
 
 
    Optional<Vehicle> findByChassisNumber(String chassisNumber);
+
+
+    Optional<Vehicle> findByVehicleRegistrationPart1AndVehicleRegistrationPart2(String part1, Long part2);
 }
