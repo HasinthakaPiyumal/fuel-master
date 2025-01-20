@@ -1,48 +1,37 @@
+import 'package:get/get.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'screens/sign_in_screen.dart';
-import 'providers/auth_provider.dart';
-import 'providers/fuel_provider.dart';
-import 'providers/qr_code_provider.dart';
+import 'presentation/theme/app_theme.dart';
+import 'core/services/storage_service.dart';
+import 'presentation/screens/login/login_screen.dart';
 
-void main() {
-  runApp(const FuelQuotaApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize services
+  final storageService = StorageService();
+  await storageService.init();
+  
+  runApp(const MyApp());
 }
 
-class FuelQuotaApp extends StatelessWidget {
-  const FuelQuotaApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => FuelProvider()),
-        ChangeNotifierProvider(create: (_) => QRCodeProvider()),
-      ],
-      child: MaterialApp(
-        title: 'Fuel Quota App',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-            primary: Colors.blue,
-            secondary: Colors.blueAccent,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            elevation: 2,
-          ),
-        ),
-        home: const SignInScreen(),
-        // Define your routes here
-        routes: {
-          '/sign-in': (context) => const SignInScreen(),
-          // Add more routes as needed
-        },
-      ),
+    SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, // Set this to any color you want.
+      statusBarIconBrightness: Brightness.dark, // Makes the status bar icons dark.
+    ),
+  );
+    return GetMaterialApp(
+      title: 'Fuel Master',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      defaultTransition: Transition.rightToLeftWithFade,
+      home: LoginScreen(),
     );
   }
 }
