@@ -4,10 +4,30 @@ import 'package:pumper_mobile_app/core/constants/app_colors.dart';
 import 'package:pumper_mobile_app/presentation/screens/shared/primary_button.dart';
 import 'package:pumper_mobile_app/presentation/screens/home/widgets/app_drawer.dart';
 import 'package:pumper_mobile_app/presentation/screens/home/widgets/summary_card.dart';
+import 'package:pumper_mobile_app/presentation/screens/qr_scanner/qr_scanner_screen.dart';
 import 'package:pumper_mobile_app/presentation/screens/home/widgets/fuel_transaction_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  Future<void> _openQRScanner(BuildContext context) async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const QRScannerScreen(),
+      ),
+    );
+
+    if (result != null && context.mounted) {
+      // Handle the scanned QR code result
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Scanned QR Code: $result'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +90,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               PrimaryButton(
-                onPressed: () {},
+                onPressed: () => _openQRScanner(context),
                 text: "Scan QR",
               ),
               const SizedBox(height: 24),
@@ -104,12 +124,9 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add QR scan logic
-        },
+        onPressed: () => _openQRScanner(context),
         backgroundColor: Colors.blue,
         child: const Icon(Icons.qr_code_scanner),
-        
       ),
     );
   }
