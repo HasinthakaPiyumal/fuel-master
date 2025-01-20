@@ -1,4 +1,6 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:pumper_mobile_app/presentation/screens/login/login_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -127,7 +129,7 @@ class AppDrawer extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   onTap: () {
-                    Navigator.pop(context);
+                    Get.offAll(() => LoginScreen());
                     // Add logout logic
                   },
                 ),
