@@ -1,4 +1,4 @@
 class AppAssets {
   // Images
-  static const String logoPath = 'assets/images/logo.png';
+  static const String logo = 'assets/app_logo.png';
 }

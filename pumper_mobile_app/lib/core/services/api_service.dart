@@ -8,7 +8,6 @@ class ApiService {
 
   late final Dio _dio;
 
-  // Private constructor
   ApiService._internal() {
     _dio = Dio(
       BaseOptions(
