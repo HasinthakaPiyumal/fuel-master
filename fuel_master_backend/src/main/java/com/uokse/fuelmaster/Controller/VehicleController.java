@@ -22,7 +22,14 @@ public class VehicleController {
         }
 
         // Register vehicle and return response
-        String registrationId = vehicleService.registerVehicle(vehicleDTO);
-        return ResponseEntity.ok("Vehicle registered successfully with ID: " + registrationId);
+        String registrationMessage = vehicleService.registerVehicle(vehicleDTO);
+
+        // If the service returns an error message, return that as the response
+        if (registrationMessage.startsWith("Error:")) {
+            return ResponseEntity.badRequest().body(registrationMessage);  // Return error message with 400
+        }
+
+        // Otherwise, return success message
+        return ResponseEntity.ok("Vehicle registered successfully with " + registrationMessage);  // Success
     }
 }
