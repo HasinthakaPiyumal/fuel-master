@@ -2,14 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 
-
 const HomePage = () => {
   const navigate = useNavigate();
 
   return (
     <div className="homepage">
       <header className="homepage-header">
-        <img src={fuelLogo} alt="Fuel Master Logo" className="logo" />
+        {/* <img src={fuelLogo} alt="Fuel Master Logo" className="logo" /> */}
         <h1>Welcome to the Fuel Master!</h1>
       </header>
       <p className="homepage-subtitle">
@@ -32,11 +31,11 @@ const HomePage = () => {
           Create Account
         </button>
       </div>
-      <img
+      {/* <img
         src={fuelStationIllustration}
         alt="Fuel Station"
         className="homepage-image"
-      />
+      /> */}
     </div>
   );
 };
