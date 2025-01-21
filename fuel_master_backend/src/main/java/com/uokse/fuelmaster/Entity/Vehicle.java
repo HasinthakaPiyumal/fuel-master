@@ -27,16 +27,16 @@ public class Vehicle {
     private String chassisNumber;
 
     @Column(nullable = false)
-    private String fuelType;
+    private String qrUrl;
 
-    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, String fuelType) {
+    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, String qrUrl) {
         this.id = id;
         this.user = user;
         this.vehicleType = vehicleType;
         this.vehicleRegistrationPart1 = vehicleRegistrationPart1;
         this.vehicleRegistrationPart2 = vehicleRegistrationPart2;
         this.chassisNumber = chassisNumber;
-        this.fuelType = fuelType;
+        this.qrUrl = qrUrl;
     }
 
     public Vehicle() {
@@ -94,11 +94,11 @@ public class Vehicle {
     }
 
     public String getFuelType() {
-        return fuelType;
+        return qrUrl;
     }
 
     public void setFuelType(String fuelType) {
-        this.fuelType = fuelType;
+        this.qrUrl = qrUrl;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class Vehicle {
                 ", vehicleRegistrationPart1='" + vehicleRegistrationPart1 + '\'' +
                 ", vehicleRegistrationPart2=" + vehicleRegistrationPart2 +
                 ", chassisNumber='" + chassisNumber + '\'' +
-                ", fuelType='" + fuelType + '\'' +
+                ", qrUrl='" + qrUrl + '\'' +
                 '}';
     }
 }

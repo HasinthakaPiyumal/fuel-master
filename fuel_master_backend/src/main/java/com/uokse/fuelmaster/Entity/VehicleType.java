@@ -12,7 +12,10 @@ public class VehicleType {
     private String vehicleType;
 
     @Column(nullable = false)
-    private Long fuelQuantity;
+    private String fuelType;
+
+    @Column(nullable = false)
+    private Long defaultQuota;
 
     public Long getId() {
         return id;
@@ -31,10 +34,18 @@ public class VehicleType {
     }
 
     public Long getFuelQuantity() {
-        return fuelQuantity;
+        return defaultQuota;
     }
 
     public void setFuelQuantity(Long fuelQuantity) {
-        this.fuelQuantity = fuelQuantity;
+        this.defaultQuota = fuelQuantity;
+    }
+
+    public String getFuelType() {
+        return fuelType;
+    }
+
+    public void setFuelType(String fuelType) {
+        this.fuelType = fuelType;
     }
 }
