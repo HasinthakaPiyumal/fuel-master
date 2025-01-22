@@ -4,7 +4,6 @@ import com.uokse.fuelmaster.DTO.LoginDTO;
 import com.uokse.fuelmaster.DTO.UserDTO;
 import com.uokse.fuelmaster.Repo.UserRepo;
 import com.uokse.fuelmaster.Response.LoginResponse;
-import com.uokse.fuelmaster.Service.UserService;
 import com.uokse.fuelmaster.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,12 +11,12 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class UserIMPL implements UserService {
+public class UserIMPL  {
 
     @Autowired
     private UserRepo userRepo;
 
-    @Override
+
     public String addUser(UserDTO userDTO) {
         User user = new User(
                 userDTO.getId(),
@@ -32,7 +31,7 @@ public class UserIMPL implements UserService {
         return user.getFirstName();
     }
 
-    @Override
+
     public LoginResponse loginUser(LoginDTO loginDTO) {
       String msg="";
       User user = userRepo.findByPhone(loginDTO.getPhone());
