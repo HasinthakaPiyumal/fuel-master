@@ -1,20 +1,19 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './vehicle_owner/components/pages/HomePage';
-import UserLoginPage from './vehicle_owner/components/pages/UserLoginPage';
-import UserRegistrationPage from './vehicle_owner/components/pages/UserRegistrationPage';
-import VehicleRegistrationPage from './vehicle_owner/components/pages/VehicleRegistrationPage';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
+import AdminRoutes from './routes/AdminRoutes';
+import AppLayout from './layouts/AppLayout';
+import AdminLayout from './layouts/AdminLayout';
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<UserLoginPage />} />
-        <Route path="/register" element={<UserRegistrationPage />} />
-        <Route path="/vehicle-register" element={<VehicleRegistrationPage />} />
-      </Routes>
-    </Router>
+    <BrowserRouter>
+      <AppLayout>
+        <AppRoutes />
+      </AppLayout>
+      <AdminLayout>
+        <AdminRoutes />
+      </AdminLayout>
+    </BrowserRouter>
   );
 };
 

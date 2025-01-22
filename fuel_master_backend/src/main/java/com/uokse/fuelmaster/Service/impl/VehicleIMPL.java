@@ -7,7 +7,9 @@ import com.uokse.fuelmaster.Entity.VehicleType;
 import com.uokse.fuelmaster.Repo.MotorTrafficMockRepo;
 import com.uokse.fuelmaster.Repo.UserRepo;
 import com.uokse.fuelmaster.Repo.VehicleRepo;
-import com.uokse.fuelmaster.Repo.VehicleTypeRepo;
+import com.uokse.fuelmaster.Repo.VehicleTypeRepository;
+import com.uokse.fuelmaster.Repo.VehicleTypeRepository;
+import com.uokse.fuelmaster.Service.VehicleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class VehicleIMPL  {
+public class VehicleIMPL implements VehicleService {
 
     private static final Logger logger = LoggerFactory.getLogger(VehicleIMPL.class);
 
@@ -27,12 +29,12 @@ public class VehicleIMPL  {
     private UserRepo userRepo;
 
     @Autowired
-    private VehicleTypeRepo vehicleTypeRepo;
+    private VehicleTypeRepository vehicleTypeRepo;
 
     @Autowired
     private MotorTrafficMockRepo motorTrafficMockRepo;
 
-
+    @Override
     public String registerVehicle(VehicleDTO vehicleDTO) {
         logger.info("Starting vehicle registration...");
 
