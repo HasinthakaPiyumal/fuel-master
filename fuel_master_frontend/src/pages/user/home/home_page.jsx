@@ -24,16 +24,18 @@ const HomePage = () => {
           </div>
 
           <div className="flex gap-4">
-            <Link to="/register">
-              <Button size="lg" variant="outline">
-                Login
-              </Button>
-            </Link>
-            <Link to="/login">
-              <Button size="lg">Create Account</Button>
-            </Link>
+              <Link to="/login">
+                  <Button size="lg" variant="outline">
+                      Login
+                  </Button>
+              </Link>
+              <Link to="/signup">
+                  <Button size="lg">
+                      Create Account
+                  </Button>
+              </Link>
           </div>
-        </div>
+      </div>
 
         <div className="lg:w-1/2">
           <FuelStationAnimation />
