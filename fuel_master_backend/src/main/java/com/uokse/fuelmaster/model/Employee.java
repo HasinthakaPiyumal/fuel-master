@@ -1,9 +1,11 @@
-package com.uokse.fuelmaster.Entity;
+package com.uokse.fuelmaster.model;
 
 import jakarta.persistence.*;
 
+
 @Entity
-public class Admin {
+
+public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,17 +22,22 @@ public class Admin {
     @Column(nullable = false)
     private String password;
 
+    @ManyToOne
+    @JoinColumn(name = "fuel_station_id", nullable = false)
+    private fuelStation fuelStation;
+
     @Column(updatable = false)
     private String createdAt;
 
     private String updatedAt;
 
-    public Admin(Long id, String name, String phone, String nic, String password, String createdAt, String updatedAt) {
+    public Employee(Long id, String name, String phone, String nic, String password, com.uokse.fuelmaster.model.fuelStation fuelStation, String createdAt, String updatedAt) {
         this.id = id;
         this.name = name;
         this.phone = phone;
         this.nic = nic;
         this.password = password;
+        this.fuelStation = fuelStation;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -75,14 +82,23 @@ public class Admin {
         this.password = password;
     }
 
+    public com.uokse.fuelmaster.model.fuelStation getFuelStation() {
+        return fuelStation;
+    }
+
+    public void setFuelStation(com.uokse.fuelmaster.model.fuelStation fuelStation) {
+        this.fuelStation = fuelStation;
+    }
+
     @Override
     public String toString() {
-        return "Admin{" +
+        return "Employee{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", nic='" + nic + '\'' +
                 ", password='" + password + '\'' +
+                ", fuelStation=" + fuelStation +
                 ", createdAt='" + createdAt + '\'' +
                 ", updatedAt='" + updatedAt + '\'' +
                 '}';

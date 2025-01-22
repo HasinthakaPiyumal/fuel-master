@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.Entity;
+package com.uokse.fuelmaster.model;
 
 import jakarta.persistence.*;
 
@@ -32,7 +32,7 @@ public class FuelTransaction {
     private Double availableQuantity;
 
 
-    public FuelTransaction(Long id, Vehicle vehicle, Employee employee, com.uokse.fuelmaster.Entity.fuelStation fuelStation, Double pumpedQuantity, LocalDateTime transactionDate, Double availableQuantity) {
+    public FuelTransaction(Long id, Vehicle vehicle, Employee employee, com.uokse.fuelmaster.model.fuelStation fuelStation, Double pumpedQuantity, LocalDateTime transactionDate, Double availableQuantity) {
         this.id = id;
         this.vehicle = vehicle;
         this.employee = employee;
@@ -66,11 +66,11 @@ public class FuelTransaction {
         this.employee = employee;
     }
 
-    public com.uokse.fuelmaster.Entity.fuelStation getFuelStation() {
+    public com.uokse.fuelmaster.model.fuelStation getFuelStation() {
         return fuelStation;
     }
 
-    public void setFuelStation(com.uokse.fuelmaster.Entity.fuelStation fuelStation) {
+    public void setFuelStation(com.uokse.fuelmaster.model.fuelStation fuelStation) {
         this.fuelStation = fuelStation;
     }
 

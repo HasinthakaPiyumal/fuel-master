@@ -1,26 +1,25 @@
 package com.uokse.fuelmaster.dto;
 
-import jakarta.persistence.Column;
-
-public class UserDTO {
-
+public class AdminDTO {
     private Long id;
-    private String firstName;
-    private String lastName;
+    private String name;
     private String phone;
     private String nic;
     private String password;
+    private String createdAt;
+    private String updatedAt;
 
-    public UserDTO(Long id, String firstName, String lastName, String phone, String nic, String password) {
+    public AdminDTO(Long id, String name, String phone, String nic, String password, String createdAt, String updatedAt) {
         this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
         this.phone = phone;
         this.nic = nic;
         this.password = password;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public UserDTO() {
+    public AdminDTO() {
     }
 
     public Long getId() {
@@ -31,20 +30,12 @@ public class UserDTO {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPhone() {
@@ -69,5 +60,21 @@ public class UserDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

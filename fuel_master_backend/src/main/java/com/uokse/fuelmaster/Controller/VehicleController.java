@@ -1,7 +1,8 @@
-package com.uokse.fuelmaster.Controller;
+package com.uokse.fuelmaster.controller;
 
-import com.uokse.fuelmaster.DTO.VehicleDTO;
-import com.uokse.fuelmaster.Service.VehicleService;
+import com.uokse.fuelmaster.dto.VehicleDTO;
+import com.uokse.fuelmaster.service.impl.VehicleIMPL;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class VehicleController {
 
     @Autowired
-    private VehicleService vehicleService;
+    private VehicleIMPL vehicleIMPL;
 
     @PostMapping("/save")
     public ResponseEntity<String> saveVehicle(@RequestBody VehicleDTO vehicleDTO) {
@@ -22,7 +23,7 @@ public class VehicleController {
         }
 
         // Register vehicle and return response
-        String registrationMessage = vehicleService.registerVehicle(vehicleDTO);
+        String registrationMessage = vehicleIMPL.registerVehicle(vehicleDTO);
 
         // If the service returns an error message, return that as the response
         if (registrationMessage.startsWith("Error:")) {
