@@ -14,6 +14,11 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
@@ -27,8 +32,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         try {
-            System.out.println("AuthTokenFilter");
-            System.out.println(request);
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateToken(jwt)) {
                 String username = jwtUtils.extractUsername(jwt);
@@ -42,8 +45,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (SignatureException e) {
+            System.out.println("SignatureException: " + e.getMessage());
+        } catch (ExpiredJwtException e) {
+            System.out.println("ExpiredJwtException: " + e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            System.out.println("UnsupportedJwtException: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("IllegalArgumentException: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Cannot set user authentication: " + e);
+            System.out.println("Exception: " + e.getMessage());
         }
         filterChain.doFilter(request, response);
     }
