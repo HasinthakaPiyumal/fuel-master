@@ -29,7 +29,7 @@ const HomePage = () => {
                                 Login
                             </Button>
                         </Link>
-                        <Link to="/register">
+                        <Link to="/signup">
                             <Button size="lg">
                                 Create Account
                             </Button>
