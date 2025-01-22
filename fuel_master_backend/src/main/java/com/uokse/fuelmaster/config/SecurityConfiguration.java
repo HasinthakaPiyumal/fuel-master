@@ -33,7 +33,6 @@ public class SecurityConfiguration {
     
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
-        System.out.println("AuthTokenFilter");
         return new AuthTokenFilter();
     }
 
@@ -63,10 +62,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/user/save","/api/v1/user/login").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
-                
-                ;
+                .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
