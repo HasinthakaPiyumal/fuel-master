@@ -35,7 +35,7 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+        List<UserDTO> users = UserIMPL.getAllUsers();
         if (!users.isEmpty()) {
             return ResponseEntity.ok(users);
         } else {
@@ -46,7 +46,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        UserDTO userDTO = userService.getUserById(id);
+        UserDTO userDTO = UserIMPL.getUserById(id);
         if (userDTO != null) {
             return ResponseEntity.ok(userDTO);
         } else {
