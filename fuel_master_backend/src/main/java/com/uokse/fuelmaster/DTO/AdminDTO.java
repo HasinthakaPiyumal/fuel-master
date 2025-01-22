@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.DTO;
+package com.uokse.fuelmaster.dto;
 
 public class AdminDTO {
     private Long id;

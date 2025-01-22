@@ -1,10 +1,12 @@
-package com.uokse.fuelmaster.Service.impl;
+package com.uokse.fuelmaster.service.impl;
 
-import com.uokse.fuelmaster.DTO.LoginDTO;
-import com.uokse.fuelmaster.DTO.UserDTO;
-import com.uokse.fuelmaster.Repo.UserRepo;
-import com.uokse.fuelmaster.Response.LoginResponse;
-import com.uokse.fuelmaster.Entity.User;
+import com.uokse.fuelmaster.dto.LoginDTO;
+import com.uokse.fuelmaster.dto.UserDTO;
+import com.uokse.fuelmaster.model.User;
+import com.uokse.fuelmaster.repository.UserRepo;
+import com.uokse.fuelmaster.response.LoginResponse;
+import com.uokse.fuelmaster.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserIMPL  {
+public class UserIMPL implements UserService {
 
     @Autowired
-    private static UserRepo userRepo;
+    private UserRepo userRepo;
 
-
+    @Override
     public String addUser(UserDTO userDTO) {
         User user = new User(
                 userDTO.getId(),
@@ -25,39 +27,32 @@ public class UserIMPL  {
                 userDTO.getLastName(),
                 userDTO.getPhone(),
                 userDTO.getNic(),
-                userDTO.getPassword()
-        );
+                userDTO.getPassword());
         userRepo.save(user);
 
         return user.getFirstName();
     }
 
+    @Override
+    public Optional<User> loginUser(LoginDTO loginDTO) {
+        Optional<User> user = userRepo.findByPhone(loginDTO.getPhone());
+        if (user.isPresent()) {
+            String inputPassword = loginDTO.getPassword();
+            String storedPassword = user.get().getPassword();
+            if (inputPassword.equals(storedPassword)) {
+                Optional<User> validUser = userRepo.findOneByPhoneAndPassword(loginDTO.getPhone(), storedPassword);
+                if (validUser.isPresent()) {
+                    return user;
+                }
+            }
 
-    public LoginResponse loginUser(LoginDTO loginDTO) {
-      String msg="";
-      User user = userRepo.findByPhone(loginDTO.getPhone());
-      if(user!=null){
-          String inputPassword = loginDTO.getPassword();
-          String storedPassword= user.getPassword();
-          if(inputPassword.equals(storedPassword)){
-              Optional<User> validUser = userRepo.findOneByPhoneAndPassword(loginDTO.getPhone(),storedPassword);
-              if(validUser.isPresent()){
-                  return new LoginResponse("Login Success",true);
-              }else{
-                  return new LoginResponse("Login Failed",false);
-              }
-          } else{
-              return new LoginResponse("Password Not Match",false);
-          }
+        }
+        return null;
 
-      }else{
-          return new LoginResponse("Phone Number Not exits",false);
-      }
     }
 
-
-
-    public static List<UserDTO> getAllUsers() {
+    @Override
+    public List<UserDTO> getAllUsers() {
         List<User> users = userRepo.findAll();
         return users.stream().map(user -> new UserDTO(
                 user.getId(),
@@ -69,11 +64,8 @@ public class UserIMPL  {
         )).toList();
     }
 
-
-
-
-
-    public static UserDTO getUserById(Long id) {
+    @Override
+    public UserDTO getUserById(Long id) {
         Optional<User> userOptional = userRepo.findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();

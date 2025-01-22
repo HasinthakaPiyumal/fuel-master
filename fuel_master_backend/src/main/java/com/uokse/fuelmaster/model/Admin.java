@@ -1,42 +1,39 @@
-package com.uokse.fuelmaster.Entity;
+package com.uokse.fuelmaster.model;
 
 import jakarta.persistence.*;
 
 @Entity
-public class User {
-
+public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String firstName;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(nullable = false, unique = true)
-    private String lastName;
-
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(nullable = false,unique = true)
     private String phone;
 
-    @Column(nullable = false, unique = true, length = 12)
+    @Column(nullable = false,unique = true)
     private String nic;
 
     @Column(nullable = false)
     private String password;
 
-    public User() {
-    }
+    @Column(updatable = false)
+    private String createdAt;
 
-    public User(Long id, String firstName, String lastName, String phone, String nic, String password) {
+    private String updatedAt;
+
+    public Admin(Long id, String name, String phone, String nic, String password, String createdAt, String updatedAt) {
         this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
         this.phone = phone;
         this.nic = nic;
         this.password = password;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
-
-
 
     public Long getId() {
         return id;
@@ -46,20 +43,12 @@ public class User {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPhone() {
@@ -88,13 +77,14 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "Admin{" +
                 "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
+                ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", nic='" + nic + '\'' +
                 ", password='" + password + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
                 '}';
     }
 }
