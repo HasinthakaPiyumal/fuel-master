@@ -7,12 +7,12 @@ export default function SignUpPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
           {/* Left Section with Illustration */}
-          <div className="w-full lg:w-5/12">
+          <div className="w-full lg:w-5/12 order-2 lg:order-1 animate-fade-in">
             <FuelStationAnimation />
           </div>
 
-          {/* Right Section with Form */}
-          <div className="w-full lg:w-5/12 bg-white shadow-lg rounded-lg p-8">
+          {/* Right Section with Form - removed bg-white/80 and shadow */}
+          <div className="w-full lg:w-5/12 order-1 lg:order-2 animate-fade-in">
             <h2 className="text-2xl font-bold text-orange-600 mb-6">
               Unlock Your Potential
             </h2>
@@ -121,16 +121,15 @@ export default function SignUpPage() {
               {/* Sign In Link */}
               <p className="mt-4 text-sm text-center text-gray-600">
                 Already have an account?{" "}
-                <a href="#" className="text-orange-600 underline">
-                  Sign Up
+                <a href="/signin" className="text-orange-600 underline">
+                  Sign In
                 </a>
               </p>
             </form>
           </div>
         </div>
       </div>
-
-      <footer className="text-center py-4 text-sm text-gray-500">
+      <footer className="text-center mt-8 text-sm text-gray-500">
         Copyright © 2025 GROUP 4
       </footer>
     </div>
