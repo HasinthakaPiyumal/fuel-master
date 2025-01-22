@@ -1,9 +1,10 @@
-package com.uokse.fuelmaster.Entity;
+package com.uokse.fuelmaster.model;
 
 import jakarta.persistence.*;
 
 @Entity
 public class VehicleType {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,8 +16,9 @@ public class VehicleType {
     private String fuelType;
 
     @Column(nullable = false)
-    private Long defaultQuota;
+    private Long defaultQuota; // This is the default fuel quota
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -33,12 +35,12 @@ public class VehicleType {
         this.vehicleType = vehicleType;
     }
 
-    public Long getFuelQuantity() {
+    public Long getDefaultQuota() {
         return defaultQuota;
     }
 
-    public void setFuelQuantity(Long fuelQuantity) {
-        this.defaultQuota = fuelQuantity;
+    public void setDefaultQuota(Long defaultQuota) {
+        this.defaultQuota = defaultQuota;
     }
 
     public String getFuelType() {

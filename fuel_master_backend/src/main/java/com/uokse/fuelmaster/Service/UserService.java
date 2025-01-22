@@ -1,11 +1,17 @@
-package com.uokse.fuelmaster.Service;
+package com.uokse.fuelmaster.service;
 
-import com.uokse.fuelmaster.DTO.LoginDTO;
-import com.uokse.fuelmaster.DTO.UserDTO;
-import com.uokse.fuelmaster.Response.LoginResponse;
+import com.uokse.fuelmaster.dto.LoginDTO;
+import com.uokse.fuelmaster.dto.UserDTO;
+import com.uokse.fuelmaster.model.User;
+import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     String addUser(UserDTO userDTO);
 
-    LoginResponse loginUser(LoginDTO loginDTO);
+    Optional<User> loginUser(LoginDTO loginDTO);
+
+    List<UserDTO> getAllUsers();
+
+    UserDTO getUserById(Long id);
 }

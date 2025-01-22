@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.Repo;
+package com.uokse.fuelmaster.repository;
 
 import org.springframework.stereotype.Repository;
 

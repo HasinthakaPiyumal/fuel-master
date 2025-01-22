@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.Entity;
+package com.uokse.fuelmaster.model;
 
 import jakarta.persistence.*;
 
