@@ -4,8 +4,14 @@ import com.uokse.fuelmaster.DTO.LoginDTO;
 import com.uokse.fuelmaster.DTO.UserDTO;
 import com.uokse.fuelmaster.Response.LoginResponse;
 
+import java.util.List;
+
 public interface UserService {
     String addUser(UserDTO userDTO);
 
     LoginResponse loginUser(LoginDTO loginDTO);
+
+    List<UserDTO> getAllUsers();
+
+    UserDTO getUserById(Long id);
 }

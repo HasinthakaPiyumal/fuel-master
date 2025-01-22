@@ -7,7 +7,8 @@ import com.uokse.fuelmaster.Entity.VehicleType;
 import com.uokse.fuelmaster.Repo.MotorTrafficMockRepo;
 import com.uokse.fuelmaster.Repo.UserRepo;
 import com.uokse.fuelmaster.Repo.VehicleRepo;
-import com.uokse.fuelmaster.Repo.VehicleTypeRepo;
+import com.uokse.fuelmaster.Repo.VehicleTypeRepository;
+import com.uokse.fuelmaster.Repo.VehicleTypeRepository;
 import com.uokse.fuelmaster.Service.VehicleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class VehicleIMPL implements VehicleService {
     private UserRepo userRepo;
 
     @Autowired
-    private VehicleTypeRepo vehicleTypeRepo;
+    private VehicleTypeRepository vehicleTypeRepo;
 
     @Autowired
     private MotorTrafficMockRepo motorTrafficMockRepo;
