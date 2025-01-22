@@ -1,14 +1,12 @@
-package com.uokse.fuelmaster.Controller;
+package com.uokse.fuelmaster.controller;
 
-import com.uokse.fuelmaster.DTO.AdminDTO;
-import com.uokse.fuelmaster.DTO.UserDTO;
-import com.uokse.fuelmaster.Service.impl.AdminService;
+import com.uokse.fuelmaster.dto.AdminDTO;
+import com.uokse.fuelmaster.service.AdminService;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
 
 
-@SpringBootApplication
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/admin")

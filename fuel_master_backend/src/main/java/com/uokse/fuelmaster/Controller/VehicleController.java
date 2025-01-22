@@ -1,7 +1,8 @@
-package com.uokse.fuelmaster.Controller;
+package com.uokse.fuelmaster.controller;
 
-import com.uokse.fuelmaster.DTO.VehicleDTO;
-import com.uokse.fuelmaster.Service.impl.VehicleIMPL;
+import com.uokse.fuelmaster.dto.VehicleDTO;
+import com.uokse.fuelmaster.service.impl.VehicleIMPL;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

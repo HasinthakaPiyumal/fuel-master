@@ -1,7 +1,8 @@
-package com.uokse.fuelmaster.Repo;
+package com.uokse.fuelmaster.repository;
 
-import com.uokse.fuelmaster.Entity.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.uokse.fuelmaster.model.Admin;
 
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 }

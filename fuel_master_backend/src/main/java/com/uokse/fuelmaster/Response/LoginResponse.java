@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.Response;
+package com.uokse.fuelmaster.response;
 
 public class LoginResponse {
     String message;

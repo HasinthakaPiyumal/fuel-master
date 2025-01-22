@@ -1,41 +1,64 @@
-package com.uokse.fuelmaster.Controller;
+package com.uokse.fuelmaster.controller;
 
+import com.uokse.fuelmaster.dto.LoginDTO;
+import com.uokse.fuelmaster.dto.UserDTO;
+import com.uokse.fuelmaster.response.LoginResponse;
+import com.uokse.fuelmaster.response.SuccessResponse;
+import com.uokse.fuelmaster.service.JwtService;
+import com.uokse.fuelmaster.service.UserService;
 
-import com.uokse.fuelmaster.DTO.LoginDTO;
-import com.uokse.fuelmaster.DTO.UserDTO;
-import com.uokse.fuelmaster.Response.LoginResponse;
-import com.uokse.fuelmaster.Service.impl.UserIMPL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.uokse.fuelmaster.model.User;
 
-@SpringBootApplication
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/user")
 public class UserController {
 
     @Autowired
-    private UserIMPL userIMPL;
+    private UserService userService;
+
+    private final JwtService jwtService;
+
+    public UserController(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @PostMapping(path="/save")
     public String saveUser(@RequestBody UserDTO userDTO ){
-        String id = userIMPL.addUser(userDTO);
+        String id = userService.addUser(userDTO);
         return ("User saved with ID: " + id);
     }
 
     @PostMapping(path="/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO){
-        LoginResponse loginResponse = userIMPL.loginUser(loginDTO);
-        return ResponseEntity.ok(loginResponse);
+        Optional<User> loggedUser = userService.loginUser(loginDTO);
+        if(loggedUser != null){
+            String token = jwtService.generateToken(loggedUser.get());
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("user", loggedUser.get().getUserMap());
+            data.put("token", token);
+            SuccessResponse successResponse = new SuccessResponse(
+                "Login Success",
+                true,
+                data
+            );
+            return ResponseEntity.ok(successResponse);
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
     }
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
-        List<UserDTO> users = UserIMPL.getAllUsers();
+        List<UserDTO> users = userService.getAllUsers();
         if (!users.isEmpty()) {
             return ResponseEntity.ok(users);
         } else {
@@ -43,16 +66,13 @@ public class UserController {
         }
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        UserDTO userDTO = UserIMPL.getUserById(id);
+        UserDTO userDTO = userService.getUserById(id);
         if (userDTO != null) {
             return ResponseEntity.ok(userDTO);
         } else {
             return ResponseEntity.status(404).body("User not found");
         }
     }
-
-
 }

@@ -1,8 +1,9 @@
-package com.uokse.fuelmaster.Service.impl;
+package com.uokse.fuelmaster.service;
 
-import com.uokse.fuelmaster.DTO.AdminDTO;
-import com.uokse.fuelmaster.Entity.Admin;
-import com.uokse.fuelmaster.Repo.AdminRepository;
+import com.uokse.fuelmaster.dto.AdminDTO;
+import com.uokse.fuelmaster.model.Admin;
+import com.uokse.fuelmaster.repository.AdminRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

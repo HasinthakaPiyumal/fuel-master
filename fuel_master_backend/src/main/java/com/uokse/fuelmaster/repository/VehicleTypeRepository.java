@@ -1,7 +1,9 @@
-package com.uokse.fuelmaster.Repo;
+package com.uokse.fuelmaster.repository;
 
-import com.uokse.fuelmaster.Entity.VehicleType;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.uokse.fuelmaster.model.VehicleType;
+
 import java.util.Optional;
 
 public interface VehicleTypeRepository extends JpaRepository<VehicleType, Long> {
