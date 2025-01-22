@@ -15,7 +15,7 @@ import java.util.Optional;
 public class UserIMPL  {
 
     @Autowired
-    private UserRepo userRepo;
+    private static UserRepo userRepo;
 
 
     public String addUser(UserDTO userDTO) {
@@ -56,8 +56,8 @@ public class UserIMPL  {
     }
 
 
-    @Override
-    public List<UserDTO> getAllUsers() {
+
+    public static List<UserDTO> getAllUsers() {
         List<User> users = userRepo.findAll();
         return users.stream().map(user -> new UserDTO(
                 user.getId(),
@@ -72,8 +72,8 @@ public class UserIMPL  {
 
 
 
-    @Override
-    public UserDTO getUserById(Long id) {
+
+    public static UserDTO getUserById(Long id) {
         Optional<User> userOptional = userRepo.findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
