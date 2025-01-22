@@ -4,20 +4,20 @@ import com.uokse.fuelmaster.DTO.LoginDTO;
 import com.uokse.fuelmaster.DTO.UserDTO;
 import com.uokse.fuelmaster.Repo.UserRepo;
 import com.uokse.fuelmaster.Response.LoginResponse;
-import com.uokse.fuelmaster.Service.UserService;
 import com.uokse.fuelmaster.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserIMPL implements UserService {
+public class UserIMPL  {
 
     @Autowired
-    private UserRepo userRepo;
+    private static UserRepo userRepo;
 
-    @Override
+
     public String addUser(UserDTO userDTO) {
         User user = new User(
                 userDTO.getId(),
@@ -32,7 +32,7 @@ public class UserIMPL implements UserService {
         return user.getFirstName();
     }
 
-    @Override
+
     public LoginResponse loginUser(LoginDTO loginDTO) {
       String msg="";
       User user = userRepo.findByPhone(loginDTO.getPhone());
@@ -54,4 +54,40 @@ public class UserIMPL implements UserService {
           return new LoginResponse("Phone Number Not exits",false);
       }
     }
+
+
+
+    public static List<UserDTO> getAllUsers() {
+        List<User> users = userRepo.findAll();
+        return users.stream().map(user -> new UserDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getPhone(),
+                user.getNic(),
+                null // Exclude password in the response
+        )).toList();
+    }
+
+
+
+
+
+    public static UserDTO getUserById(Long id) {
+        Optional<User> userOptional = userRepo.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return new UserDTO(
+                    user.getId(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getPhone(),
+                    user.getNic(),
+                    null // Exclude password in the response
+            );
+        } else {
+            return null;
+        }
+    }
+
 }
