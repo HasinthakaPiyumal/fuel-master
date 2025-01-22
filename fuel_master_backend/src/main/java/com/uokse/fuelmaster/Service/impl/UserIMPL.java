@@ -8,6 +8,7 @@ import com.uokse.fuelmaster.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -53,4 +54,40 @@ public class UserIMPL  {
           return new LoginResponse("Phone Number Not exits",false);
       }
     }
+
+
+    @Override
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepo.findAll();
+        return users.stream().map(user -> new UserDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getPhone(),
+                user.getNic(),
+                null // Exclude password in the response
+        )).toList();
+    }
+
+
+
+
+    @Override
+    public UserDTO getUserById(Long id) {
+        Optional<User> userOptional = userRepo.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return new UserDTO(
+                    user.getId(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getPhone(),
+                    user.getNic(),
+                    null // Exclude password in the response
+            );
+        } else {
+            return null;
+        }
+    }
+
 }
