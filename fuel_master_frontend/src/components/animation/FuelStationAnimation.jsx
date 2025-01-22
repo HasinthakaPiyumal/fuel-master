@@ -1,14 +1,10 @@
-
-import Lottie from 'lottie-react';
-import fuelStationAnimation from '@/assets/animations/fuel-station-animation.json';
+import Lottie from "lottie-react";
+import fuelStationAnimation from "@/assets/animations/fuel-station-animation.json";
 
 const FuelStationAnimation = () => {
-    return (
-        <Lottie
-            animationData={fuelStationAnimation}
-            className="w-full max-w-2xl"
-        />
-    )
-}
+  return (
+    <Lottie animationData={fuelStationAnimation} className="w-full max-w-2xl" />
+  );
+};
 
-export default FuelStationAnimation
+export default FuelStationAnimation;
