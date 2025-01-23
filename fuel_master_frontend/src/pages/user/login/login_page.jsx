@@ -5,6 +5,7 @@ import FuelStationAnimation from '@/components/animation/FuelStationAnimation';
 import { Input } from '@/components/ui/input';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
+
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false)
     return (
@@ -69,3 +70,5 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+
