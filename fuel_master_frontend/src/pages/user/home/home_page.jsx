@@ -23,19 +23,17 @@ const HomePage = () => {
             <p>4. Receive your unique QR code for fuel quota management.</p>
           </div>
 
-          <div className="flex gap-4">
-              <Link to="/login">
-                  <Button size="lg" variant="outline">
-                      Login
-                  </Button>
-              </Link>
-              <Link to="/signup">
-                  <Button size="lg">
-                      Create Account
-                  </Button>
-              </Link>
+          <div className="flex gap-4 mb-8">
+            <Link to="/login">
+              <Button size="lg" variant="outline">
+                Login
+              </Button>
+            </Link>
+            <Link to="/signup">
+              <Button size="lg">Create Account</Button>
+            </Link>
           </div>
-      </div>
+        </div>
 
         <div className="lg:w-1/2">
           <FuelStationAnimation />
