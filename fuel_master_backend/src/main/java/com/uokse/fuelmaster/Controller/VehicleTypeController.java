@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.Controller;
+package com.uokse.fuelmaster.controller;
 
 import com.uokse.fuelmaster.model.VehicleType;
 import com.uokse.fuelmaster.service.AdminService;

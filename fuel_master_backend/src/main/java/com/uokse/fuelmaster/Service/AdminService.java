@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.Service;
+package com.uokse.fuelmaster.service;
 
 import com.uokse.fuelmaster.dto.AdminDTO;
 import com.uokse.fuelmaster.model.Admin;

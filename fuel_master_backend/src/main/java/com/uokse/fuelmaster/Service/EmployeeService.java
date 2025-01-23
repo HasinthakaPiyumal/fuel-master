@@ -1,6 +1,6 @@
-package com.uokse.fuelmaster.Service;
+package com.uokse.fuelmaster.service;
 
-import com.uokse.fuelmaster.DTO.Request.EmployeeDTO;
+import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
 import com.uokse.fuelmaster.model.Employee;
 import com.uokse.fuelmaster.repository.EmployeeRepository;
 

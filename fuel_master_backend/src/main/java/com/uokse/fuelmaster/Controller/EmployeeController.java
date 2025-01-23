@@ -1,8 +1,8 @@
-package com.uokse.fuelmaster.Controller;
+package com.uokse.fuelmaster.controller;
 
 
-import com.uokse.fuelmaster.DTO.Request.EmployeeDTO;
-import com.uokse.fuelmaster.Service.EmployeeService;
+import com.uokse.fuelmaster.service.EmployeeService;
+import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
