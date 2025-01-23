@@ -1,6 +1,6 @@
-package com.uokse.fuelmaster.Service.impl;
+package com.uokse.fuelmaster.service.impl;
 
-import com.uokse.fuelmaster.DTO.VehicleDTO;
+import com.uokse.fuelmaster.dto.VehicleDTO;
 import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.model.Vehicle;
 import com.uokse.fuelmaster.model.VehicleType;

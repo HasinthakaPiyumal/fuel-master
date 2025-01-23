@@ -1,6 +1,6 @@
-package com.uokse.fuelmaster.Service.impl;
+package com.uokse.fuelmaster.service.impl;
 
-import com.uokse.fuelmaster.DTO.LoginDTO;
+import com.uokse.fuelmaster.dto.LoginDTO;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.repository.UserRepo;

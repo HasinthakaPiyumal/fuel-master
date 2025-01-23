@@ -1,10 +1,9 @@
-package com.uokse.fuelmaster.Controller;
+package com.uokse.fuelmaster.controller;
 
 
-import com.uokse.fuelmaster.DTO.LoginDTO;
-import com.uokse.fuelmaster.Service.impl.UserIMPL;
+import com.uokse.fuelmaster.dto.LoginDTO;
+import com.uokse.fuelmaster.service.impl.UserIMPL;
 import com.uokse.fuelmaster.dto.UserDTO;
-import com.uokse.fuelmaster.response.LoginResponse;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.JwtService;
 

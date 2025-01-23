@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.DTO.Request;
+package com.uokse.fuelmaster.dto.Request;
 
 public class EmployeeDTO {
     private String id;

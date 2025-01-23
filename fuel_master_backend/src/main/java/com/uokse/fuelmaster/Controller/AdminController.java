@@ -1,7 +1,7 @@
-package com.uokse.fuelmaster.Controller;
+package com.uokse.fuelmaster.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.uokse.fuelmaster.Service.AdminService;
+import com.uokse.fuelmaster.service.AdminService;
 import com.uokse.fuelmaster.dto.AdminDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
