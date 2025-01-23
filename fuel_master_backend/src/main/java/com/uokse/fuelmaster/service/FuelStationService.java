@@ -1,6 +1,6 @@
 package com.uokse.fuelmaster.service;
 
-import com.uokse.fuelmaster.DTO.FuelStationDTO;
+import com.uokse.fuelmaster.dto.FuelStationDTO;
 import com.uokse.fuelmaster.model.fuelStation;
 import com.uokse.fuelmaster.repository.FuelStationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
