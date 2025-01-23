@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.controller;
+package com.uokse.fuelmaster.Controller;
 
 import com.uokse.fuelmaster.model.VehicleType;
 import com.uokse.fuelmaster.service.AdminService;
@@ -23,13 +23,8 @@ public class VehicleTypeController {
     // Add a new vehicle type (Admin-only)
     @PostMapping("/save")
     public ResponseEntity<?> addVehicleType(
-            @RequestHeader("admin-id") Long adminId, // Pass Admin ID in the header
             @RequestBody VehicleType vehicleType) {
 
-        // Validate admin existence
-        if (!adminService.isAdmin(adminId)) {
-            return ResponseEntity.status(403).body("Forbidden: Admin privileges required.");
-        }
 
         try {
             VehicleType createdVehicleType = vehicleTypeService.addVehicleType(vehicleType);

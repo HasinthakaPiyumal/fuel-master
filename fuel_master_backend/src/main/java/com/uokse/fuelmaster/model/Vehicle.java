@@ -27,19 +27,19 @@ public class Vehicle {
     private String chassisNumber;
 
     @Column(nullable = false)
-    private String qrUrl;
+    private Long qrId;
 
-    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, String qrUrl) {
+    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, Long qrId) {
         this.id = id;
         this.user = user;
         this.vehicleType = vehicleType;
         this.vehicleRegistrationPart1 = vehicleRegistrationPart1;
         this.vehicleRegistrationPart2 = vehicleRegistrationPart2;
         this.chassisNumber = chassisNumber;
-        this.qrUrl = qrUrl;
+        this.qrId= qrId;
     }
 
-    public Vehicle() {
+    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber) {
     }
 
 
@@ -93,12 +93,12 @@ public class Vehicle {
         this.chassisNumber = chassisNumber;
     }
 
-    public String getFuelType() {
-        return qrUrl;
+    public Long getQrId() {
+        return qrId;
     }
 
-    public void setFuelType(String fuelType) {
-        this.qrUrl = qrUrl;
+    public void setQrId(Long qrId) {
+        this.qrId = qrId;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class Vehicle {
                 ", vehicleRegistrationPart1='" + vehicleRegistrationPart1 + '\'' +
                 ", vehicleRegistrationPart2=" + vehicleRegistrationPart2 +
                 ", chassisNumber='" + chassisNumber + '\'' +
-                ", qrUrl='" + qrUrl + '\'' +
+                ", qrId='" + qrId + '\'' +
                 '}';
     }
 }
