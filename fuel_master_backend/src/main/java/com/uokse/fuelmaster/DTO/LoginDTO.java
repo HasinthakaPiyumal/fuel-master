@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.dto;
+package com.uokse.fuelmaster.DTO;
 
 public class LoginDTO {
     private String phone;

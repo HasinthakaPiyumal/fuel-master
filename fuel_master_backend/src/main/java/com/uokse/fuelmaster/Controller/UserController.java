@@ -1,11 +1,13 @@
-package com.uokse.fuelmaster.controller;
+package com.uokse.fuelmaster.Controller;
 
-import com.uokse.fuelmaster.dto.LoginDTO;
+
+import com.uokse.fuelmaster.DTO.LoginDTO;
+import com.uokse.fuelmaster.Service.impl.UserIMPL;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.response.LoginResponse;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.JwtService;
-import com.uokse.fuelmaster.service.UserService;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ import java.util.Optional;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserIMPL userIMPL;
 
     private final JwtService jwtService;
 
@@ -33,13 +35,13 @@ public class UserController {
 
     @PostMapping(path="/save")
     public String saveUser(@RequestBody UserDTO userDTO ){
-        String id = userService.addUser(userDTO);
+        String id = userIMPL.addUser(userDTO);
         return ("User saved with ID: " + id);
     }
 
     @PostMapping(path="/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO){
-        Optional<User> loggedUser = userService.loginUser(loginDTO);
+    public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO) {
+        Optional<User> loggedUser = userIMPL.loginUser(loginDTO);
         if(loggedUser != null){
             String token = jwtService.generateToken(loggedUser.get());
             HashMap<String, Object> data = new HashMap<>();
@@ -58,7 +60,7 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+        List<UserDTO> users = userIMPL.getAllUsers();
         if (!users.isEmpty()) {
             return ResponseEntity.ok(users);
         } else {
@@ -68,7 +70,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        UserDTO userDTO = userService.getUserById(id);
+        UserDTO userDTO = userIMPL.getUserById(id);
         if (userDTO != null) {
             return ResponseEntity.ok(userDTO);
         } else {
