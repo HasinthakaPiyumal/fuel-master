@@ -22,9 +22,9 @@ public class VehicleController {
         if (vehicleDTO.getChassisNumber() == null || vehicleDTO.getChassisNumber().isEmpty()) {
             return ResponseEntity.badRequest().body("Chassis number cannot be null or empty.");
         }
-
         // Register vehicle and return response
-        String registrationMessage = vehicleIMPL.registerVehicle(vehicleDTO);
+        try {
+            String registrationMessage = vehicleIMPL.registerVehicle(vehicleDTO);            
 
         // If the service returns an error message, return that as the response
         if (registrationMessage.startsWith("Error:")) {
@@ -33,5 +33,9 @@ public class VehicleController {
 
         // Otherwise, return success message
         return ResponseEntity.ok("Vehicle registered successfully with " + registrationMessage);  // Success
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
 }
