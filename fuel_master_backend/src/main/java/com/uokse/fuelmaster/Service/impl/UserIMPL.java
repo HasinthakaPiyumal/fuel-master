@@ -1,11 +1,11 @@
-package com.uokse.fuelmaster.service.impl;
+package com.uokse.fuelmaster.Service.impl;
 
-import com.uokse.fuelmaster.dto.LoginDTO;
+import com.uokse.fuelmaster.DTO.LoginDTO;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.repository.UserRepo;
 import com.uokse.fuelmaster.response.LoginResponse;
-import com.uokse.fuelmaster.service.UserService;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserIMPL implements UserService {
+public class UserIMPL {
 
     @Autowired
     private UserRepo userRepo;
 
-    @Override
+
     public String addUser(UserDTO userDTO) {
         User user = new User(
                 userDTO.getId(),
@@ -33,7 +33,7 @@ public class UserIMPL implements UserService {
         return user.getFirstName();
     }
 
-    @Override
+
     public Optional<User> loginUser(LoginDTO loginDTO) {
         Optional<User> user = userRepo.findByPhone(loginDTO.getPhone());
         if (user.isPresent()) {
@@ -51,7 +51,7 @@ public class UserIMPL implements UserService {
 
     }
 
-    @Override
+
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepo.findAll();
         return users.stream().map(user -> new UserDTO(
@@ -64,7 +64,7 @@ public class UserIMPL implements UserService {
         )).toList();
     }
 
-    @Override
+
     public UserDTO getUserById(Long id) {
         Optional<User> userOptional = userRepo.findById(id);
         if (userOptional.isPresent()) {

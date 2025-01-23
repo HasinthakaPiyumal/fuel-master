@@ -42,6 +42,9 @@ public class Employee {
         this.updatedAt = updatedAt;
     }
 
+    public Employee(String id, String name, String phone, String nic, String password, String fuelStation) {
+    }
+
     public Long getId() {
         return id;
     }

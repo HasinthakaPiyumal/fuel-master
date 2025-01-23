@@ -1,10 +1,14 @@
-package com.uokse.fuelmaster.controller;
+package com.uokse.fuelmaster.Controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.uokse.fuelmaster.Service.AdminService;
 import com.uokse.fuelmaster.dto.AdminDTO;
-import com.uokse.fuelmaster.service.AdminService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -20,5 +24,6 @@ public class AdminController {
         String id = adminService.addAdmin(adminDTO);
         return ("Admin saved with ID: " + id);
     }
+
 
 }
