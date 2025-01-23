@@ -1,7 +1,7 @@
 package com.uokse.fuelmaster.Controller;
 
-import com.uokse.fuelmaster.dto.VehicleDTO;
-import com.uokse.fuelmaster.service.impl.VehicleIMPL;
+import com.uokse.fuelmaster.DTO.VehicleDTO;
+import com.uokse.fuelmaster.Service.impl.VehicleIMPL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +14,7 @@ public class VehicleController {
 
     @Autowired
     private VehicleIMPL vehicleIMPL;
+
 
     @PostMapping("/save")
     public ResponseEntity<String> saveVehicle(@RequestBody VehicleDTO vehicleDTO) {
