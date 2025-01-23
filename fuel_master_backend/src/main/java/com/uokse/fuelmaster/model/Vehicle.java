@@ -26,7 +26,7 @@ public class Vehicle {
     @Column(nullable = false, unique = true)
     private String chassisNumber;
 
-    @Column(nullable = false)
+    @Column
     private Long qrId;
 
     public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, Long qrId) {

@@ -1,18 +1,37 @@
 package com.uokse.fuelmaster.dto;
 
+import jakarta.persistence.Column;
+
+
 public class VehicleDTO {
+
     private Long id;
-    private Long userId;  // This should be the User's ID
-    private String vehicleType;  // This should be the VehicleType's ID
+
+    @Column(nullable = false)
+    private Long userId;
+
+   @Column(nullable = false)
+    private String vehicleType;
+
+  @Column(nullable = false)
     private String vehicleRegistrationPart1;
+
+   @Column(nullable = false)
     private Long vehicleRegistrationPart2;
+
+   @Column(nullable = false,unique = true)
     private String chassisNumber;
+
+   @Column(nullable = false)
     private String fuelType;
 
-    // Getters and setters for each field
+    // Constructors, Getters, and Setters...
 
+    public VehicleDTO() {
+    }
 
-    public VehicleDTO(Long id, Long userId, String vehicleTypeName, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, String fuelType) {
+    public VehicleDTO(Long id, Long userId, String vehicleType, String vehicleRegistrationPart1,
+                      Long vehicleRegistrationPart2, String chassisNumber, String fuelType) {
         this.id = id;
         this.userId = userId;
         this.vehicleType = vehicleType;
@@ -42,7 +61,7 @@ public class VehicleDTO {
         return vehicleType;
     }
 
-    public void setVehicleTypeId(String vehicleType) {
+    public void setVehicleType(String vehicleType) {
         this.vehicleType = vehicleType;
     }
 
