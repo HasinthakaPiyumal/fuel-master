@@ -1,4 +1,4 @@
-package com.uokse.fuelmaster.controller;
+package com.uokse.fuelmaster.Controller;
 
 import com.uokse.fuelmaster.dto.VehicleDTO;
 import com.uokse.fuelmaster.service.impl.VehicleIMPL;
