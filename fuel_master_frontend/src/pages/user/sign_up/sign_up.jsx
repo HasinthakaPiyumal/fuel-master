@@ -18,7 +18,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-// Define the form validation schema
 const signUpFormSchema = z
   .object({
     firstName: z.string().min(1, "First name is required"),
@@ -48,7 +47,6 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Initialize form with Zod validation
   const form = useForm({
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
@@ -62,18 +60,15 @@ export default function SignUpPage() {
     },
   });
 
-  // Handle form submission
   async function onSubmit(values) {
     try {
       console.log("Form Submitted:", values);
 
-      // Display success toast
       toast({
         title: "Success",
         description: "Account created successfully!",
       });
 
-      // Reset form fields including the checkbox
       form.reset({
         firstName: "",
         lastName: "",
@@ -81,7 +76,7 @@ export default function SignUpPage() {
         nic: "",
         password: "",
         confirmPassword: "",
-        terms: false, // Explicitly reset checkbox
+        terms: false,
       });
     } catch (error) {
       toast({
@@ -96,12 +91,10 @@ export default function SignUpPage() {
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
-          {/* Left Section with Illustration */}
           <div className="lg:w-1/2">
             <FuelStationAnimation />
           </div>
 
-          {/* Right Section with Form */}
           <div className="w-full lg:w-5/12">
             <Card>
               <CardHeader>
@@ -115,7 +108,6 @@ export default function SignUpPage() {
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                   >
-                    {/* First Name and Last Name Fields */}
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -254,7 +246,6 @@ export default function SignUpPage() {
                       )}
                     />
 
-                    {/* Submit Button */}
                     <div className="mt-6">
                       <Button
                         type="submit"
@@ -264,7 +255,6 @@ export default function SignUpPage() {
                       </Button>
                     </div>
 
-                    {/* Sign In Link */}
                     <p className="mt-4 text-sm text-center text-gray-600">
                       Already have an account?{" "}
                       <a href="/signin" className="text-orange-600 underline">

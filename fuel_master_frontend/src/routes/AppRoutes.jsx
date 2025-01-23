@@ -1,8 +1,8 @@
-
-import { Routes, Route } from 'react-router-dom';
-import HomePage from '../pages/user/home/home_page';
-import SignUpPage from '@/pages/user/sign_up/sign_up';
-import LoginPage from '@/pages/user/login/login_page';
+import { Routes, Route } from "react-router-dom";
+import HomePage from "../pages/user/home/home_page";
+import SignUpPage from "@/pages/user/sign_up/sign_up";
+import LoginPage from "@/pages/user/login/login_page";
+import PhoneNumber from "@/pages/user/phone_number/phone_number";
 
 const AppRoutes = () => {
   return (
@@ -10,6 +10,7 @@ const AppRoutes = () => {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/phone" element={<PhoneNumber />} />
     </Routes>
   );
 };
