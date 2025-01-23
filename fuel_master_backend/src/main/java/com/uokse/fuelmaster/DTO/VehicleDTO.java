@@ -1,9 +1,9 @@
-package com.uokse.fuelmaster.dto;
+package com.uokse.fuelmaster.DTO;
 
 public class VehicleDTO {
     private Long id;
     private Long userId;  // This should be the User's ID
-    private Long vehicleTypeId;  // This should be the VehicleType's ID
+    private String vehicleType;  // This should be the VehicleType's ID
     private String vehicleRegistrationPart1;
     private Long vehicleRegistrationPart2;
     private String chassisNumber;
@@ -11,6 +11,16 @@ public class VehicleDTO {
 
     // Getters and setters for each field
 
+
+    public VehicleDTO(Long id, Long userId, String vehicleTypeName, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, String fuelType) {
+        this.id = id;
+        this.userId = userId;
+        this.vehicleType = vehicleType;
+        this.vehicleRegistrationPart1 = vehicleRegistrationPart1;
+        this.vehicleRegistrationPart2 = vehicleRegistrationPart2;
+        this.chassisNumber = chassisNumber;
+        this.fuelType = fuelType;
+    }
 
     public Long getId() {
         return id;
@@ -28,12 +38,12 @@ public class VehicleDTO {
         this.userId = userId;
     }
 
-    public Long getVehicleTypeId() {
-        return vehicleTypeId;
+    public String getVehicleType() {
+        return vehicleType;
     }
 
-    public void setVehicleTypeId(Long vehicleTypeId) {
-        this.vehicleTypeId = vehicleTypeId;
+    public void setVehicleTypeId(String vehicleType) {
+        this.vehicleType = vehicleType;
     }
 
     public String getVehicleRegistrationPart1() {
