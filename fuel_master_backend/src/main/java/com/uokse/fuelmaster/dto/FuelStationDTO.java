@@ -1,12 +1,14 @@
 package com.uokse.fuelmaster.dto;
 
 public class FuelStationDTO {
+    private Long id;
     private String regNo;
     private String location;
     private String owner;
     private Integer employeeCount;
 
-    public FuelStationDTO(String regNo, String location, String owner, Integer employeeCount) {
+    public FuelStationDTO(Long id, String regNo, String location, String owner, Integer employeeCount) {
+        this.id = id;
         this.regNo = regNo;
         this.location = location;
         this.owner = owner;
@@ -14,6 +16,14 @@ public class FuelStationDTO {
     }
 
     // Getters and Setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
     public String getRegNo() {
         return regNo;
     }
