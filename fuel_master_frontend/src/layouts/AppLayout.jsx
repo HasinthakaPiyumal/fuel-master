@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import logo from "../assets/images/logo.png";
+
 const AppLayout = ({ children }) => {
   return (
     <div className="min-h-screen relative ">
@@ -9,7 +10,7 @@ const AppLayout = ({ children }) => {
         <div className="bg-primary absolute translate-x-[-80%] translate-y-[20%] w-96 h-96 rounded-full"></div>
       </div>
       <div className="bg-[#FFF3F1] bg-opacity-75 fixed top-0 left-0 w-full h-full z-[-1]"></div>
-      <div className="pt-[20px] px-[80px]">
+      <div className="pt-[20px] px-[12px] sm:px-[20px] md:px-[40px] lg:px-[80px]">
         <div className="mb-8">
           <img src={logo} alt="Fuel Master Logo" className="w-[147px]" />
         </div>

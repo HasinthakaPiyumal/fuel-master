@@ -1,11 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
+import AdminLayout from '@/layouts/AdminLayout';
 
 const AdminRoutes = () => {
   return (
-    <Routes>
-      <Route path="/admin" element={<div className='text-white font-bold text-2xl'>admin</div>} />
-      {/* Add more routes here as needed */}
-    </Routes>
+    <AdminLayout>
+      <Routes>
+        <Route path="/" element={<div className='font-bold text-2xl'>admin</div>} />
+      </Routes>
+    </AdminLayout>
   );
 };
 
