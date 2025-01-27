@@ -20,7 +20,7 @@ public class UserIMPL {
     private UserRepo userRepo;
 
 
-    public String addUser(UserDTO userDTO) {
+    public Long addUser(UserDTO userDTO) {
         User user = new User(
                 userDTO.getId(),
                 userDTO.getFirstName(),
@@ -30,7 +30,7 @@ public class UserIMPL {
                 userDTO.getPassword());
         userRepo.save(user);
 
-        return user.getFirstName();
+        return user.getId();
     }
 
 
