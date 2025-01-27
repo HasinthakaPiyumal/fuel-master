@@ -1,5 +1,6 @@
 package com.uokse.fuelmaster.controller;
 
+import com.uokse.fuelmaster.dto.VehicleTypeDTO;
 import com.uokse.fuelmaster.model.VehicleType;
 import com.uokse.fuelmaster.service.AdminService;
 import com.uokse.fuelmaster.service.VehicleTypeService;
@@ -23,13 +24,14 @@ public class VehicleTypeController {
     // Add a new vehicle type (Admin-only)
     @PostMapping("/save")
     public ResponseEntity<?> addVehicleType(
-            @RequestBody VehicleType vehicleType) {
+            @RequestBody VehicleTypeDTO vehicleType) {
 
-
+        System.out.println("Vehicle type: " + vehicleType);
         try {
             VehicleType createdVehicleType = vehicleTypeService.addVehicleType(vehicleType);
             return ResponseEntity.ok(createdVehicleType);
         } catch (IllegalArgumentException e) {
+            System.err.println("Vehicle type registration failed: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

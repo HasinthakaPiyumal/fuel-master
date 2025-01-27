@@ -36,6 +36,15 @@ public class VehicleIMPL implements VehicleService {
     private MotorTrafficMockRepo motorTrafficMockRepo;
 
 
+    private String generateUniqueQRId(String chassisNumber, String registrationNumber) {
+        // Combine chassis number and registration number with timestamp for uniqueness
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String combined = chassisNumber + registrationNumber + timestamp;
+        
+        // Generate a hash of the combined string
+        return "QR" + Math.abs(combined.hashCode());
+    }
+
     @Transactional
     public String registerVehicle(VehicleDTO vehicleDTO) {
         logger.info("Starting vehicle registration...");
@@ -68,13 +77,19 @@ public class VehicleIMPL implements VehicleService {
             return "Error: Invalid user or vehicle type information.";
         }
 
+        String qrId = generateUniqueQRId(
+            vehicleDTO.getChassisNumber(), 
+            vehicleDTO.getVehicleRegistrationPart1() + vehicleDTO.getVehicleRegistrationPart2()
+        );
+
         Vehicle vehicle = new Vehicle(
                 vehicleDTO.getId(),
                 user,
                 vehicleType,
                 vehicleDTO.getVehicleRegistrationPart1(),
                 vehicleDTO.getVehicleRegistrationPart2(),
-                vehicleDTO.getChassisNumber()
+                vehicleDTO.getChassisNumber(),
+                qrId
         );
 
         logger.info("Saving vehicle to the database: {}", vehicle);

@@ -34,7 +34,8 @@ public class UserController {
 
     @PostMapping(path="/save")
     public String saveUser(@RequestBody UserDTO userDTO ){
-        String id = userIMPL.addUser(userDTO);
+        System.out.println("UserDTO: " + userDTO);
+        Long id = userIMPL.addUser(userDTO);
         return ("User saved with ID: " + id);
     }
 

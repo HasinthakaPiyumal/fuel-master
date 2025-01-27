@@ -27,9 +27,9 @@ public class Vehicle {
     private String chassisNumber;
 
     @Column
-    private Long qrId;
+    private String qrId;
 
-    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, Long qrId) {
+    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, String qrId) {
         this.id = id;
         this.user = user;
         this.vehicleType = vehicleType;
@@ -37,9 +37,6 @@ public class Vehicle {
         this.vehicleRegistrationPart2 = vehicleRegistrationPart2;
         this.chassisNumber = chassisNumber;
         this.qrId= qrId;
-    }
-
-    public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber) {
     }
 
 
@@ -93,11 +90,11 @@ public class Vehicle {
         this.chassisNumber = chassisNumber;
     }
 
-    public Long getQrId() {
+    public String getQrId() {
         return qrId;
     }
 
-    public void setQrId(Long qrId) {
+    public void setQrId(String qrId) {
         this.qrId = qrId;
     }
 

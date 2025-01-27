@@ -1,53 +1,40 @@
-package com.uokse.fuelmaster.model;
+package com.uokse.fuelmaster.dto;
 
-import jakarta.persistence.*;
+import com.uokse.fuelmaster.model.FuelType;
 
-@Entity
-public class VehicleType {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class VehicleTypeDTO {
     private Long id;
-
-    @Column(nullable = false)
     private String vehicleType;
-
-    @Column(nullable = false)
     private FuelType fuelType;
-
-    @Column(nullable = false)
-    private Long defaultQuota; // This is the default fuel quota
-
-    // Getters and Setters
+    private Long defaultQuota;
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getVehicleType() {
         return vehicleType;
     }
-
     public void setVehicleType(String vehicleType) {
         this.vehicleType = vehicleType;
     }
-
-    public Long getDefaultQuota() {
-        return defaultQuota;
-    }
-
-    public void setDefaultQuota(Long defaultQuota) {
-        this.defaultQuota = defaultQuota;
-    }
-
     public FuelType getFuelType() {
         return fuelType;
     }
-
     public void setFuelType(FuelType fuelType) {
         this.fuelType = fuelType;
+    }
+    public Long getDefaultQuota() {
+        return defaultQuota;
+    }
+    public void setDefaultQuota(Long defaultQuota) {
+        this.defaultQuota = defaultQuota;
+    }
+    public VehicleTypeDTO(Long id, String vehicleType, FuelType fuelType, Long defaultQuota) {
+        this.id = id;
+        this.vehicleType = vehicleType;
+        this.fuelType = fuelType;
+        this.defaultQuota = defaultQuota;
     }
 }
