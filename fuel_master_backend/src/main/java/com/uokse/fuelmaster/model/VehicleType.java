@@ -12,6 +12,7 @@ public class VehicleType {
     @Column(nullable = false)
     private String vehicleType;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FuelType fuelType;
 

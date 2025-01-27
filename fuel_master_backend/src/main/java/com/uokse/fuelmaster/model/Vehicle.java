@@ -40,6 +40,8 @@ public class Vehicle {
     }
 
 
+    public Vehicle() {
+    }
 
     // Getters and Setters
     public User getUser() {
