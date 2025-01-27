@@ -1,13 +1,11 @@
 package com.uokse.fuelmaster.service.impl;
 
 import com.uokse.fuelmaster.dto.VehicleDTO;
+import com.uokse.fuelmaster.model.FuelQuota;
 import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.model.Vehicle;
 import com.uokse.fuelmaster.model.VehicleType;
-import com.uokse.fuelmaster.repository.MotorTrafficMockRepo;
-import com.uokse.fuelmaster.repository.UserRepo;
-import com.uokse.fuelmaster.repository.VehicleRepo;
-import com.uokse.fuelmaster.repository.VehicleTypeRepository;
+import com.uokse.fuelmaster.repository.*;
 import com.uokse.fuelmaster.service.VehicleService;
 
 import jakarta.transaction.Transactional;
@@ -16,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,12 +36,15 @@ public class VehicleIMPL implements VehicleService {
     @Autowired
     private MotorTrafficMockRepo motorTrafficMockRepo;
 
+    @Autowired
+    private FuelQuotaRepository fuelQuotaRepository;
+
 
     private String generateUniqueQRId(String chassisNumber, String registrationNumber) {
         // Combine chassis number and registration number with timestamp for uniqueness
         String timestamp = String.valueOf(System.currentTimeMillis());
         String combined = chassisNumber + registrationNumber + timestamp;
-        
+
         // Generate a hash of the combined string
         return "QR" + Math.abs(combined.hashCode());
     }
@@ -78,8 +82,8 @@ public class VehicleIMPL implements VehicleService {
         }
 
         String qrId = generateUniqueQRId(
-            vehicleDTO.getChassisNumber(), 
-            vehicleDTO.getVehicleRegistrationPart1() + vehicleDTO.getVehicleRegistrationPart2()
+                vehicleDTO.getChassisNumber(),
+                vehicleDTO.getVehicleRegistrationPart1() + vehicleDTO.getVehicleRegistrationPart2()
         );
 
         Vehicle vehicle = new Vehicle(
@@ -95,8 +99,21 @@ public class VehicleIMPL implements VehicleService {
         logger.info("Saving vehicle to the database: {}", vehicle);
         vehicleRepo.save(vehicle);
 
+        FuelQuota fuelQuota = new FuelQuota();
+        fuelQuota.setVehicle(vehicle);
+        fuelQuota.setQuotaAmount(vehicleType.getDefaultQuota()); // Set the default quota from VehicleType
+        fuelQuota.setQuotaDate(LocalDate.now()); // Set the current date
+
+        fuelQuotaRepository.save(fuelQuota);
+
         logger.info("Vehicle registered successfully: {}", vehicle.getChassisNumber());
         return vehicle.getVehicleRegistrationPart1() + vehicle.getVehicleRegistrationPart2();
     }
+
+    public Vehicle getVehicleInfo(Long vehicleId) {
+        logger.info("Retrieving vehicle info for vehicle ID: {}", vehicleId);
+        return vehicleRepo.findById(vehicleId).orElse(null);
+    }
+
 
 }
