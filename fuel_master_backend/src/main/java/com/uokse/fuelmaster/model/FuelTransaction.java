@@ -42,6 +42,10 @@ public class FuelTransaction {
         this.availableQuantity = availableQuantity;
     }
 
+    public FuelTransaction() {
+
+    }
+
     public Long getId() {
         return id;
     }

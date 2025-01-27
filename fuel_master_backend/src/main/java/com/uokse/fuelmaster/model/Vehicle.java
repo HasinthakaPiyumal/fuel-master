@@ -29,6 +29,8 @@ public class Vehicle {
     @Column
     private String qrId;
 
+
+
     public Vehicle(Long id, User user, VehicleType vehicleType, String vehicleRegistrationPart1, Long vehicleRegistrationPart2, String chassisNumber, String qrId) {
         this.id = id;
         this.user = user;
@@ -112,4 +114,5 @@ public class Vehicle {
                 ", qrId='" + qrId + '\'' +
                 '}';
     }
+
 }
