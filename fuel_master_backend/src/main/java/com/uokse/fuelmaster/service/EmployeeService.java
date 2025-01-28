@@ -3,27 +3,45 @@ package com.uokse.fuelmaster.service;
 import com.uokse.fuelmaster.dto.EmployeeViewDetailsDTO;
 import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
 import com.uokse.fuelmaster.model.Employee;
+import com.uokse.fuelmaster.model.FuelStation;
 import com.uokse.fuelmaster.repository.EmployeeRepository;
+import com.uokse.fuelmaster.repository.FuelStationRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class EmployeeService {
-
+    @Autowired
     private EmployeeRepository employeeRepo;
+    @Autowired
+    private FuelStationRepo fuelStationRepo;
 
     public String addEmployee(EmployeeDTO employeeDTO) {
-        Employee employee = new Employee(
-                employeeDTO.getId(),
-                employeeDTO.getName(),
-                employeeDTO.getPhone(),
-                employeeDTO.getNic(),
-                employeeDTO.getPassword(),
-                employeeDTO.getFuelStation());
 
-        employeeRepo.save(employee);
+        Employee employee = null;
+        try {
+            FuelStation fuelStation = fuelStationRepo.findById(employeeDTO.getFuelStation()).orElseThrow();
 
-        return employee.getName();
+            employee = new Employee(
+                    null,
+                    employeeDTO.getName(),
+                    employeeDTO.getPhone(),
+                    employeeDTO.getNic(),
+                    employeeDTO.getPassword(),
+                    fuelStation,
+                    null,null
+            );
+
+            employeeRepo.save(employee);
+
+            return employee.getName();
+        } catch (Exception e) {
+            System.out.println("Employee registration failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     public List<EmployeeViewDetailsDTO> getAllEmployees() {

@@ -1,14 +1,16 @@
 package com.uokse.fuelmaster.dto.Request;
 
+import com.uokse.fuelmaster.model.FuelStation;
+
 public class EmployeeDTO {
     private String id;
     private String name;
     private String phone;
     private String nic;
     private String password;
-    private String fuelStation;
+    private Long fuelStation;
 
-    public EmployeeDTO(String id, String name, String phone, String nic, String password, String fuelStation) {
+    public EmployeeDTO(String id, String name, String phone, String nic, String password, Long fuelStation) {
         this.id = id;
         this.name = name;
         this.phone = phone;
@@ -60,11 +62,11 @@ public class EmployeeDTO {
         this.password = password;
     }
 
-    public String getFuelStation() {
+    public Long getFuelStation() {
         return fuelStation;
     }
 
-    public void setFuelStation(String fuelStation) {
+    public void setFuelStation(Long fuelStation) {
         this.fuelStation = fuelStation;
     }
 }
