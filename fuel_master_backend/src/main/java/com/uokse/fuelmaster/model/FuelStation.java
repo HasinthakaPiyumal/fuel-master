@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class fuelStation {
+public class FuelStation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,10 +26,9 @@ public class fuelStation {
 
     private LocalDateTime updatedAt;
 
-    public fuelStation() {
+    public FuelStation() {
     }
-
-    public fuelStation(Long id, String regNo, String location, String owner, Integer employeeCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public FuelStation(Long id, String regNo, String location, String owner, Integer employeeCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.regNo = regNo;
         this.location = location;

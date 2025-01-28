@@ -28,9 +28,15 @@ public class UserIMPL {
                 userDTO.getPhone(),
                 userDTO.getNic(),
                 userDTO.getPassword());
-        userRepo.save(user);
 
-        return user.getId();
+        try {
+            userRepo.save(user);
+
+            return user.getId();
+        } catch (Exception e) {
+            System.out.println("User registration failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
 

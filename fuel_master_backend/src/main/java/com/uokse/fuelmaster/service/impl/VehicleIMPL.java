@@ -101,7 +101,7 @@ public class VehicleIMPL implements VehicleService {
 
         FuelQuota fuelQuota = new FuelQuota();
         fuelQuota.setVehicle(vehicle);
-        fuelQuota.setQuotaAmount(vehicleType.getDefaultQuota()); // Set the default quota from VehicleType
+        fuelQuota.setDefaultQuota(vehicleType.getDefaultQuota()); // Set the default quota from VehicleType
         fuelQuota.setQuotaDate(LocalDate.now()); // Set the current date
 
         fuelQuotaRepository.save(fuelQuota);
