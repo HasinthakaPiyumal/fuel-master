@@ -12,8 +12,9 @@ public class VehicleType {
     @Column(nullable = false)
     private String vehicleType;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String fuelType;
+    private FuelType fuelType;
 
     @Column(nullable = false)
     private Long defaultQuota; // This is the default fuel quota
@@ -43,11 +44,11 @@ public class VehicleType {
         this.defaultQuota = defaultQuota;
     }
 
-    public String getFuelType() {
+    public FuelType getFuelType() {
         return fuelType;
     }
 
-    public void setFuelType(String fuelType) {
+    public void setFuelType(FuelType fuelType) {
         this.fuelType = fuelType;
     }
 }

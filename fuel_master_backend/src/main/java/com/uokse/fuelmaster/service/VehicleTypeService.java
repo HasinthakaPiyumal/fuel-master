@@ -1,5 +1,6 @@
 package com.uokse.fuelmaster.service;
 
+import com.uokse.fuelmaster.dto.VehicleTypeDTO;
 import com.uokse.fuelmaster.model.VehicleType;
 import com.uokse.fuelmaster.repository.VehicleTypeRepository;
 
@@ -15,15 +16,19 @@ public class VehicleTypeService {
     @Autowired
     private VehicleTypeRepository vehicleTypeRepository;
 
-    public VehicleType addVehicleType(VehicleType vehicleType) {
+    public VehicleType addVehicleType(VehicleTypeDTO vehicleTypeDTO) {
         // Check for duplicate vehicle type
         Optional<VehicleType> existingVehicleType = vehicleTypeRepository.findByVehicleTypeAndFuelType(
-                vehicleType.getVehicleType(), vehicleType.getFuelType());
+                vehicleTypeDTO.getVehicleType(), vehicleTypeDTO.getFuelType());
 
         if (existingVehicleType.isPresent()) {
             throw new IllegalArgumentException("Vehicle type with the same type and fuel type already exists.");
         }
 
+        VehicleType vehicleType = new VehicleType();
+        vehicleType.setVehicleType(vehicleTypeDTO.getVehicleType());
+        vehicleType.setFuelType(vehicleTypeDTO.getFuelType());
+        vehicleType.setDefaultQuota(vehicleTypeDTO.getDefaultQuota());
         return vehicleTypeRepository.save(vehicleType);
     }
 

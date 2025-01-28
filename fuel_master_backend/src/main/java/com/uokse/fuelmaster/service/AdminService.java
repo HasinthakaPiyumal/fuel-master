@@ -1,6 +1,8 @@
 package com.uokse.fuelmaster.service;
 
 import com.uokse.fuelmaster.dto.AdminDTO;
+import com.uokse.fuelmaster.dto.Response.AdminViewDTO;
+import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.model.Admin;
 import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.repository.AdminRepository;
@@ -16,6 +18,7 @@ public class AdminService {
 
     @Autowired
     private AdminRepository adminRepository;
+
 
     // Method to add an admin
     public String addAdmin(AdminDTO adminDTO) {
@@ -38,8 +41,22 @@ public class AdminService {
         return admin.getName();
     }
 
-    // Method to check if the admin ID is valid
 
+    public List<AdminViewDTO> getAllAdmins() {
+        List<Admin> admins = adminRepository.findAll();
+        return admins.stream().map(admin -> new AdminViewDTO(
+                admin.getName(),
+                admin.getPhone(),
+                admin.getNic()
+        )).toList();
+    }
 
-
+    public List<AdminViewDTO> getAdminByPhone(String phone) {
+        List<Admin> admins = adminRepository.findByPhone(phone);
+        return admins.stream().map(admin -> new AdminViewDTO(
+                admin.getName(),
+                admin.getPhone(),
+                admin.getNic()
+        )).toList();
+    }
 }

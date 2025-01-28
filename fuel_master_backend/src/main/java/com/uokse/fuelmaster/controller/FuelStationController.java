@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/fuelstation")
 public class FuelStationController {
@@ -20,5 +22,17 @@ public class FuelStationController {
             return ResponseEntity.badRequest().body(response);
         }
         return ResponseEntity.ok(response);
+    }
+
+    // New endpoint to get all fuel stations
+    @GetMapping("/all")
+    public ResponseEntity<List<FuelStationDTO>> getAllFuelStations() {
+        return ResponseEntity.ok(fuelStationService.getAllFuelStations());
+    }
+
+    // New endpoint to get a single fuel station by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<FuelStationDTO> getFuelStationById(@PathVariable Long id) {
+        return ResponseEntity.ok(fuelStationService.getFuelStationById(id));
     }
 }

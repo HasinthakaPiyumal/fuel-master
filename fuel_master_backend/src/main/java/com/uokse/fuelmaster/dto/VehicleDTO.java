@@ -1,5 +1,7 @@
 package com.uokse.fuelmaster.dto;
 
+import com.uokse.fuelmaster.model.FuelType;
+
 import jakarta.persistence.Column;
 
 
@@ -23,7 +25,7 @@ public class VehicleDTO {
     private String chassisNumber;
 
    @Column(nullable = false)
-    private String fuelType;
+    private FuelType fuelType;
 
     // Constructors, Getters, and Setters...
 
@@ -31,7 +33,7 @@ public class VehicleDTO {
     }
 
     public VehicleDTO(Long id, Long userId, String vehicleType, String vehicleRegistrationPart1,
-                      Long vehicleRegistrationPart2, String chassisNumber, String fuelType) {
+                      Long vehicleRegistrationPart2, String chassisNumber, FuelType fuelType) {
         this.id = id;
         this.userId = userId;
         this.vehicleType = vehicleType;
@@ -89,11 +91,11 @@ public class VehicleDTO {
         this.chassisNumber = chassisNumber;
     }
 
-    public String getFuelType() {
+    public FuelType getFuelType() {
         return fuelType;
     }
 
-    public void setFuelType(String fuelType) {
+    public void setFuelType(FuelType fuelType) {
         this.fuelType = fuelType;
     }
 }

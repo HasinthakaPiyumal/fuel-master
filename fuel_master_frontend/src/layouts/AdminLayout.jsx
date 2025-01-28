@@ -1,13 +1,17 @@
 import PropTypes from 'prop-types';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 
 const AdminLayout = ({ children }) => {
   return (
-    <div className="app-layout">
-      <main className="main-content">
+    <SidebarProvider>
+      <AppSidebar />
+      <main>
+        <SidebarTrigger />
         {children}
       </main>
-    </div>
-  );
+    </SidebarProvider>
+  )
 };
 
 AdminLayout.propTypes = {
