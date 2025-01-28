@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import FuelStationAnimation from '@/components/animation/FuelStationAnimation';
 import { Input } from '@/components/ui/input';
@@ -7,19 +8,21 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { toast } from 'react-hot-toast';
 
+// Login form validation 
 const loginSchema = z.object({
     phone: z.string()
-        .min(10, "Phone number must be at least 10 digits")
-        .max(15, "Phone number must not exceed 15 digits")
-        .regex(/^\+?[0-9]+$/, "Invalid phone number format"),
+        .min(10, "Phone number must be 10 digits")
+        .max(10, "Phone number must be 10 digits")
+        .regex(/^0[0-9]{9}$/, "Phone number must start with 0 and be 10 digits"),
     password: z.string()
         .min(8, "Password must be at least 8 characters")
-        .max(50, "Password must not exceed 50 characters"),
 });
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
     
     const {
         register,
@@ -35,10 +38,59 @@ const LoginPage = () => {
 
     const onSubmit = async (data) => {
         try {
-            console.log('Form data:', data);
-            // I want to add API calls here
+            
+            const config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: 'https://api-fuel-master-fbc37438737d.herokuapp.com/api/v1/user/login', 
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({
+                    phone: data.phone,
+                    password: data.password
+                })
+            };
+
+            const response = await axios.request(config);
+            
+            if (response.data) {
+                
+                const token = response.data.token;
+                localStorage.setItem('token', token);
+                
+             
+                if (response.data.user) {
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
+                }
+
+                
+                toast.success('Login successful!');
+
+               
+                console.log('Login successful:', response.data);
+
+                
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+                
+                navigate('/home');
+            }
         } catch (error) {
             console.error('Login error:', error);
+            
+            
+            if (error.response) {
+                
+                const errorMessage = error.response.data?.message || 'Invalid credentials';
+                toast.error(errorMessage);
+            } else if (error.request) {
+               
+                toast.error('Server not responding. Please try again later.');
+            } else {
+              
+                toast.error('An error occurred. Please try again.');
+            }
         }
     };
 
