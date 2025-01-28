@@ -16,7 +16,7 @@ public class FuelQuota {
     private Vehicle vehicle;
 
     @Column(nullable = false)
-    private Long quotaAmount; // Total quota
+    private Long defaultQuota; // Total quota
 
     @Column(nullable = false)
     private Long usedQuota; // Track used quota
@@ -46,12 +46,12 @@ public class FuelQuota {
         this.vehicle = vehicle;
     }
 
-    public Long getQuotaAmount() {
-        return quotaAmount;
+    public Long getDefaultQuota() {
+        return defaultQuota;
     }
 
-    public void setQuotaAmount(Long quotaAmount) {
-        this.quotaAmount = quotaAmount;
+    public void setDefaultQuota(Long defaultQuota) {
+        this.defaultQuota = defaultQuota;
     }
 
     public Long getUsedQuota() {
@@ -71,6 +71,6 @@ public class FuelQuota {
     }
 
     public Long getAvailableQuota() {
-        return quotaAmount - usedQuota; // Calculate available quota
+        return defaultQuota - usedQuota; // Calculate available quota
     }
 }

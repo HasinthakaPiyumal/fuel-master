@@ -29,7 +29,7 @@ public class FuelTransaction {
     private LocalDateTime transactionDate;
 
     @Column(nullable = false)
-    private Double availableQuantity;
+    private Double availableQuota;
 
 
     public FuelTransaction(Long id, Vehicle vehicle, Employee employee, com.uokse.fuelmaster.model.fuelStation fuelStation, Double pumpedQuantity, LocalDateTime transactionDate, Double availableQuantity) {
@@ -39,7 +39,7 @@ public class FuelTransaction {
         this.fuelStation = fuelStation;
         this.pumpedQuantity = pumpedQuantity;
         this.transactionDate = transactionDate;
-        this.availableQuantity = availableQuantity;
+        this.availableQuota = availableQuantity;
     }
 
     public FuelTransaction() {
@@ -94,12 +94,12 @@ public class FuelTransaction {
         this.transactionDate = transactionDate;
     }
 
-    public Double getAvailableQuantity() {
-        return availableQuantity;
+    public Double getAvailableQuota() {
+        return availableQuota;
     }
 
-    public void setAvailableQuantity(Double availableQuantity) {
-        this.availableQuantity = availableQuantity;
+    public void setAvailableQuota(Double availableQuota) {
+        this.availableQuota = availableQuota;
     }
 
     @Override
@@ -111,7 +111,7 @@ public class FuelTransaction {
                 ", fuelStation=" + fuelStation +
                 ", pumpedQuantity=" + pumpedQuantity +
                 ", transactionDate=" + transactionDate +
-                ", availableQuantity=" + availableQuantity +
+                ", availableQuota=" + availableQuota +
                 '}';
     }
 }
