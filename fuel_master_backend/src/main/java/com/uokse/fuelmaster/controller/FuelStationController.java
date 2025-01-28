@@ -1,6 +1,7 @@
 package com.uokse.fuelmaster.controller;
 
 import com.uokse.fuelmaster.dto.FuelStationDTO;
+import com.uokse.fuelmaster.model.fuelStation;
 import com.uokse.fuelmaster.service.FuelStationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,4 +36,14 @@ public class FuelStationController {
     public ResponseEntity<FuelStationDTO> getFuelStationById(@PathVariable Long id) {
         return ResponseEntity.ok(fuelStationService.getFuelStationById(id));
     }
+
+    // New endpoint to update an existing fuel station
+    @PutMapping("/fuel-stations/{id}")
+    public ResponseEntity<fuelStation> updateFuelStation(
+            @PathVariable Long id,
+            @RequestBody fuelStation updatedFuelStation) {
+        fuelStation fuelStation = fuelStationService.updateFuelStation(id, updatedFuelStation);
+        return ResponseEntity.ok(fuelStation);
+    }
+
 }

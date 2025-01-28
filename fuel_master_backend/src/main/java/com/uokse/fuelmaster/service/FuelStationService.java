@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FuelStationService {
@@ -56,4 +57,23 @@ public class FuelStationService {
                 station.getOwner(),
                 station.getEmployeeCount());
     }
+
+    //update existing fuel station
+    public fuelStation updateFuelStation(Long id, fuelStation updatedFuelStation) {
+        Optional<fuelStation> existingFuelStationOpt = fuelStationRepo.findById(id);
+
+        if (existingFuelStationOpt.isPresent()) {
+            fuelStation existingFuelStation = existingFuelStationOpt.get();
+
+            existingFuelStation.setRegNo(updatedFuelStation.getRegNo());
+            existingFuelStation.setOwner(updatedFuelStation.getOwner());
+            existingFuelStation.setLocation(updatedFuelStation.getLocation());
+            existingFuelStation.setEmployeeCount(updatedFuelStation.getEmployeeCount());
+
+            return fuelStationRepo.save(existingFuelStation);
+        } else {
+            throw new IllegalArgumentException("Fuel Station not found with id: " + id);
+        }
+    }
+
 }
