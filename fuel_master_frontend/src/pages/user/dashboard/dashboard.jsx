@@ -5,11 +5,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 const vehicleSchema = z.object({
   vehicleNumber: z.object({
-    prefix: z.string().min(1, "Prefix is required"),
+    prefix: z
+      .string()
+      .min(1, "Prefix is required")
+      .regex(/^[A-Z]+$/, "Prefix must be uppercase letters only"),
     number: z.string().min(1, "Number is required"),
   }),
   vehicleType: z.string().min(1, "Vehicle type is required"),
-  chassisNumber: z.string().min(1, "Chassis number is required"),
+  chassisNumber: z
+    .string()
+    .min(1, "Chassis number is required")
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Chassis number must be uppercase letters and numbers only"
+    ),
   fuelType: z.enum(["Petrol", "Diesel"], {
     required_error: "Please select a fuel type",
   }),
@@ -41,6 +50,11 @@ const Dashboard = () => {
       fuelType: "Petrol",
     },
   });
+
+  const handleUpperCase = (e, field) => {
+    const value = e.target.value.toUpperCase();
+    setValue(field, value);
+  };
 
   const selectedFuelType = watch("fuelType");
 
@@ -113,20 +127,25 @@ const Dashboard = () => {
                   <input
                     type="text"
                     placeholder="Ex: ABC"
-                    className="border rounded p-1.5 w-1/3 text-sm"
+                    className="border rounded p-1.5 w-1/3 text-sm uppercase"
                     {...register("vehicleNumber.prefix")}
+                    onChange={(e) => handleUpperCase(e, "vehicleNumber.prefix")}
                   />
                   <input
-                    type="text"
+                    type="number"
                     placeholder="Ex: 8822"
                     className="border rounded p-1.5 w-2/3 text-sm"
                     {...register("vehicleNumber.number")}
                   />
                 </div>
-                {(errors.vehicleNumber?.prefix ||
-                  errors.vehicleNumber?.number) && (
+                {errors.vehicleNumber?.prefix && (
                   <p className="text-red-500 text-xs mt-1">
-                    Vehicle number is required
+                    {errors.vehicleNumber.prefix.message}
+                  </p>
+                )}
+                {errors.vehicleNumber?.number && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.vehicleNumber.number.message}
                   </p>
                 )}
               </div>
@@ -153,8 +172,9 @@ const Dashboard = () => {
                 <input
                   type="text"
                   placeholder="Ex: NHKSCM2"
-                  className="w-full border rounded p-1.5 text-sm"
+                  className="w-full border rounded p-1.5 text-sm uppercase"
                   {...register("chassisNumber")}
+                  onChange={(e) => handleUpperCase(e, "chassisNumber")}
                 />
                 {errors.chassisNumber && (
                   <p className="text-red-500 text-xs mt-1">
@@ -222,6 +242,10 @@ const Dashboard = () => {
             </form>
           </div>
         </div>
+      </div>
+
+      <div className="bg-[#F84C25] text-white text-center py-2 text-sm fixed bottom-0 w-full">
+        <p>Copyright © 2025 GROUP 4</p>
       </div>
     </div>
   );
