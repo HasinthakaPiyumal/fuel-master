@@ -25,7 +25,7 @@ public class QuotaService {
 
         for (FuelQuota quota : fuelQuotas) {
             Long defaultQuota = quota.getVehicle().getVehicleType().getDefaultQuota();
-            quota.setQuotaAmount(defaultQuota); // Reset to default quota
+            quota.setDefaultQuota(defaultQuota); // Reset to default quota
             quota.setUsedQuota(0L); // Reset used quota to 0
             quota.setQuotaDate(LocalDate.now()); // Update quota date
         }

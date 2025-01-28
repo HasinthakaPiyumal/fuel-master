@@ -33,6 +33,21 @@ public class VehicleTypeService {
     }
 
     public List<VehicleType> getAllVehicleTypes() {
+
         return vehicleTypeRepository.findAll();
+    }
+
+    public VehicleType updateVehicleType(Long id, VehicleType updatedVehicleType) {
+        Optional<VehicleType> existingVehicleType = vehicleTypeRepository.findById(id);
+         if (existingVehicleType.isPresent()) {
+             VehicleType vehicleType = existingVehicleType.get();
+              vehicleType.setVehicleType(updatedVehicleType.getVehicleType());
+              vehicleType.setFuelType(updatedVehicleType.getFuelType());
+              vehicleType.setDefaultQuota(updatedVehicleType.getDefaultQuota());
+              return vehicleTypeRepository.save(vehicleType);
+         }else{
+             throw new IllegalArgumentException("Vehicle type with ID " + id + " not found.");
+         }
+
     }
 }

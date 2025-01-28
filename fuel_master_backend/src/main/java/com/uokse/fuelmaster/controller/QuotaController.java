@@ -32,7 +32,7 @@ public class QuotaController {
         if (quota.isPresent()) {
             FuelQuota fuelQuota = quota.get();
             QuotaSummaryDTO summary = new QuotaSummaryDTO(
-                    fuelQuota.getQuotaAmount(),
+                    fuelQuota.getDefaultQuota(),
                     fuelQuota.getUsedQuota(),
                     fuelQuota.getAvailableQuota(),
                     fuelQuota.getQuotaDate().plusDays(7) // Example: Assuming weekly renewal
