@@ -41,4 +41,16 @@ public class VehicleTypeController {
     public ResponseEntity<List<VehicleType>> getAllVehicleTypes() {
         return ResponseEntity.ok(vehicleTypeService.getAllVehicleTypes());
     }
+
+    //Update vehicle types
+    @PutMapping("/update/{id}")
+    public ResponseEntity<VehicleType> updateVehicleType(
+            @PathVariable Long id,
+            @RequestBody VehicleType updatedVehicleType) {
+        VehicleType vehicleType = vehicleTypeService.updateVehicleType(id, updatedVehicleType);
+        return ResponseEntity.ok(vehicleType);
+    }
+
+
+
 }
