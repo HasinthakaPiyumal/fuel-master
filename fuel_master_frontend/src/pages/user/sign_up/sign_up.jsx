@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import axios from "axios";
 
 const signUpFormSchema = z
   .object({
@@ -62,7 +63,21 @@ export default function SignUpPage() {
 
   async function onSubmit(values) {
     try {
-      console.log("Form Submitted:", values);
+      const response = await axios.post(
+        "https://api-fuel-master-fbc37438737d.herokuapp.com/api/v1/user/save",
+        {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          phone: values.phoneNumber,
+          nic: values.nic,
+          password: values.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       toast({
         title: "Success",
@@ -78,11 +93,15 @@ export default function SignUpPage() {
         confirmPassword: "",
         terms: false,
       });
+
+      window.location.href = "/signin";
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Something went wrong. Please try again.",
+        description:
+          error.response?.data?.message ||
+          "Something went wrong. Please try again.",
       });
     }
   }
