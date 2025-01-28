@@ -52,7 +52,7 @@ public class FuelTransactionService {
         transaction.setFuelStation(station);
         transaction.setPumpedQuantity(pumpedQuantity);
         transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setAvailableQuantity(updatedAvailableQuantity);
+        transaction.setAvailableQuota(updatedAvailableQuantity);
 
         fuelTransactionRepository.save(transaction);
 
