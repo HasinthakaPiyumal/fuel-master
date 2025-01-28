@@ -2,13 +2,16 @@ package com.uokse.fuelmaster.controller;
 
 
 import com.uokse.fuelmaster.dto.LoginDTO;
+import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.service.impl.UserIMPL;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.JwtService;
 
 
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,7 +57,8 @@ public class UserController {
             );
             return ResponseEntity.ok(successResponse);
         } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            ErrorResponse errorResponse = new ErrorResponse(401, "Login Failed");
+            return ResponseEntity.status(401).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
 

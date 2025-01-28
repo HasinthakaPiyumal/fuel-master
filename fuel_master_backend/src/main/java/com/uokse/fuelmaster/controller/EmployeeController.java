@@ -4,6 +4,7 @@ package com.uokse.fuelmaster.controller;
 import com.uokse.fuelmaster.dto.EmployeeViewDetailsDTO;
 import com.uokse.fuelmaster.service.EmployeeService;
 import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 public class EmployeeController {
 
+    @Autowired
     private EmployeeService employeeService;
 
 

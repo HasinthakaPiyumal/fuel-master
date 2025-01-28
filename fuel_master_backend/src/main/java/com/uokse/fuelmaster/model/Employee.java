@@ -24,14 +24,14 @@ public class Employee {
 
     @ManyToOne
     @JoinColumn(name = "fuel_station_id", nullable = false)
-    private fuelStation fuelStation;
+    private FuelStation fuelStation;
 
     @Column(updatable = false)
     private String createdAt;
 
     private String updatedAt;
 
-    public Employee(Long id, String name, String phone, String nic, String password, com.uokse.fuelmaster.model.fuelStation fuelStation, String createdAt, String updatedAt) {
+    public Employee(Long id, String name, String phone, String nic, String password, FuelStation fuelStation, String createdAt, String updatedAt) {
         this.id = id;
         this.name = name;
         this.phone = phone;
@@ -40,9 +40,6 @@ public class Employee {
         this.fuelStation = fuelStation;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public Employee(String id, String name, String phone, String nic, String password, String fuelStation) {
     }
 
     public Long getId() {
@@ -85,11 +82,11 @@ public class Employee {
         this.password = password;
     }
 
-    public com.uokse.fuelmaster.model.fuelStation getFuelStation() {
+    public FuelStation getFuelStation() {
         return fuelStation;
     }
 
-    public void setFuelStation(com.uokse.fuelmaster.model.fuelStation fuelStation) {
+    public void setFuelStation(FuelStation fuelStation) {
         this.fuelStation = fuelStation;
     }
 

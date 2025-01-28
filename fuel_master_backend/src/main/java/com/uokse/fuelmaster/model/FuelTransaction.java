@@ -20,7 +20,7 @@ public class FuelTransaction {
 
     @ManyToOne
     @JoinColumn(name = "fuel_station_id", nullable = false)
-    private fuelStation fuelStation;
+    private FuelStation fuelStation;
 
     @Column(nullable = false)
     private Double pumpedQuantity;
@@ -32,7 +32,7 @@ public class FuelTransaction {
     private Double availableQuota;
 
 
-    public FuelTransaction(Long id, Vehicle vehicle, Employee employee, com.uokse.fuelmaster.model.fuelStation fuelStation, Double pumpedQuantity, LocalDateTime transactionDate, Double availableQuantity) {
+    public FuelTransaction(Long id, Vehicle vehicle, Employee employee, FuelStation fuelStation, Double pumpedQuantity, LocalDateTime transactionDate, Double availableQuantity) {
         this.id = id;
         this.vehicle = vehicle;
         this.employee = employee;
@@ -70,11 +70,11 @@ public class FuelTransaction {
         this.employee = employee;
     }
 
-    public com.uokse.fuelmaster.model.fuelStation getFuelStation() {
+    public FuelStation getFuelStation() {
         return fuelStation;
     }
 
-    public void setFuelStation(com.uokse.fuelmaster.model.fuelStation fuelStation) {
+    public void setFuelStation(FuelStation fuelStation) {
         this.fuelStation = fuelStation;
     }
 
