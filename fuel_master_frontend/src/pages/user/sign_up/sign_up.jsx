@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import FuelStationAnimation from "@/components/animation/FuelStationAnimation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,9 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
+import { showToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import axios from "axios";
+import apiService from "@/services/api.service";
 
 const signUpFormSchema = z
   .object({
@@ -47,6 +47,7 @@ const signUpFormSchema = z
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(signUpFormSchema),
@@ -62,27 +63,22 @@ export default function SignUpPage() {
   });
 
   async function onSubmit(values) {
+    setLoading(true)
     try {
-      const response = await axios.post(
-        "https://api-fuel-master-fbc37438737d.herokuapp.com/api/v1/user/save",
-        {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          phone: values.phoneNumber,
-          nic: values.nic,
-          password: values.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const data = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phone: values.phoneNumber,
+        nic: values.nic,
+        password: values.password,
+      }
+      const response = await apiService.post('/v1/user/save', data);
 
-      toast({
-        title: "Success",
-        description: "Account created successfully!",
-      });
+      if (response.status === 200) {
+        showToast.success("Account created successfully!");
+      } else {
+        showToast.error(response.data.message || "Something went wrong. Please try again.");
+      }
 
       form.reset({
         firstName: "",
@@ -94,15 +90,11 @@ export default function SignUpPage() {
         terms: false,
       });
 
-      window.location.href = "/signin";
+      window.location.href = "/login";
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description:
-          error.response?.data?.message ||
-          "Something went wrong. Please try again.",
-      });
+      showToast.error(error.response.data.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -266,17 +258,14 @@ export default function SignUpPage() {
                     />
 
                     <div className="mt-6">
-                      <Button
-                        type="submit"
-                        className="w-full bg-orange-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      >
+                      <Button type="submit" className="w-full" loading={loading}>
                         Sign Up
                       </Button>
                     </div>
 
                     <p className="mt-4 text-sm text-center text-gray-600">
                       Already have an account?{" "}
-                      <a href="/signin" className="text-orange-600 underline">
+                      <a href="/login" className="text-orange-600 underline">
                         Sign In
                       </a>
                     </p>

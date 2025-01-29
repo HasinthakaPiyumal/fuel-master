@@ -70,9 +70,9 @@ export const reducer = (state, action) => {
         toasts: state.toasts.map((t) =>
           t.id === toastId || toastId === undefined
             ? {
-                ...t,
-                open: false,
-              }
+              ...t,
+              open: false,
+            }
             : t),
       };
     }
@@ -152,4 +152,41 @@ function useToast() {
   };
 }
 
-export { useToast, toast }
+const showToast = {
+  success: (message, title = "Success") => {
+    toast({
+      variant: "default",
+      title: title,
+      description: message,
+      className: "bg-green-50 text-green-900 border-green-200",
+    });
+  },
+
+  error: (message, title = "Oops!") => {
+    toast({
+      variant: "destructive",
+      title: title,
+      description: message,
+    });
+  },
+
+  warning: (message, title = "Warning") => {
+    toast({
+      variant: "default",
+      title: title,
+      description: message,
+      className: "bg-yellow-50 text-yellow-900 border-yellow-200",
+    });
+  },
+
+  info: (message, title = "Info") => {
+    toast({
+      variant: "default",
+      title: title,
+      description: message,
+      className: "bg-blue-50 text-blue-900 border-blue-200",
+    });
+  }
+};
+
+export { useToast, toast, showToast }

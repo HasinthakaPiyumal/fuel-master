@@ -65,7 +65,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="">
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
@@ -189,22 +189,20 @@ const Dashboard = () => {
                   <button
                     type="button"
                     onClick={() => setValue("fuelType", "Petrol")}
-                    className={`px-4 py-1 rounded text-sm ${
-                      selectedFuelType === "Petrol"
-                        ? "bg-[#F84C25] text-white"
-                        : "border"
-                    }`}
+                    className={`px-4 py-1 rounded text-sm ${selectedFuelType === "Petrol"
+                      ? "bg-[#F84C25] text-white"
+                      : "border"
+                      }`}
                   >
                     Petrol
                   </button>
                   <button
                     type="button"
                     onClick={() => setValue("fuelType", "Diesel")}
-                    className={`px-4 py-1 rounded text-sm ${
-                      selectedFuelType === "Diesel"
-                        ? "bg-[#F84C25] text-white"
-                        : "border"
-                    }`}
+                    className={`px-4 py-1 rounded text-sm ${selectedFuelType === "Diesel"
+                      ? "bg-[#F84C25] text-white"
+                      : "border"
+                      }`}
                   >
                     Diesel
                   </button>
@@ -242,10 +240,6 @@ const Dashboard = () => {
             </form>
           </div>
         </div>
-      </div>
-
-      <div className="bg-[#F84C25] text-white text-center py-2 text-sm fixed bottom-0 w-full">
-        <p>Copyright © 2025 GROUP 4</p>
       </div>
     </div>
   );
