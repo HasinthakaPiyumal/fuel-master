@@ -8,9 +8,13 @@ const AdminLayout = ({ children }) => {
       <AppSidebar />
       <main>
         <SidebarTrigger />
-        {children}
+        <div className="flex flex-col p-4 md:p-8 ">
+          {children}
+        </div>
       </main>
+
     </SidebarProvider>
+
   )
 };
 
