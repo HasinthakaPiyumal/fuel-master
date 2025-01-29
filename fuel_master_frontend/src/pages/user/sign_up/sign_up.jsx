@@ -106,9 +106,9 @@ export default function SignUpPage() {
 
   return (
     <div>
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
-          <div className="lg:w-1/2">
+      <div className="container">
+        <div className="flex items-center justify-between">
+          <div className="lg:w-1/2 hidden lg:flex justify-center">
             <FuelStationAnimation />
           </div>
 
@@ -226,7 +226,7 @@ export default function SignUpPage() {
                               <div className="relative">
                                 <Input
                                   type={showPasswords ? "text" : "password"}
-                                  placeholder="Confirm your password"
+                                  placeholder="Confirm password"
                                   className="pr-10"
                                   {...field}
                                 />
