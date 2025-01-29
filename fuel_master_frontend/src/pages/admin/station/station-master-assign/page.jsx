@@ -72,7 +72,7 @@ export default function StationMasterAssign() {
   };
 
   return (
-    <div className="flex items-center justify-center h-[calc(100vh-80px)]">
+    <div className="flex h-[calc(100vh-80px)]">
       <Card className="max-w-xl w-full mx-4">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
