@@ -3,10 +3,13 @@ package com.uokse.fuelmaster.service.impl;
 import com.uokse.fuelmaster.dto.LoginDTO;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.model.User;
+import com.uokse.fuelmaster.model.Vehicle;
 import com.uokse.fuelmaster.repository.UserRepo;
+import com.uokse.fuelmaster.repository.VehicleRepo;
 import com.uokse.fuelmaster.response.LoginResponse;
 
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,15 @@ public class UserIMPL {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private VehicleRepo vehicleRepo;
+
+    @Autowired
+     private VehicleIMPL vehicleIMPL;
+
+
+
 
 
     public Long addUser(UserDTO userDTO) {
@@ -87,5 +99,25 @@ public class UserIMPL {
             return null;
         }
     }
+
+    //remove user
+    @Transactional
+    public void removeUser(Long id) {
+        if (userRepo.existsById(id)) {
+            // First, get the associated vehicle
+            Long vehicleId = vehicleRepo.findByUserId(id).getId();
+
+            if (vehicleId != null) {
+                vehicleIMPL.removeVehicle(vehicleId);  // Remove the associated vehicle
+            } else {
+                throw new RuntimeException("Vehicle not found for user");
+            }
+
+            userRepo.deleteById(id); // Now delete the user
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
 
 }
