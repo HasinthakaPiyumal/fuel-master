@@ -42,6 +42,9 @@ public class Employee {
         this.updatedAt = updatedAt;
     }
 
+    public Employee() {
+    }
+
     public Long getId() {
         return id;
     }

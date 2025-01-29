@@ -2,12 +2,16 @@ package com.uokse.fuelmaster.controller;
 
 
 import com.uokse.fuelmaster.dto.EmployeeViewDetailsDTO;
+import com.uokse.fuelmaster.response.ErrorResponse;
+import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.EmployeeService;
 import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -20,11 +24,24 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
 
-
     @PostMapping(path="/save")
-    public String saveEmployee(@RequestBody EmployeeDTO employeeDTO ){
-        String id = employeeService.addEmployee(employeeDTO);
-        return ("User saved with ID : " + id);
+    public ResponseEntity<?> saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        try {
+            String id = employeeService.addEmployee(employeeDTO);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("employeeName", id);
+
+            SuccessResponse successResponse = new SuccessResponse(
+                    "User saved successfully",
+                    true,
+                    data
+            );
+            return ResponseEntity.ok(successResponse);
+
+        } catch (IllegalArgumentException e) {  // Catch the specific exception
+            ErrorResponse errorResponse = new ErrorResponse(404, e.getMessage());
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
     }
 
     @GetMapping("/all")
@@ -33,7 +50,8 @@ public class EmployeeController {
         if (!employees.isEmpty()) {
             return ResponseEntity.ok(employees);
         } else {
-            return ResponseEntity.status(404).body("No users found");
+            ErrorResponse errorResponse = new ErrorResponse(404, "No employees found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
 
@@ -43,7 +61,8 @@ public class EmployeeController {
         if (employee != null) {
             return ResponseEntity.ok(employee);
         } else {
-            return ResponseEntity.status(404).body("No employee found");
+            ErrorResponse errorResponse = new ErrorResponse(404, "No Employee Found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
 
