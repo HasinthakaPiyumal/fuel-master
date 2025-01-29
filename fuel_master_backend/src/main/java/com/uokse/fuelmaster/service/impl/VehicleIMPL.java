@@ -115,5 +115,17 @@ public class VehicleIMPL implements VehicleService {
         return vehicleRepo.findById(vehicleId).orElse(null);
     }
 
+    //remove vehicle
+    @Transactional
+    public void removeVehicle(Long id) {
+        if (vehicleRepo.existsById(id)) {
+            fuelQuotaRepository.deleteByVehicleId(id); // Delete related records first
+            vehicleRepo.deleteById(id); // Now delete vehicle
+        } else {
+            throw new RuntimeException("Vehicle not found");
+        }
+    }
+
+
 
 }

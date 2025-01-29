@@ -5,10 +5,13 @@ import com.uokse.fuelmaster.dto.VehicleInfoDTO;
 import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.model.Vehicle;
 import com.uokse.fuelmaster.model.VehicleType;
+import com.uokse.fuelmaster.response.ErrorResponse;
+import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.impl.VehicleIMPL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,6 +78,18 @@ public class VehicleController {
 
         logger.info("Vehicle info retrieved successfully for vehicle ID: {}", vehicleId);
         return ResponseEntity.ok(vehicleInfo);
+    }
+
+    //remove vehicle
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> removeVehicle(@PathVariable Long id) {
+        try {
+            vehicleIMPL.removeVehicle(id);
+            return ResponseEntity.ok(new SuccessResponse("Vehicle deleted successfully", true, null));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+        }
     }
 
 
