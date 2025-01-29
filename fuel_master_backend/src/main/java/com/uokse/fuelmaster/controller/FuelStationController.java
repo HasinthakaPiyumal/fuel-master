@@ -61,7 +61,6 @@ public class FuelStationController {
                     .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Fuel station not found"));
         }
     }
-
     // Delete Fuel Station
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteFuelStation(@PathVariable Long id) {

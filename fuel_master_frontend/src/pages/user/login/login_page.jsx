@@ -39,9 +39,9 @@ const LoginPage = () => {
   });
 
   const onSubmit = async (data) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await apiService.post('/v1/user/login', data);
+      const response = await apiService.post("/v1/user/login", data);
       if (response.status === 200) {
         const token = response.data.data.token;
         localStorage.setItem("token", token);
@@ -53,11 +53,14 @@ const LoginPage = () => {
 
         navigate("/dashboard");
       } else {
-        showToast.error(response.data.message || "Something went wrong. Please try again.");
+        showToast.error(
+          response.data.message || "Something went wrong. Please try again."
+        );
       }
     } catch (error) {
       if (error.response) {
-        const errorMessage = error.response.data?.message || "Invalid credentials";
+        const errorMessage =
+          error.response.data?.message || "Invalid credentials";
         showToast.error(errorMessage);
       } else if (error.request) {
         showToast.error("Server not responding. Please try again later.");
@@ -65,20 +68,20 @@ const LoginPage = () => {
         showToast.error("An error occurred. Please try again.");
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   return (
     <React.Fragment>
-      <div className="flex items-center justify-center">
+      <div className="flex flex-col lg:flex-row items-center justify-center">
         <div className="lg:w-1/2 hidden lg:flex justify-center">
           <FuelStationAnimation />
         </div>
 
-        <div className="lg:w-1/2 w-full max-w-md mx-auto p-6">
-          <div className="bg-white shadow-lg rounded-lg p-8">
-            <h1 className="text-3xl font-bold text-orange-600 text-center mb-6">
+        <div className="lg:w-1/2 w-full max-w-md mx-auto mb-12">
+          <div className="bg-white shadow-lg rounded-lg p-6">
+            <h1 className="text-3xl font-bold text-orange-600 text-center mb-8">
               Welcome back!
             </h1>
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -116,8 +119,9 @@ const LoginPage = () => {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
-                    className={`h-12 pr-10 ${errors.password ? "border-red-500" : ""
-                      }`}
+                    className={`h-12 pr-10 ${
+                      errors.password ? "border-red-500" : ""
+                    }`}
                     {...register("password")}
                     disabled={isSubmitting}
                   />
