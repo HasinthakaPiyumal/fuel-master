@@ -50,4 +50,18 @@ public class VehicleTypeService {
          }
 
     }
+
+    //Get vehicle type by id
+    public VehicleType getVehicleTypeById(Long id) {
+        return vehicleTypeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehicle type not found"));
+    }
+
+    public void deleteVehicleType(Long id) {
+        if (vehicleTypeRepository.existsById(id)) {
+            vehicleTypeRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Vehicle type not found");
+        }
+    }
 }

@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import FuelStationAnimation from "@/components/animation/FuelStationAnimation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,9 +14,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
+import { showToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import axios from "axios";
+import apiService from "@/services/api.service";
 
 const signUpFormSchema = z
   .object({
@@ -45,8 +44,8 @@ const signUpFormSchema = z
   });
 
 export default function SignUpPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(signUpFormSchema),
@@ -62,27 +61,24 @@ export default function SignUpPage() {
   });
 
   async function onSubmit(values) {
+    setLoading(true);
     try {
-      const response = await axios.post(
-        "https://api-fuel-master-fbc37438737d.herokuapp.com/api/v1/user/save",
-        {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          phone: values.phoneNumber,
-          nic: values.nic,
-          password: values.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const data = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phone: values.phoneNumber,
+        nic: values.nic,
+        password: values.password,
+      };
+      const response = await apiService.post("/v1/user/save", data);
 
-      toast({
-        title: "Success",
-        description: "Account created successfully!",
-      });
+      if (response.status === 200) {
+        showToast.success("Account created successfully!");
+      } else {
+        showToast.error(
+          response.data.message || "Something went wrong. Please try again."
+        );
+      }
 
       form.reset({
         firstName: "",
@@ -94,27 +90,29 @@ export default function SignUpPage() {
         terms: false,
       });
 
-      window.location.href = "/signin";
+      window.location.href = "/login";
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description:
-          error.response?.data?.message ||
-          "Something went wrong. Please try again.",
-      });
+      showToast.error(
+        error.response.data.message || "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   }
 
+  const togglePasswordVisibility = () => {
+    setShowPasswords((prev) => !prev);
+  };
+
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
-          <div className="lg:w-1/2">
+    <div>
+      <div className="container">
+        <div className="flex items-center justify-between">
+          <div className="lg:w-1/2 hidden lg:flex justify-center">
             <FuelStationAnimation />
           </div>
 
-          <div className="w-full lg:w-5/12">
+          <div className="w-full lg:w-5/12 pb-8">
             <Card>
               <CardHeader>
                 <h2 className="text-2xl font-bold text-orange-600">
@@ -156,87 +154,101 @@ export default function SignUpPage() {
                       />
                     </div>
 
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Phone Number" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Phone Number" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="nic"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>NIC</FormLabel>
+                            <FormControl>
+                              <Input placeholder="NIC" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="nic"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>NIC</FormLabel>
-                          <FormControl>
-                            <Input placeholder="NIC" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  type={showPasswords ? "text" : "password"}
+                                  placeholder="Enter your password"
+                                  className="pr-10"
+                                  {...field}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={togglePasswordVisibility}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                  {showPasswords ? (
+                                    <EyeOffIcon className="h-5 w-5" />
+                                  ) : (
+                                    <EyeIcon className="h-5 w-5" />
+                                  )}
+                                </button>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Enter your password"
-                                {...field}
-                              />
-                              <FontAwesomeIcon
-                                icon={showPassword ? faEyeSlash : faEye}
-                                className="absolute right-3 top-2.5 cursor-pointer text-gray-500"
-                                onClick={() => setShowPassword((prev) => !prev)}
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  type={showPasswords ? "text" : "password"}
+                                  placeholder="Confirm password"
+                                  className="pr-10"
+                                  {...field}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={togglePasswordVisibility}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                  {showPasswords ? (
+                                    <EyeOffIcon className="h-5 w-5" />
+                                  ) : (
+                                    <EyeIcon className="h-5 w-5" />
+                                  )}
+                                </button>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Confirm Password</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                type={showConfirmPassword ? "text" : "password"}
-                                placeholder="Confirm your password"
-                                {...field}
-                              />
-                              <FontAwesomeIcon
-                                icon={showConfirmPassword ? faEyeSlash : faEye}
-                                className="absolute right-3 top-2.5 cursor-pointer text-gray-500"
-                                onClick={() =>
-                                  setShowConfirmPassword((prev) => !prev)
-                                }
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Terms and Conditions */}
                     <FormField
                       control={form.control}
                       name="terms"
@@ -246,16 +258,26 @@ export default function SignUpPage() {
                             <FormControl>
                               <input
                                 type="checkbox"
+                                id="terms-checkbox"
                                 {...field}
                                 className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
                               />
                             </FormControl>
                             <label
-                              htmlFor="terms"
-                              className="ml-2 block text-sm text-gray-700"
+                              htmlFor="terms-checkbox"
+                              className="ml-2 block text-sm text-gray-700 cursor-pointer"
+                              onClick={() =>
+                                form.setValue("terms", !field.value)
+                              }
                             >
                               I agree to{" "}
-                              <a href="#" className="text-orange-600 underline">
+                              <a
+                                href="#"
+                                className="text-orange-600 underline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                              >
                                 Terms and Conditions
                               </a>
                             </label>
@@ -268,7 +290,8 @@ export default function SignUpPage() {
                     <div className="mt-6">
                       <Button
                         type="submit"
-                        className="w-full bg-orange-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full"
+                        loading={loading}
                       >
                         Sign Up
                       </Button>
@@ -276,7 +299,7 @@ export default function SignUpPage() {
 
                     <p className="mt-4 text-sm text-center text-gray-600">
                       Already have an account?{" "}
-                      <a href="/signin" className="text-orange-600 underline">
+                      <a href="/login" className="text-orange-600 underline">
                         Sign In
                       </a>
                     </p>

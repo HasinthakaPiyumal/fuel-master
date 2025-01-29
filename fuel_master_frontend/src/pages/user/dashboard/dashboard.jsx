@@ -5,11 +5,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 const vehicleSchema = z.object({
   vehicleNumber: z.object({
-    prefix: z.string().min(1, "Prefix is required"),
+    prefix: z
+      .string()
+      .min(1, "Prefix is required")
+      .regex(/^[A-Z]+$/, "Prefix must be uppercase letters only"),
     number: z.string().min(1, "Number is required"),
   }),
   vehicleType: z.string().min(1, "Vehicle type is required"),
-  chassisNumber: z.string().min(1, "Chassis number is required"),
+  chassisNumber: z
+    .string()
+    .min(1, "Chassis number is required")
+    .regex(
+      /^[A-Z0-9]+$/,
+      "Chassis number must be uppercase letters and numbers only"
+    ),
   fuelType: z.enum(["Petrol", "Diesel"], {
     required_error: "Please select a fuel type",
   }),
@@ -42,6 +51,11 @@ const Dashboard = () => {
     },
   });
 
+  const handleUpperCase = (e, field) => {
+    const value = e.target.value.toUpperCase();
+    setValue(field, value);
+  };
+
   const selectedFuelType = watch("fuelType");
 
   const onSubmit = (data) => {
@@ -51,7 +65,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="">
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
@@ -85,15 +99,13 @@ const Dashboard = () => {
                   <span className="ml-auto">{userInfo.name}</span>
                 </div>
               </div>
-              <div className="mb-4">
-                <div className="flex">
+              <div className="mb-4 flex justify-between gap-4">
+                <div className="flex flex-1">
                   <span className="text-gray-700">NIC:</span>
                   <span className="ml-auto">{userInfo.nic}</span>
                 </div>
-              </div>
-              <div className="mb-4">
-                <div className="flex">
-                  <span className="text-gray-700">Phone Number:</span>
+                <div className="flex flex-1">
+                  <span className="text-gray-700">Phone:</span>
                   <span className="ml-auto">{userInfo.phoneNumber}</span>
                 </div>
               </div>
@@ -113,20 +125,25 @@ const Dashboard = () => {
                   <input
                     type="text"
                     placeholder="Ex: ABC"
-                    className="border rounded p-1.5 w-1/3 text-sm"
+                    className="border rounded p-1.5 w-1/3 text-sm uppercase"
                     {...register("vehicleNumber.prefix")}
+                    onChange={(e) => handleUpperCase(e, "vehicleNumber.prefix")}
                   />
                   <input
-                    type="text"
+                    type="number"
                     placeholder="Ex: 8822"
                     className="border rounded p-1.5 w-2/3 text-sm"
                     {...register("vehicleNumber.number")}
                   />
                 </div>
-                {(errors.vehicleNumber?.prefix ||
-                  errors.vehicleNumber?.number) && (
+                {errors.vehicleNumber?.prefix && (
                   <p className="text-red-500 text-xs mt-1">
-                    Vehicle number is required
+                    {errors.vehicleNumber.prefix.message}
+                  </p>
+                )}
+                {errors.vehicleNumber?.number && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.vehicleNumber.number.message}
                   </p>
                 )}
               </div>
@@ -153,8 +170,9 @@ const Dashboard = () => {
                 <input
                   type="text"
                   placeholder="Ex: NHKSCM2"
-                  className="w-full border rounded p-1.5 text-sm"
+                  className="w-full border rounded p-1.5 text-sm uppercase"
                   {...register("chassisNumber")}
+                  onChange={(e) => handleUpperCase(e, "chassisNumber")}
                 />
                 {errors.chassisNumber && (
                   <p className="text-red-500 text-xs mt-1">

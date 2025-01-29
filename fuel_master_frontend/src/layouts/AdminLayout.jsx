@@ -6,11 +6,16 @@ const AdminLayout = ({ children }) => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main>
+      <main className="w-full">
         <SidebarTrigger />
-        {children}
+        <div className="flex flex-col p-4 md:p-8 w-full">
+          {children}
+        </div>
       </main>
+
+
     </SidebarProvider>
+
   )
 };
 

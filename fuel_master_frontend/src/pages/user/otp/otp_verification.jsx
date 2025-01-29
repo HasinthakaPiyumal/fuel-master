@@ -1,5 +1,5 @@
 import React from "react";
-import FuelStationAnimation from '@/components/animation/FuelStationAnimation';
+import FuelStationAnimation from "@/components/animation/FuelStationAnimation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -40,44 +40,42 @@ export default function VerifyOtpPage() {
   function onSubmit(data) {
     try {
       const verifyOTP = async () => {
-        const response = await fetch('/api/verify-otp', {
-          method: 'POST',
+        const response = await fetch("/api/verify-otp", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ otp: data.pin }),
         });
 
         if (!response.ok) {
-          throw new Error('OTP verification failed');
+          throw new Error("OTP verification failed");
         }
 
-        toast.success('OTP verified successfully!');
+        toast.success("OTP verified successfully!");
       };
 
       verifyOTP();
     } catch (error) {
-      toast.error('Failed to verify OTP. Please try again.');
-      console.error('OTP verification error:', error);
+      toast.error("Failed to verify OTP. Please try again.");
+      console.error("OTP verification error:", error);
     }
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
-          {/* Left Section with Illustration */}
-          <div className="lg:w-1/2">
-            <FuelStationAnimation />
-          </div>
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
+        <div className="lg:w-1/2">
+          <FuelStationAnimation />
+        </div>
 
-        {/* Right Section: OTP Form */}
         <div className="bg-white shadow-lg rounded-lg p-8 md:p-12">
           <h1 className="text-2xl font-bold text-orange-600 mb-4 text-center">
             Verify OTP
           </h1>
           <p className="text-gray-600 text-center mb-6">
-            We've sent a 6-digit verification code to <strong>076 321 5389</strong>.
-            Please enter the OTP below. <br />
+            We've sent a 6-digit verification code to{" "}
+            <strong>076 321 5389</strong>. Please enter the OTP below. <br />
             <span className="text-sm">
               If this isn't your number?{" "}
               <a href="#" className="text-orange-600 underline">
@@ -86,7 +84,6 @@ export default function VerifyOtpPage() {
             </span>
           </p>
 
-          {/* OTP Input Form */}
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -123,7 +120,6 @@ export default function VerifyOtpPage() {
             </form>
           </Form>
 
-          {/* Resend Link */}
           <p className="text-center text-sm text-gray-600 mt-4">
             Didn't receive it?{" "}
             <a href="#" className="text-orange-600 underline">
@@ -132,11 +128,6 @@ export default function VerifyOtpPage() {
           </p>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="absolute bottom-0 w-full bg-orange-600 text-white py-2 text-center text-sm">
-        Copyright © 2025 GROUP 4
-      </footer>
     </div>
   );
 }

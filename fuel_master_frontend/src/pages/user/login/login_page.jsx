@@ -8,7 +8,8 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { toast } from "react-hot-toast";
+import { showToast } from "@/hooks/use-toast";
+import apiService from "@/services/api.service";
 
 // Login form validation
 const loginSchema = z.object({
@@ -23,6 +24,7 @@ const loginSchema = z.object({
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -37,63 +39,49 @@ const LoginPage = () => {
   });
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
-      const config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: "https://api-fuel-master-fbc37438737d.herokuapp.com/api/v1/user/login",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: JSON.stringify({
-          phone: data.phone,
-          password: data.password,
-        }),
-      };
-
-      const response = await axios.request(config);
-
-      if (response.data) {
-        const token = response.data.token;
+      const response = await apiService.post("/v1/user/login", data);
+      if (response.status === 200) {
+        const token = response.data.data.token;
         localStorage.setItem("token", token);
-
         if (response.data.user) {
           localStorage.setItem("user", JSON.stringify(response.data.user));
         }
-
-        toast.success("Login successful!");
-
-        console.log("Login successful:", response.data);
-
+        showToast.success("Login successful!");
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        navigate("/home");
+        navigate("/dashboard");
+      } else {
+        showToast.error(
+          response.data.message || "Something went wrong. Please try again."
+        );
       }
     } catch (error) {
-      console.error("Login error:", error);
-
       if (error.response) {
         const errorMessage =
           error.response.data?.message || "Invalid credentials";
-        toast.error(errorMessage);
+        showToast.error(errorMessage);
       } else if (error.request) {
-        toast.error("Server not responding. Please try again later.");
+        showToast.error("Server not responding. Please try again later.");
       } else {
-        toast.error("An error occurred. Please try again.");
+        showToast.error("An error occurred. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <React.Fragment>
-      <div className="flex items-center justify-center">
+      <div className="flex flex-col lg:flex-row items-center justify-center">
         <div className="lg:w-1/2 hidden lg:flex justify-center">
           <FuelStationAnimation />
         </div>
 
-        <div className="lg:w-1/2 w-full max-w-md mx-auto p-6">
-          <div className="bg-white shadow-lg rounded-lg p-8">
-            <h1 className="text-3xl font-bold text-orange-600 text-center mb-6">
+        <div className="lg:w-1/2 w-full max-w-md mx-auto mb-12">
+          <div className="bg-white shadow-lg rounded-lg p-6">
+            <h1 className="text-3xl font-bold text-orange-600 text-center mb-8">
               Welcome back!
             </h1>
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -159,14 +147,14 @@ const LoginPage = () => {
               <Button
                 type="submit"
                 className="w-full h-12 text-white bg-[#FF5533] hover:bg-[#FF5533]/90"
-                disabled={isSubmitting}
+                loading={loading}
               >
-                {isSubmitting ? "Logging in..." : "Log in"}
+                Log in
               </Button>
             </form>
 
             <p className="text-center text-gray-600 mt-4">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link to="/signup" className="text-[#FF5533] hover:underline">
                 Sign Up
               </Link>

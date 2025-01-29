@@ -21,6 +21,7 @@ import {
 import { NavMain } from "./nav-main"
 import { NavProjects } from "./nav-projects"
 import { NavUser } from "./nav-user"
+import NavHeader from "./nav-header"
 
 // This is sample data.
 const data = {
@@ -51,61 +52,87 @@ const data = {
       title: "Dashboard",
       url: "/admin/dashboard",
       icon: Home,
-      isActive: true,
+    },
+    {
+      title: "Employee Management",
+      url: "/admin/employee-list",
+      icon: Users,
       items: [
         {
-          title: "Overview",
-          url: "/admin/dashboard",
+          title: "All Employees",
+          url: "/admin/employee-list",
         },
         {
-          title: "Analytics",
-          url: "/admin/dashboard/analytics",
-        },
-        {
-          title: "Reports",
-          url: "/admin/dashboard/reports",
+          title: "Add Employee",
+          url: "/admin/employee-add",
         },
       ],
     },
     {
-      title: "Fuel Station Management",
-      url: "/admin/fuel-stations",
+      title: "Vehicle Management",
+      url: "/admin/vehicle-type-list",
+      icon: Truck,
+      items: [
+        {
+          title: "Vehicle Types",
+          url: "/admin/vehicle-type-list",
+        },
+        {
+          title: "Add Vehicle Type",
+          url: "/admin/vehicle-type-add",
+        },
+        {
+          title: "Vehicle Reports",
+          url: "/admin/vehicle-type-report",
+        },
+      ],
+    },
+    {
+      title: "Station Management",
+      url: "/admin/station-list",
       icon: GaugeCircle,
       items: [
         {
           title: "All Stations",
-          url: "/admin/fuel-stations",
+          url: "/admin/station-list",
         },
         {
           title: "Add Station",
-          url: "/admin/fuel-stations/add",
+          url: "/admin/station-add",
         },
         {
-          title: "Station Reports",
-          url: "/admin/fuel-stations/reports",
+          title: "Station Master Add",
+          url: "/admin/station-master-add",
+        },
+        {
+          title: "Station Master Assign",
+          url: "/admin/station-master-assign",
         },
       ],
     },
     {
-      title: "Fuel Quota Management",
-      url: "/admin/quota",
+      title: "Quota Management",
+      url: "/admin/quota-management-list",
       icon: Fuel,
       items: [
         {
-          title: "Quota Overview",
-          url: "/admin/quota",
-        },
-        {
-          title: "Allocations",
-          url: "/admin/quota/allocations",
-        },
-        {
-          title: "Usage History",
-          url: "/admin/quota/history",
+          title: "Quota Usage",
+          url: "/admin/quota-management-list",
         },
         {
           title: "Settings",
-          url: "/admin/quota/settings",
+          url: "/admin/quota-management-settings",
+        },
+      ],
+    },
+    {
+      title: "Reports",
+      url: "/admin/user-report",
+      icon: BarChart3,
+      items: [
+        {
+          title: "User Reports",
+          url: "/admin/user-report",
         },
       ],
     },
@@ -133,11 +160,10 @@ export function AppSidebar({ ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        {/* <TeamSwitcher teams={data.teams} /> */}
+        <NavHeader />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
