@@ -21,27 +21,30 @@ public class EmployeeService {
 
     public String addEmployee(EmployeeDTO employeeDTO) {
 
-        Employee employee = null;
-        try {
-            FuelStation fuelStation = fuelStationRepo.findById(employeeDTO.getFuelStation()).orElseThrow();
+            // Check if NIC already exists
+            Optional<Employee> existingEmployee = employeeRepo.findByNic(employeeDTO.getNic());
+            if (existingEmployee.isPresent()) {
+                throw new IllegalArgumentException("NIC already registered: " + employeeDTO.getNic());
+            }
 
-            employee = new Employee(
+            // Check if Fuel Station exists
+            FuelStation fuelStation = fuelStationRepo.findById(employeeDTO.getFuelStation())
+                    .orElseThrow(() -> new IllegalArgumentException("Fuel Station not found"));
+
+            Employee employee = new Employee(
                     null,
                     employeeDTO.getName(),
                     employeeDTO.getPhone(),
                     employeeDTO.getNic(),
                     employeeDTO.getPassword(),
                     fuelStation,
-                    null,null
+                    null, null
             );
 
             employeeRepo.save(employee);
-
             return employee.getName();
-        } catch (Exception e) {
-            System.out.println("Employee registration failed: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
+
+
     }
 
     public List<EmployeeViewDetailsDTO> getAllEmployees() {

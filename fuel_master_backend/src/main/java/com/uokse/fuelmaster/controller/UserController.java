@@ -37,7 +37,6 @@ public class UserController {
 
     @PostMapping(path="/save")
     public String saveUser(@RequestBody UserDTO userDTO ){
-        System.out.println("UserDTO: " + userDTO);
         Long id = userIMPL.addUser(userDTO);
         return ("User saved with ID: " + id);
     }
@@ -68,7 +67,8 @@ public class UserController {
         if (!users.isEmpty()) {
             return ResponseEntity.ok(users);
         } else {
-            return ResponseEntity.status(404).body("No users found");
+            ErrorResponse errorResponse = new ErrorResponse(404, "No Users Found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
 
@@ -78,7 +78,8 @@ public class UserController {
         if (userDTO != null) {
             return ResponseEntity.ok(userDTO);
         } else {
-            return ResponseEntity.status(404).body("User not found");
+            ErrorResponse errorResponse = new ErrorResponse(404, "User Not Found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
 }

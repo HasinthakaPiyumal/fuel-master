@@ -38,7 +38,7 @@ public class FuelStationController {
     }
 
     // New endpoint to update an existing fuel station
-    @PutMapping("/update/{id}")
+    @PutMapping("/fuel-stations/{id}")
     public ResponseEntity<FuelStation> updateFuelStation(
             @PathVariable Long id,
             @RequestBody FuelStation updatedFuelStation) {
