@@ -6,9 +6,11 @@ import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.EmployeeService;
 import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -25,7 +27,15 @@ public class EmployeeController {
 
 
     @PostMapping(path="/save")
-    public ResponseEntity<?> saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<?> saveEmployee(@Valid @RequestBody EmployeeDTO employeeDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // Extract validation error messages
+            HashMap<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
+
+            return ResponseEntity.badRequest().body(errors);
+        }
         try {
             String id = employeeService.addEmployee(employeeDTO);
             HashMap<String, Object> data = new HashMap<>();

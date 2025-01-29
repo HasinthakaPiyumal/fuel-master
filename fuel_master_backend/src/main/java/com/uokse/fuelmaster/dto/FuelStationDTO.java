@@ -1,10 +1,19 @@
 package com.uokse.fuelmaster.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class FuelStationDTO {
     private Long id;
+    @NotBlank(message = "FuelStation registration Number  is mandatory")
     private String regNo;
+    @NotBlank(message = "FuelStation location is mandatory")
     private String location;
+    @NotBlank(message = "FuelStation owner name is mandatory")
     private String owner;
+    @NotNull(message = "FuelStation employee count is mandatory")
+    @Min(value = 1, message = "Employee count must be at least 1")
     private Integer employeeCount;
 
     public FuelStationDTO(Long id, String regNo, String location, String owner, Integer employeeCount) {
