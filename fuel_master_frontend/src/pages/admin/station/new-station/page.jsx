@@ -67,109 +67,110 @@ const NewStation = () => {
   ];
 
   return (
-    <Card className="max-w-xl w-full p-6">
-      <h1 className="text-2xl font-bold mb-6">Add New Station</h1>
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="regNo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Registration Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="FS33234" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Location</FormLabel>
-                <FormControl>
-                  <Input placeholder="Athurugiriya" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="owner"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Owner</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Add New Station</h1>
+      <Card className="max-w-xl w-full p-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="regNo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Registration Number</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an owner" />
-                    </SelectTrigger>
+                    <Input placeholder="FS33234" {...field} />
                   </FormControl>
-                  <SelectContent>
-                    {owners.map((owner) => (
-                      <SelectItem key={owner.id} value={owner.id}>
-                        {owner.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="employeeCount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Employee Count</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="10"
-                    onKeyDown={(e) => {
-                      if (
-                        e.key === "-" ||
-                        e.key === "." ||
-                        e.key === "e" ||
-                        e.key === "E"
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === "" || parseInt(value) < 0) {
-                        field.onChange("0");
-                      } else {
-                        field.onChange(value);
-                      }
-                    }}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Athurugiriya" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit">Create Station</Button>
-        </form>
-      </Form>
-    </Card>
+            <FormField
+              control={form.control}
+              name="owner"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Owner</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an owner" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {owners.map((owner) => (
+                        <SelectItem key={owner.id} value={owner.id}>
+                          {owner.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="employeeCount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Employee Count</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="10"
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === "-" ||
+                          e.key === "." ||
+                          e.key === "e" ||
+                          e.key === "E"
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "" || parseInt(value) < 0) {
+                          field.onChange("0");
+                        } else {
+                          field.onChange(value);
+                        }
+                      }}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit">Create Station</Button>
+          </form>
+        </Form>
+      </Card>
+    </div>
   );
 };
 export default NewStation;
