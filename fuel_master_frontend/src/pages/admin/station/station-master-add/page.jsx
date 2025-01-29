@@ -60,7 +60,6 @@ export default function AddStationMaster() {
     setLoading(true);
     try {
       console.log(values);
-      // Add your API call here
     } catch (error) {
       console.error(error);
     } finally {
@@ -69,7 +68,7 @@ export default function AddStationMaster() {
   }
 
   return (
-    <Card className="max-w-xl w-full mx-auto">
+    <Card className="max-w-xl w-full">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center">
           Add Station Master
