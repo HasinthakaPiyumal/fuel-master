@@ -2,8 +2,11 @@ package com.uokse.fuelmaster.controller;
 
 import com.uokse.fuelmaster.dto.FuelStationDTO;
 import com.uokse.fuelmaster.model.FuelStation;
+import com.uokse.fuelmaster.response.SuccessResponse;
+import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.service.FuelStationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,34 +19,57 @@ public class FuelStationController {
     @Autowired
     private FuelStationService fuelStationService;
 
+    // Add Fuel Station
     @PostMapping("/save")
-    public ResponseEntity<String> registerFuelStation(@RequestBody FuelStationDTO fuelStationDTO) {
-        String response = fuelStationService.registerFuelStation(fuelStationDTO);
-        if (response.contains("Error")) {
-            return ResponseEntity.badRequest().body(response);
+    public ResponseEntity<?> addFuelStation(@RequestBody FuelStationDTO fuelStationDTO) {
+        try {
+            FuelStation fuelStation = fuelStationService.addFuelStation(fuelStationDTO);
+            return ResponseEntity.ok(new SuccessResponse("Fuel station added successfully", true, fuelStation));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to add fuel station"));
         }
-        return ResponseEntity.ok(response);
     }
 
-    // New endpoint to get all fuel stations
+    // Update Fuel Station
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateFuelStation(@PathVariable Long id, @RequestBody FuelStationDTO fuelStationDTO) {
+        try {
+            FuelStation updatedFuelStation = fuelStationService.updateFuelStation(id, fuelStationDTO);
+            return ResponseEntity.ok(new SuccessResponse("Fuel station updated successfully", true, updatedFuelStation));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Fuel station not found"));
+        }
+    }
+
+    // View all Fuel Stations
     @GetMapping("/all")
-    public ResponseEntity<List<FuelStationDTO>> getAllFuelStations() {
-        return ResponseEntity.ok(fuelStationService.getAllFuelStations());
+    public ResponseEntity<?> getAllFuelStations() {
+        List<FuelStation> fuelStations = fuelStationService.getAllFuelStations();
+        return ResponseEntity.ok(new SuccessResponse("Fuel stations retrieved successfully", true, fuelStations));
     }
 
-    // New endpoint to get a single fuel station by ID
+    // View a specific Fuel Station by ID
     @GetMapping("/{id}")
-    public ResponseEntity<FuelStationDTO> getFuelStationById(@PathVariable Long id) {
-        return ResponseEntity.ok(fuelStationService.getFuelStationById(id));
+    public ResponseEntity<?> getFuelStationById(@PathVariable Long id) {
+        try {
+            FuelStation fuelStation = fuelStationService.getFuelStationById(id);
+            return ResponseEntity.ok(new SuccessResponse("Fuel station retrieved successfully", true, fuelStation));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Fuel station not found"));
+        }
     }
-
-    // New endpoint to update an existing fuel station
-    @PutMapping("/fuel-stations/{id}")
-    public ResponseEntity<FuelStation> updateFuelStation(
-            @PathVariable Long id,
-            @RequestBody FuelStation updatedFuelStation) {
-        FuelStation fuelStation = fuelStationService.updateFuelStation(id, updatedFuelStation);
-        return ResponseEntity.ok(fuelStation);
+    // Delete Fuel Station
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteFuelStation(@PathVariable Long id) {
+        try {
+            fuelStationService.deleteFuelStation(id);
+            return ResponseEntity.ok(new SuccessResponse("Fuel station deleted successfully", true, null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Fuel station not found"));
+        }
     }
-
 }

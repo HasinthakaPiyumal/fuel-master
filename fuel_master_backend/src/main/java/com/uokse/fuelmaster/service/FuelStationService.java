@@ -13,67 +13,42 @@ import java.util.Optional;
 public class FuelStationService {
 
     @Autowired
-    private FuelStationRepo fuelStationRepo;
+    private FuelStationRepo fuelStationRepository;
 
-    public String registerFuelStation(FuelStationDTO fuelStationDTO) {
-        // Check if the registration number is already used
-        if (fuelStationRepo.existsByRegNo(fuelStationDTO.getRegNo())) {
-            return "Error: Registration number already exists.";
-        }
-
-        // Save the fuel station
+    public FuelStation addFuelStation(FuelStationDTO fuelStationDTO) {
         FuelStation fuelStation = new FuelStation();
         fuelStation.setRegNo(fuelStationDTO.getRegNo());
         fuelStation.setLocation(fuelStationDTO.getLocation());
         fuelStation.setOwner(fuelStationDTO.getOwner());
         fuelStation.setEmployeeCount(fuelStationDTO.getEmployeeCount());
 
-        fuelStationRepo.save(fuelStation);
-
-        return "Fuel station registered successfully.";
+        return fuelStationRepository.save(fuelStation);
     }
 
-    // New method to fetch all fuel stations
-    public List<FuelStationDTO> getAllFuelStations() {
-        List<FuelStation> stations = fuelStationRepo.findAll();
-        return stations.stream()
-                .map(station -> new FuelStationDTO(
-                        station.getId(),
-                        station.getRegNo(),
-                        station.getLocation(),
-                        station.getOwner(),
-                        station.getEmployeeCount()))
-                .toList();
-    }
-
-    // New method to fetch a single fuel station by ID
-    public FuelStationDTO getFuelStationById(Long id) {
-        FuelStation station = fuelStationRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Fuel station not found with ID: " + id));
-        return new FuelStationDTO(
-                station.getId(),
-                station.getRegNo(),
-                station.getLocation(),
-                station.getOwner(),
-                station.getEmployeeCount());
-    }
-
-    //update existing fuel station
-    public FuelStation updateFuelStation(Long id, FuelStation updatedFuelStation) {
-        Optional<FuelStation> existingFuelStationOpt = fuelStationRepo.findById(id);
-
-        if (existingFuelStationOpt.isPresent()) {
-            FuelStation existingFuelStation = existingFuelStationOpt.get();
-
-            existingFuelStation.setRegNo(updatedFuelStation.getRegNo());
-            existingFuelStation.setOwner(updatedFuelStation.getOwner());
-            existingFuelStation.setLocation(updatedFuelStation.getLocation());
-            existingFuelStation.setEmployeeCount(updatedFuelStation.getEmployeeCount());
-
-            return fuelStationRepo.save(existingFuelStation);
+    public FuelStation updateFuelStation(Long id, FuelStationDTO fuelStationDTO) {
+        Optional<FuelStation> fuelStationOptional = fuelStationRepository.findById(id);
+        if (fuelStationOptional.isPresent()) {
+            FuelStation fuelStation = fuelStationOptional.get();
+            fuelStation.setRegNo(fuelStationDTO.getRegNo());
+            fuelStation.setLocation(fuelStationDTO.getLocation());
+            fuelStation.setOwner(fuelStationDTO.getOwner());
+            fuelStation.setEmployeeCount(fuelStationDTO.getEmployeeCount());
+            return fuelStationRepository.save(fuelStation);
         } else {
-            throw new IllegalArgumentException("Fuel Station not found with id: " + id);
+            throw new RuntimeException("Fuel station not found");
         }
     }
 
+    public List<FuelStation> getAllFuelStations() {
+        return fuelStationRepository.findAll();
+    }
+
+    public FuelStation getFuelStationById(Long id) {
+        Optional<FuelStation> fuelStationOptional = fuelStationRepository.findById(id);
+        return fuelStationOptional.orElseThrow(() -> new RuntimeException("Fuel station not found"));
+    }
+
+    public void deleteFuelStation(Long id) {
+        fuelStationRepository.deleteById(id);
+    }
 }
