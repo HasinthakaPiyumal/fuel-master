@@ -59,11 +59,11 @@ public class FuelStationService {
     }
 
     //update existing fuel station
-    public fuelStation updateFuelStation(Long id, fuelStation updatedFuelStation) {
-        Optional<fuelStation> existingFuelStationOpt = fuelStationRepo.findById(id);
+    public FuelStation updateFuelStation(Long id, FuelStation updatedFuelStation) {
+        Optional<FuelStation> existingFuelStationOpt = fuelStationRepo.findById(id);
 
         if (existingFuelStationOpt.isPresent()) {
-            fuelStation existingFuelStation = existingFuelStationOpt.get();
+            FuelStation existingFuelStation = existingFuelStationOpt.get();
 
             existingFuelStation.setRegNo(updatedFuelStation.getRegNo());
             existingFuelStation.setOwner(updatedFuelStation.getOwner());
