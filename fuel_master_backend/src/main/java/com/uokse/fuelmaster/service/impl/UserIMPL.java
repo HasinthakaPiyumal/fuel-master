@@ -21,6 +21,10 @@ public class UserIMPL {
 
 
     public Long addUser(UserDTO userDTO) {
+        if(userRepo.findByNic(userDTO.getNic()).isPresent()){
+            throw new IllegalArgumentException("NIC already registered"+userDTO.getNic());
+        }
+
         User user = new User(
                 userDTO.getId(),
                 userDTO.getFirstName(),
@@ -29,14 +33,10 @@ public class UserIMPL {
                 userDTO.getNic(),
                 userDTO.getPassword());
 
-        try {
-            userRepo.save(user);
 
-            return user.getId();
-        } catch (Exception e) {
-            System.out.println("User registration failed: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
+        userRepo.save(user);
+        return user.getId();
+
     }
 
 
