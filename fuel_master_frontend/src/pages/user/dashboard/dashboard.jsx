@@ -99,15 +99,13 @@ const Dashboard = () => {
                   <span className="ml-auto">{userInfo.name}</span>
                 </div>
               </div>
-              <div className="mb-4">
-                <div className="flex">
+              <div className="mb-4 flex justify-between gap-4">
+                <div className="flex flex-1">
                   <span className="text-gray-700">NIC:</span>
                   <span className="ml-auto">{userInfo.nic}</span>
                 </div>
-              </div>
-              <div className="mb-4">
-                <div className="flex">
-                  <span className="text-gray-700">Phone Number:</span>
+                <div className="flex flex-1">
+                  <span className="text-gray-700">Phone:</span>
                   <span className="ml-auto">{userInfo.phoneNumber}</span>
                 </div>
               </div>
@@ -189,20 +187,22 @@ const Dashboard = () => {
                   <button
                     type="button"
                     onClick={() => setValue("fuelType", "Petrol")}
-                    className={`px-4 py-1 rounded text-sm ${selectedFuelType === "Petrol"
-                      ? "bg-[#F84C25] text-white"
-                      : "border"
-                      }`}
+                    className={`px-4 py-1 rounded text-sm ${
+                      selectedFuelType === "Petrol"
+                        ? "bg-[#F84C25] text-white"
+                        : "border"
+                    }`}
                   >
                     Petrol
                   </button>
                   <button
                     type="button"
                     onClick={() => setValue("fuelType", "Diesel")}
-                    className={`px-4 py-1 rounded text-sm ${selectedFuelType === "Diesel"
-                      ? "bg-[#F84C25] text-white"
-                      : "border"
-                      }`}
+                    className={`px-4 py-1 rounded text-sm ${
+                      selectedFuelType === "Diesel"
+                        ? "bg-[#F84C25] text-white"
+                        : "border"
+                    }`}
                   >
                     Diesel
                   </button>
