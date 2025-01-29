@@ -139,7 +139,7 @@ export default function StationMasterAssign() {
               />
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Assigning..." : "Assign Station Master"}
+                {loading ? "Assigning...." : "Assign Station Master"}
               </Button>
             </form>
           </Form>
