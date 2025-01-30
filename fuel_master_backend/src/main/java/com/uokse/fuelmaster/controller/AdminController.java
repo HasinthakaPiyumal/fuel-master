@@ -1,15 +1,19 @@
 package com.uokse.fuelmaster.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.uokse.fuelmaster.dto.Response.AdminViewDTO;
-import com.uokse.fuelmaster.dto.UserDTO;
+import com.uokse.fuelmaster.response.ErrorResponse;
+import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.AdminService;
 import com.uokse.fuelmaster.dto.AdminDTO;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -21,10 +25,30 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    @PostMapping(path="/save")
-    public String saveAdmin(@RequestBody AdminDTO adminDTO ){
-        String id = adminService.addAdmin(adminDTO);
-        return ("Admin saved with ID: " + id);
+    @PostMapping(path = "/save")
+    public ResponseEntity<?> saveAdmin(@Valid @RequestBody AdminDTO adminDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // Extract validation error messages
+            HashMap<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
+
+            return ResponseEntity.badRequest().body(errors);
+        }
+        try {
+            String name = adminService.addAdmin(adminDTO);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("AdminName", name);
+            SuccessResponse successResponse = new SuccessResponse(
+                    "Admin saved successfully",
+                    true,
+                    data
+            );
+            return ResponseEntity.ok(successResponse);
+        } catch (IllegalArgumentException e) {  // Catch the specific exception
+            ErrorResponse errorResponse = new ErrorResponse(400, e.getMessage());
+            return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
     }
 
     @GetMapping("/all")
@@ -33,21 +57,19 @@ public class AdminController {
         if (!admins.isEmpty()) {
             return ResponseEntity.ok(admins);
         } else {
-            return ResponseEntity.status(404).body("No admins found");
+            ErrorResponse errorResponse = new ErrorResponse(404, "No Admins Found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
 
     @GetMapping("/{phone}")
-    public ResponseEntity<?> getAdminByPhone(@RequestParam String phone) {
+    public ResponseEntity<?> getAdminByPhone(@PathVariable String phone) {
         List<AdminViewDTO> admins = adminService.getAdminByPhone(phone);
         if (!admins.isEmpty()) {
             return ResponseEntity.ok(admins);
         } else {
-            return ResponseEntity.status(404).body("No admins found");
+            ErrorResponse errorResponse = new ErrorResponse(404, "Admin NotFound");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
-
-
-
-
 }

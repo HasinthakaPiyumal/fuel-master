@@ -3,10 +3,14 @@ package com.uokse.fuelmaster.service.impl;
 import com.uokse.fuelmaster.dto.LoginDTO;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.model.User;
+import com.uokse.fuelmaster.model.Vehicle;
 import com.uokse.fuelmaster.repository.UserRepo;
+import com.uokse.fuelmaster.repository.VehicleRepo;
 import com.uokse.fuelmaster.response.LoginResponse;
 
 import com.uokse.fuelmaster.util.PasswordUtil;
+
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +23,24 @@ public class UserIMPL {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private VehicleRepo vehicleRepo;
+
+    @Autowired
+     private VehicleIMPL vehicleIMPL;
+
+
+
+
 
     public Long addUser(UserDTO userDTO) {
 
         String hashedPassword = PasswordUtil.hashPassword(userDTO.getPassword());
+        if(userRepo.findByNic(userDTO.getNic()).isPresent()){
+            throw new IllegalArgumentException("NIC already registered" +userDTO.getNic());
+        } else if (userRepo.findByPhone(userDTO.getPhone()).isPresent()){
+            throw new IllegalArgumentException("Phone number already registered" +userDTO.getPhone());
+        }
         User user = new User(
                 userDTO.getId(),
                 userDTO.getFirstName(),
@@ -31,14 +49,10 @@ public class UserIMPL {
                 userDTO.getNic(),
                 hashedPassword);
 
-        try {
-            userRepo.save(user);
 
-            return user.getId();
-        } catch (Exception e) {
-            System.out.println("User registration failed: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
+        userRepo.save(user);
+        return user.getId();
+
     }
 
     public Optional<User> loginUser(LoginDTO loginDTO) {
@@ -87,6 +101,25 @@ public class UserIMPL {
     public User getUserByPhone(String phone) {
         Optional<User> userOptional = userRepo.findByPhone(phone);
         return userOptional.orElse(null);
+    }
+
+    //remove user
+    @Transactional
+    public void removeUser(Long id) {
+        if (userRepo.existsById(id)) {
+            // First, get the associated vehicle
+            Long vehicleId = vehicleRepo.findByUserId(id).getId();
+
+            if (vehicleId != null) {
+                vehicleIMPL.removeVehicle(vehicleId);  // Remove the associated vehicle
+            } else {
+                throw new RuntimeException("Vehicle not found for user");
+            }
+
+            userRepo.deleteById(id); // Now delete the user
+        } else {
+            throw new RuntimeException("User not found");
+        }
     }
 
 }

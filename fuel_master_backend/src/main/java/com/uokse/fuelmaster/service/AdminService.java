@@ -2,9 +2,7 @@ package com.uokse.fuelmaster.service;
 
 import com.uokse.fuelmaster.dto.AdminDTO;
 import com.uokse.fuelmaster.dto.Response.AdminViewDTO;
-import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.model.Admin;
-import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.repository.AdminRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +21,12 @@ public class AdminService {
     // Method to add an admin
     public String addAdmin(AdminDTO adminDTO) {
 
+        if(adminRepository.findByNic(adminDTO.getNic()).isPresent()){
+            throw new IllegalArgumentException("NIC already registered" +adminDTO.getNic());
+        }
+        if (adminRepository.findByPhone(adminDTO.getPhone()).isPresent()) {
+            throw new IllegalArgumentException("Phone number already registered: " + adminDTO.getPhone());
+        }
         // Create an admin object from the DTO
         Admin admin = new Admin(
                 adminDTO.getId(),
@@ -36,8 +40,6 @@ public class AdminService {
 
         // Save the admin object to the database
         adminRepository.save(admin);
-
-
         return admin.getName();
     }
 
@@ -52,7 +54,7 @@ public class AdminService {
     }
 
     public List<AdminViewDTO> getAdminByPhone(String phone) {
-        List<Admin> admins = adminRepository.findByPhone(phone);
+        Optional<Admin> admins = adminRepository.findByPhone(phone);
         return admins.stream().map(admin -> new AdminViewDTO(
                 admin.getName(),
                 admin.getPhone(),

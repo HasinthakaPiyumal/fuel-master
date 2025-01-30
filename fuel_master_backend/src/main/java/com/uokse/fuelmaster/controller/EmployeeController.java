@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -34,12 +36,20 @@ public class EmployeeController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping(path = "/save")
-    public ResponseEntity<?> saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    @PostMapping(path="/save")
+    public ResponseEntity<?> saveEmployee(@Valid @RequestBody EmployeeDTO employeeDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // Extract validation error messages
+            HashMap<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
+
+            return ResponseEntity.badRequest().body(errors);
+        }
         try {
-            String id = employeeService.addEmployee(employeeDTO);
+            String name = employeeService.addEmployee(employeeDTO);
             HashMap<String, Object> data = new HashMap<>();
-            data.put("employeeName", id);
+            data.put("employeeName", name);
 
             SuccessResponse successResponse = new SuccessResponse(
                     "User saved successfully",

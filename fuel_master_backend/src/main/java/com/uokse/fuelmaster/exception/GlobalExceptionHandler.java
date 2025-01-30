@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.uokse.fuelmaster.response.ErrorResponse;
@@ -18,5 +19,10 @@ public class GlobalExceptionHandler {
             "The requested resource was not found"
         );
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    // Handles invalid enum values for fuelType
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.badRequest().body("Invalid fuel type. Allowed values: PETROL, DIESEL, ELECTRIC, HYBRID");
     }
 } 
