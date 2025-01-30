@@ -12,4 +12,5 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     List<Admin> findByPhone(String phone);
 
+    Optional<Object> findByNic(String nic);
 }

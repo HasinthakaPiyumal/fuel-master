@@ -20,4 +20,10 @@ public interface VehicleRepo extends JpaRepository<Vehicle, Long> {
 
 
     Optional<Vehicle> findByVehicleRegistrationPart1AndVehicleRegistrationPart2(String part1, Long part2);
+
+
+    Vehicle findByUserId(Long userId);
+
+
+
 }

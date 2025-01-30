@@ -3,28 +3,30 @@ package com.uokse.fuelmaster.dto;
 import com.uokse.fuelmaster.model.FuelType;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 
 public class VehicleDTO {
 
     private Long id;
 
-    @Column(nullable = false)
+    @NotNull(message = "User Id is mandatory")
     private Long userId;
 
-   @Column(nullable = false)
+   @NotBlank(message = "Vehicle Type is mandatory")
     private String vehicleType;
 
-  @Column(nullable = false)
+    @NotBlank(message = "Vehicle Registration Part 1 is mandatory")
     private String vehicleRegistrationPart1;
 
-   @Column(nullable = false)
+    @NotNull(message = "Vehicle Registration Part 2 is mandatory")
     private Long vehicleRegistrationPart2;
 
-   @Column(nullable = false,unique = true)
+    @NotBlank(message = "Chassis Number is mandatory")
     private String chassisNumber;
 
-   @Column(nullable = false)
+    @NotNull(message = "Fuel Type is mandatory")
     private FuelType fuelType;
 
     // Constructors, Getters, and Setters...
