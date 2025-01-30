@@ -1,15 +1,19 @@
 package com.uokse.fuelmaster.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.uokse.fuelmaster.dto.Response.AdminViewDTO;
-import com.uokse.fuelmaster.dto.UserDTO;
+import com.uokse.fuelmaster.response.ErrorResponse;
+import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.AdminService;
 import com.uokse.fuelmaster.dto.AdminDTO;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -22,9 +26,29 @@ public class AdminController {
     private AdminService adminService;
 
     @PostMapping(path="/save")
-    public String saveAdmin(@RequestBody AdminDTO adminDTO ){
-        String id = adminService.addAdmin(adminDTO);
-        return ("Admin saved with ID: " + id);
+    public ResponseEntity<?> saveAdmin(@Valid @RequestBody AdminDTO adminDTO, BindingResult bindingResult ){
+        if (bindingResult.hasErrors()) {
+            // Extract validation error messages
+            HashMap<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
+
+            return ResponseEntity.badRequest().body(errors);
+        }
+        try{
+            Long id =adminService.addAdmin(adminDTO);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("UserId", id);
+            SuccessResponse successResponse = new SuccessResponse(
+                    "User saved successfully",
+                    true,
+                    data
+            );
+            return ResponseEntity.ok(successResponse);
+        }catch (IllegalArgumentException e) {  // Catch the specific exception
+            ErrorResponse errorResponse = new ErrorResponse(400, e.getMessage());
+            return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
     }
 
     @GetMapping("/all")

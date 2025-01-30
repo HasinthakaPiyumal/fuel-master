@@ -5,11 +5,14 @@ import com.uokse.fuelmaster.model.FuelStation;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.service.FuelStationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -21,7 +24,15 @@ public class FuelStationController {
 
     // Add Fuel Station
     @PostMapping("/save")
-    public ResponseEntity<?> addFuelStation(@RequestBody FuelStationDTO fuelStationDTO) {
+    public ResponseEntity<?> addFuelStation(@Valid @RequestBody FuelStationDTO fuelStationDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // Extract validation error messages
+            HashMap<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
+
+            return ResponseEntity.badRequest().body(errors);
+        }
         try {
             FuelStation fuelStation = fuelStationService.addFuelStation(fuelStationDTO);
             return ResponseEntity.ok(new SuccessResponse("Fuel station added successfully", true, fuelStation));
