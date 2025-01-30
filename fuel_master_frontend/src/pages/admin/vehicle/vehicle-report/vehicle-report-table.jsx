@@ -33,8 +33,7 @@ const VehicleReportTable = () => {
             <TableCell>55L</TableCell>
             <TableCell>2025-01-30</TableCell>
             <TableCell>
-              <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-500 mr-1" />
+              <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                 Active
               </span>
             </TableCell>
@@ -48,8 +47,7 @@ const VehicleReportTable = () => {
             <TableCell>70L</TableCell>
             <TableCell>2025-01-29</TableCell>
             <TableCell>
-              <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-500 mr-1" />
+              <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
                 Inactive
               </span>
             </TableCell>
