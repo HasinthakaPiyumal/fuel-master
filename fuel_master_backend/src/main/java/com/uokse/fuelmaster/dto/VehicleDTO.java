@@ -14,8 +14,8 @@ public class VehicleDTO {
     @NotNull(message = "User Id is mandatory")
     private Long userId;
 
-   @NotBlank(message = "Vehicle Type is mandatory")
-    private String vehicleType;
+   @NotNull(message = "Vehicle Type is mandatory")
+    private Long vehicleType;
 
     @NotBlank(message = "Vehicle Registration Part 1 is mandatory")
     private String vehicleRegistrationPart1;
@@ -34,7 +34,7 @@ public class VehicleDTO {
     public VehicleDTO() {
     }
 
-    public VehicleDTO(Long id, Long userId, String vehicleType, String vehicleRegistrationPart1,
+    public VehicleDTO(Long id, Long userId, Long vehicleType, String vehicleRegistrationPart1,
                       Long vehicleRegistrationPart2, String chassisNumber, FuelType fuelType) {
         this.id = id;
         this.userId = userId;
@@ -61,11 +61,11 @@ public class VehicleDTO {
         this.userId = userId;
     }
 
-    public String getVehicleType() {
+    public Long getVehicleType() {
         return vehicleType;
     }
 
-    public void setVehicleType(String vehicleType) {
+    public void setVehicleType(Long vehicleType) {
         this.vehicleType = vehicleType;
     }
 

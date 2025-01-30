@@ -107,7 +107,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("UserDetails: " + userDetails);
                 System.out.println("UserName: " + userEmail);
 
-                assert userDetails != null;
+                if (userDetails == null) {
+                    clearContextAndSetUnauthorized(request, response, filterChain, "Provided token is invalid or expired");
+                    return;
+                }
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     System.out.println("Token is valid");
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -120,11 +123,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     System.out.println("Security Context set");
                 }else{
-                    clearContextAndSetUnauthorized(request, response, filterChain, "Invalid JWT token 1");
+                    clearContextAndSetUnauthorized(request, response, filterChain, "Provided token is invalid or expired");
                     return;
                 }
             }else {
-                clearContextAndSetUnauthorized(request, response, filterChain, "Invalid JWT token 2");
+                clearContextAndSetUnauthorized(request, response, filterChain, "Provided token is invalid or expired");
                 return;
             }
             System.out.println(request.getHeader("Authorization"));

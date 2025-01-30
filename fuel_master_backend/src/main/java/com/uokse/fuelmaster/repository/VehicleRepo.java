@@ -24,6 +24,6 @@ public interface VehicleRepo extends JpaRepository<Vehicle, Long> {
 
     Vehicle findByUserId(Long userId);
 
-
+    Vehicle findByQrId(String qrId);
 
 }

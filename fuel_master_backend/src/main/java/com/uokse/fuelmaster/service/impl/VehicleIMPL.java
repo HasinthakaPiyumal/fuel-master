@@ -74,7 +74,7 @@ public class VehicleIMPL implements VehicleService {
         }
 
         User user = userRepo.findById(vehicleDTO.getUserId()).orElse(null);
-        VehicleType vehicleType = vehicleTypeRepo.findByVehicleTypeAndFuelType(vehicleDTO.getVehicleType(), vehicleDTO.getFuelType()).orElse(null);
+        VehicleType vehicleType = vehicleTypeRepo.findById(vehicleDTO.getVehicleType()).orElse(null);
 
         if (user == null || vehicleType == null) {
             logger.error("Invalid user or vehicle type information. User: {}, VehicleType: {}", user, vehicleType);
