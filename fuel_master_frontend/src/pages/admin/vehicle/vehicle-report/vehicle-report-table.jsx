@@ -24,7 +24,6 @@ const VehicleReportTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {/* Example row - Replace with your data mapping */}
           <TableRow>
             <TableCell>VT001</TableCell>
             <TableCell>Sedan</TableCell>
@@ -35,7 +34,6 @@ const VehicleReportTable = () => {
             <TableCell>2025-01-30</TableCell>
             <TableCell>
               <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset">
-                {/* Use different colors based on status */}
                 <span className="h-1.5 w-1.5 rounded-full bg-green-500 mr-1" />
                 Active
               </span>
