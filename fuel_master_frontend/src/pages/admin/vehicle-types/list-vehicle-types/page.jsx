@@ -4,7 +4,7 @@ import VehicleTypesTable from "./vehicle-types-table";
 const ListVehicleTypes = () => {
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Stations List</h1>
+      <h1 className="text-2xl font-bold">Vehicle Type List</h1>
       <VehicleTypesTable />
     </div>
   );
