@@ -95,9 +95,69 @@ const QuotaUsageList = () => {
                     <option value="Inactive">Inactive</option>
                 </select>
             </div>
+
+           
+            <div className="overflow-x-auto shadow-md rounded-lg">
+                <table className="min-w-full bg-white">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="p-3 text-left font-semibold">Station</th>
+                            <th className="p-3 text-left font-semibold">Quota Used (L)</th>
+                            <th className="p-3 text-left font-semibold">Quota Limit (L)</th>
+                            <th className="p-3 text-left font-semibold">Usage Period</th>
+                            <th className="p-3 text-left font-semibold">Remaining Quota (L)</th>
+                            <th className="p-3 text-left font-semibold">Last Updated</th>
+                            <th className="p-3 text-left font-semibold">Status</th>
+                            <th className="p-3 text-left font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {filteredData.map((row) => (
+                            <tr key={row.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 whitespace-nowrap">{row.stationName}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{row.quotaUsed.toLocaleString()}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{row.quotaLimit.toLocaleString()}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{row.usagePeriod}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{row.remainingQuota.toLocaleString()}</td>
+
+                                <td className="px-6 py-4 whitespace-nowrap">{row.lastUpdated}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className={`px-2 py-1 text-sm rounded-full ${row.status === 'Active'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-red-100 text-red-800'
+                                        }`}>
+                                        {row.status}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex space-x-3">
+                                        <button
+                                            onClick={() => handleEdit(row.id)}
+                                            className="text-blue-600 hover:text-blue-900"
+                                        >
+                                            <FaEdit className="h-5 w-5" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(row.id)}
+                                            className="text-red-600 hover:text-red-900"
+                                        >
+                                            <FaTrash className="h-5 w-5" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
 
-         
+
+            {filteredData.length === 0 && !loading && (
+                <div className="text-center py-4 text-gray-500">
+                    No records found
+                </div>
+            )}
+        </div>
     );
 };
 
