@@ -47,7 +47,36 @@ const QuotaSettings = () => {
                             />
                         </div>
 
-                       
+                        <div className="grid w-full items-center gap-1.5">
+                            <Label htmlFor="maxQuotaPerStation">Maximum Quota</Label>
+                            <Input
+                                id="maxQuotaPerStation"
+                                name="maxQuotaPerStation"
+                                type="number"
+                                value={settings.maxQuotaPerStation}
+                                onChange={handleInputChange}
+                                min="0"
+                                placeholder="Enter maximum quota"
+                            />
+                        </div>
+
+                        <div className="grid w-full items-center gap-1.5">
+                            <Label htmlFor="quotaResetPeriod">Reset Period</Label>
+                            <Select 
+                                value={settings.quotaResetPeriod} 
+                                onValueChange={(value) => setSettings({ ...settings, quotaResetPeriod: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select reset period" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="daily">Daily</SelectItem>
+                                    <SelectItem value="weekly">Weekly</SelectItem>
+                                    <SelectItem value="monthly">Monthly</SelectItem>
+                                    <SelectItem value="quarterly">Quarterly</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div className="flex">
