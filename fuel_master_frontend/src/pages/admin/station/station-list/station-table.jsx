@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 const StationsTable = () => {
   const stations = [
@@ -32,16 +31,19 @@ const StationsTable = () => {
     },
   ];
 
-  const getStatusBadge = (status) => {
+  const getStatusButton = (status) => {
     const statusStyles = {
-      active: "bg-green-100 text-green-800",
-      inactive: "bg-red-100 text-red-800",
+      active: "bg-green-100 text-green-700 hover:bg-green-200 hover:shadow-md",
+      inactive: "bg-red-100 text-red-700 hover:bg-red-200 hover:shadow-md",
     };
 
     return (
-      <Badge className={statusStyles[status]}>
+      <button
+        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium transition-all duration-200 ease-in-out ${statusStyles[status]}`}
+        onClick={() => console.log("Status changed")}
+      >
         {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
+      </button>
     );
   };
 
@@ -61,7 +63,7 @@ const StationsTable = () => {
             <TableRow key={station.id}>
               <TableCell className="font-medium">{station.name}</TableCell>
               <TableCell>{station.location}</TableCell>
-              <TableCell>{getStatusBadge(station.status)}</TableCell>
+              <TableCell>{getStatusButton(station.status)}</TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
