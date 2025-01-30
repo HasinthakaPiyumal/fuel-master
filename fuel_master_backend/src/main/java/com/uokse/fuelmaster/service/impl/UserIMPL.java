@@ -6,7 +6,7 @@ import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.repository.UserRepo;
 import com.uokse.fuelmaster.response.LoginResponse;
 
-
+import com.uokse.fuelmaster.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +21,15 @@ public class UserIMPL {
 
 
     public Long addUser(UserDTO userDTO) {
+
+        String hashedPassword = PasswordUtil.hashPassword(userDTO.getPassword());
         User user = new User(
                 userDTO.getId(),
                 userDTO.getFirstName(),
                 userDTO.getLastName(),
                 userDTO.getPhone(),
                 userDTO.getNic(),
-                userDTO.getPassword());
+                hashedPassword);
 
         try {
             userRepo.save(user);
@@ -39,24 +41,19 @@ public class UserIMPL {
         }
     }
 
-
     public Optional<User> loginUser(LoginDTO loginDTO) {
         Optional<User> user = userRepo.findByPhone(loginDTO.getPhone());
         if (user.isPresent()) {
             String inputPassword = loginDTO.getPassword();
             String storedPassword = user.get().getPassword();
-            if (inputPassword.equals(storedPassword)) {
-                Optional<User> validUser = userRepo.findOneByPhoneAndPassword(loginDTO.getPhone(), storedPassword);
-                if (validUser.isPresent()) {
-                    return user;
-                }
+            if (PasswordUtil.verifyPassword(inputPassword, storedPassword)) {
+                return user;
             }
 
         }
         return null;
 
     }
-
 
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepo.findAll();
@@ -69,7 +66,6 @@ public class UserIMPL {
                 null // Exclude password in the response
         )).toList();
     }
-
 
     public UserDTO getUserById(Long id) {
         Optional<User> userOptional = userRepo.findById(id);
@@ -86,6 +82,11 @@ public class UserIMPL {
         } else {
             return null;
         }
+    }
+
+    public User getUserByPhone(String phone) {
+        Optional<User> userOptional = userRepo.findByPhone(phone);
+        return userOptional.orElse(null);
     }
 
 }

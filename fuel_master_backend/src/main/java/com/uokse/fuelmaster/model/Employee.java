@@ -1,11 +1,15 @@
 package com.uokse.fuelmaster.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 
 @Entity
-
-public class Employee {
+public class Employee implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -77,8 +81,18 @@ public class Employee {
         this.nic = nic;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return phone;
     }
 
     public void setPassword(String password) {
@@ -91,6 +105,16 @@ public class Employee {
 
     public void setFuelStation(FuelStation fuelStation) {
         this.fuelStation = fuelStation;
+    }
+
+    public HashMap getCommonData(){
+        return new HashMap(){{
+            put("id", id);
+            put("name", name);
+            put("phone", phone);
+            put("nic", nic);
+            put("fuelStation", fuelStation.getLocation());
+        }};
     }
 
     @Override

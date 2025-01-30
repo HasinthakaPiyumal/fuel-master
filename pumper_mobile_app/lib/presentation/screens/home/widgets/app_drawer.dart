@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:pumper_mobile_app/core/services/auth_service.dart';
 import 'package:pumper_mobile_app/presentation/screens/login/login_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -7,6 +8,18 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = AuthService();
+    final user = authService.currentUser;
+
+    // If no user is logged in, show a basic drawer
+    if (user == null) {
+      return const Drawer(
+        child: Center(
+          child: Text('No user logged in'),
+        ),
+      );
+    }
+
     return Drawer(
       child: Column(
         children: [
@@ -39,9 +52,9 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  const Text(
-                    'John Doe',
-                    style: TextStyle(
+                  Text(
+                    user.name.capitalizeFirst ?? '',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -50,9 +63,9 @@ class AppDrawer extends StatelessWidget {
                   const SizedBox(height: 5),
                   Row(
                     children: [
-                      const Text(
-                        'Station Manager',
-                        style: TextStyle(
+                      Text(
+                        '${user.fuelStationLocation.capitalizeFirst ?? ''} Station',
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
                         ),
@@ -68,7 +81,7 @@ class AppDrawer extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
-                          'Admin',
+                          'Operator',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -87,21 +100,21 @@ class AppDrawer extends StatelessWidget {
             child: Column(
               children: [
                 _buildDetailItem(
-                  icon: Icons.email_outlined,
-                  label: 'Email',
-                  value: 'john.doe@example.com',
+                  icon: Icons.phone_outlined,
+                  label: 'Phone',
+                  value: user.phone,
                 ),
                 const SizedBox(height: 16),
                 _buildDetailItem(
-                  icon: Icons.phone_outlined,
-                  label: 'Phone',
-                  value: '+1 234 567 890',
+                  icon: Icons.credit_card_outlined,
+                  label: 'NIC',
+                  value: user.nic,
                 ),
                 const SizedBox(height: 16),
                 _buildDetailItem(
                   icon: Icons.location_on_outlined,
                   label: 'Station',
-                  value: 'Main Street Station',
+                  value: user.fuelStationLocation,
                 ),
               ],
             ),
@@ -129,8 +142,8 @@ class AppDrawer extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   onTap: () {
+                    authService.signOut();
                     Get.offAll(() => LoginScreen());
-                    // Add logout logic
                   },
                 ),
                 const SizedBox(height: 8),
