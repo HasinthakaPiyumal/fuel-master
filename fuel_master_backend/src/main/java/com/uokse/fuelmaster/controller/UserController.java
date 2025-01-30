@@ -7,12 +7,12 @@ import com.uokse.fuelmaster.service.impl.UserIMPL;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.JwtService;
-
-
+import jakarta.validation.Valid;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.uokse.fuelmaster.model.User;
@@ -36,11 +36,31 @@ public class UserController {
     }
 
     @PostMapping(path="/save")
-    public String saveUser(@RequestBody UserDTO userDTO ){
-        Long id = userIMPL.addUser(userDTO);
-        return ("User saved with ID: " + id);
-    }
+    public ResponseEntity<?> saveUser(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult ){
+        if (bindingResult.hasErrors()) {
+            // Extract validation error messages
+            HashMap<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
 
+            return ResponseEntity.badRequest().body(errors);
+        }
+        try{
+            Long id = userIMPL.addUser(userDTO);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("UserId", id);
+            SuccessResponse successResponse = new SuccessResponse(
+                    "User saved successfully",
+                    true,
+                    data
+            );
+            return ResponseEntity.ok(successResponse);
+        }catch (IllegalArgumentException e) {  // Catch the specific exception
+            ErrorResponse errorResponse = new ErrorResponse(400, e.getMessage());
+            return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
+
+    }
     @PostMapping(path="/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO) {
         Optional<User> loggedUser = userIMPL.loginUser(loginDTO);
