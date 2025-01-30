@@ -33,9 +33,12 @@ const VehicleReportTable = () => {
             <TableCell>55L</TableCell>
             <TableCell>2025-01-30</TableCell>
             <TableCell>
-              <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+              <button
+                className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium transition-all duration-200 ease-in-out bg-green-100 text-green-700 hover:bg-green-200 hover:shadow-md"
+                onClick={() => console.log("Status changed")}
+              >
                 Active
-              </span>
+              </button>
             </TableCell>
           </TableRow>
           <TableRow>
@@ -47,9 +50,12 @@ const VehicleReportTable = () => {
             <TableCell>70L</TableCell>
             <TableCell>2025-01-29</TableCell>
             <TableCell>
-              <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
+              <button
+                className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium transition-all duration-200 ease-in-out bg-red-100 text-red-700 hover:bg-red-200 hover:shadow-md"
+                onClick={() => console.log("Status changed")}
+              >
                 Inactive
-              </span>
+              </button>
             </TableCell>
           </TableRow>
         </TableBody>
