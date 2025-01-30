@@ -22,9 +22,13 @@ public class EmployeeService {
     public String addEmployee(EmployeeDTO employeeDTO) {
 
             // Check if NIC already exists
-            Optional<Employee> existingEmployee = employeeRepo.findByNic(employeeDTO.getNic());
-            if (existingEmployee.isPresent()) {
+            Optional<Employee> existingEmployeeByNIC = employeeRepo.findByNic(employeeDTO.getNic());
+            Optional<Employee> existingEmployeeByPhone = employeeRepo.findByPhone(employeeDTO.getPhone());
+            if (existingEmployeeByNIC.isPresent()) {
                 throw new IllegalArgumentException("NIC already registered: " + employeeDTO.getNic());
+            }
+            if (existingEmployeeByPhone.isPresent()) {
+                throw new IllegalArgumentException("Phone number already registered: " + employeeDTO.getPhone());
             }
 
             // Check if Fuel Station exists

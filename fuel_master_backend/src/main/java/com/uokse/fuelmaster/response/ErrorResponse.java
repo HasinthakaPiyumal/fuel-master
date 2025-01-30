@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.HashMap;
 
 @Data
 @NoArgsConstructor
@@ -18,4 +19,6 @@ public class ErrorResponse {
         this.message = message;
         this.timestamp = System.currentTimeMillis();
     }
-} 
+
+
+}

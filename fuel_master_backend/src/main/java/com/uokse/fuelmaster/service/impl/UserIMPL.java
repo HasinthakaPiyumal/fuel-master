@@ -22,7 +22,9 @@ public class UserIMPL {
 
     public Long addUser(UserDTO userDTO) {
         if(userRepo.findByNic(userDTO.getNic()).isPresent()){
-            throw new IllegalArgumentException("NIC already registered"+userDTO.getNic());
+            throw new IllegalArgumentException("NIC already registered" +userDTO.getNic());
+        } else if (userRepo.findByPhone(userDTO.getPhone()).isPresent()){
+            throw new IllegalArgumentException("Phone number already registered" +userDTO.getPhone());
         }
 
         User user = new User(

@@ -37,9 +37,9 @@ public class EmployeeController {
             return ResponseEntity.badRequest().body(errors);
         }
         try {
-            String id = employeeService.addEmployee(employeeDTO);
+            String name = employeeService.addEmployee(employeeDTO);
             HashMap<String, Object> data = new HashMap<>();
-            data.put("employeeName", id);
+            data.put("employeeName", name);
 
             SuccessResponse successResponse = new SuccessResponse(
                     "User saved successfully",

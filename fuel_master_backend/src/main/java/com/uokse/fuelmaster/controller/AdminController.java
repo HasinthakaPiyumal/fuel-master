@@ -25,8 +25,8 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    @PostMapping(path="/save")
-    public ResponseEntity<?> saveAdmin(@Valid @RequestBody AdminDTO adminDTO, BindingResult bindingResult ){
+    @PostMapping(path = "/save")
+    public ResponseEntity<?> saveAdmin(@Valid @RequestBody AdminDTO adminDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // Extract validation error messages
             HashMap<String, String> errors = new HashMap<>();
@@ -35,17 +35,17 @@ public class AdminController {
 
             return ResponseEntity.badRequest().body(errors);
         }
-        try{
-            Long id =adminService.addAdmin(adminDTO);
+        try {
+            String name = adminService.addAdmin(adminDTO);
             HashMap<String, Object> data = new HashMap<>();
-            data.put("UserId", id);
+            data.put("AdminName", name);
             SuccessResponse successResponse = new SuccessResponse(
-                    "User saved successfully",
+                    "Admin saved successfully",
                     true,
                     data
             );
             return ResponseEntity.ok(successResponse);
-        }catch (IllegalArgumentException e) {  // Catch the specific exception
+        } catch (IllegalArgumentException e) {  // Catch the specific exception
             ErrorResponse errorResponse = new ErrorResponse(400, e.getMessage());
             return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
@@ -57,21 +57,19 @@ public class AdminController {
         if (!admins.isEmpty()) {
             return ResponseEntity.ok(admins);
         } else {
-            return ResponseEntity.status(404).body("No admins found");
+            ErrorResponse errorResponse = new ErrorResponse(404, "No Admins Found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
 
     @GetMapping("/{phone}")
-    public ResponseEntity<?> getAdminByPhone(@RequestParam String phone) {
+    public ResponseEntity<?> getAdminByPhone(@PathVariable String phone) {
         List<AdminViewDTO> admins = adminService.getAdminByPhone(phone);
         if (!admins.isEmpty()) {
             return ResponseEntity.ok(admins);
         } else {
-            return ResponseEntity.status(404).body("No admins found");
+            ErrorResponse errorResponse = new ErrorResponse(404, "Admin NotFound");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
-
-
-
-
 }
