@@ -2,8 +2,10 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import QRCode from 'qrcode';
+
 export default function VehiclePage() {
-  // This would typically come from your API/backend
+ 
   const vehicleData = {
     name: "Navon Sanjuni",
     nic: "200173600804",
@@ -13,17 +15,48 @@ export default function VehiclePage() {
     chassisNumber: "ABCABC1234...",
     fuelType: "Diesel"
   };
+
   const quotaData = {
     availableQuota: 5,
     quotaUsed: 10,
     totalQuota: 15,
     renewalDate: "2025/01/16 12:22PM"
   };
+
+  const handleQRDownload = async () => {
+    try {
+     
+      const qrData = {
+        vehicleNumber: vehicleData.vehicleNumber,
+        nic: vehicleData.nic,
+        fuelType: vehicleData.fuelType,
+        quota: quotaData.availableQuota,
+        name: vehicleData.name,
+        phoneNumber: vehicleData.phoneNumber
+      };
+
+     
+      const qrCodeURL = await QRCode.toDataURL(JSON.stringify(qrData));
+
+     
+      const link = document.createElement('a');
+      link.href = qrCodeURL;
+      link.download = `QR_${vehicleData.vehicleNumber}.png`;
+      
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+    
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 max-w-6xl">
-     
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Vehicle Information Card */}
         <Card className="bg-white shadow-lg">
           <CardContent className="p-6">
             <h2 className="text-2xl font-semibold text-orange-600 mb-6">Your Vehicle</h2>
@@ -39,7 +72,7 @@ export default function VehiclePage() {
             </div>
           </CardContent>
         </Card>
-        {/* Quota Summary Card */}
+       
         <Card className="bg-white shadow-lg">
           <CardContent className="p-6">
             <h2 className="text-2xl font-semibold text-orange-600 mb-6">Quota Summary</h2>
@@ -61,7 +94,7 @@ export default function VehiclePage() {
               </div>
               <Button 
                 className="w-full mt-4 bg-orange-600 hover:bg-orange-700 text-white"
-                onClick={() => {/* Handle QR download */}}
+                onClick={handleQRDownload}
               >
                 Download QR
               </Button>
@@ -72,7 +105,8 @@ export default function VehiclePage() {
     </div>
   );
 }
-// Helper component for info rows
+
+
 function InfoRow({ label, value }) {
   return (
     <div className="flex justify-between items-center py-2 border-b border-gray-100">
