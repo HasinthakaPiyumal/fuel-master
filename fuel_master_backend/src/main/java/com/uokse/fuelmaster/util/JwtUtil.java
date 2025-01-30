@@ -71,6 +71,7 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token) {
+        System.out.println("Token: " + token);
         try {
             Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -78,6 +79,7 @@ public class JwtUtil {
                 .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
+            System.out.println("Invalid JWT signature: {}"+ e.getMessage());
             return false;
         }
     }

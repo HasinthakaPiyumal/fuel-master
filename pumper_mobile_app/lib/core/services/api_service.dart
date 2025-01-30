@@ -1,23 +1,32 @@
 import 'package:dio/dio.dart';
+import 'package:pumper_mobile_app/core/services/storage_service.dart';
 
 class ApiService {
+  final StorageService _storageService = StorageService();
+  
   static final ApiService _instance = ApiService._internal();
+  static String token = '';
 
-  static const String _baseUrl = 'http://localhost:8080';
-  static const String token = 'abcd1234';
+  static const String _baseUrl = 'http://192.168.8.116:8080/api/v1';
 
   late final Dio _dio;
+
+  Map<String, String> _getHeaders(String endpoint) {
+    final headers = {'Content-Type': 'application/json'};
+    if (!endpoint.contains('/employee/login')) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    return headers;
+  }
 
   ApiService._internal() {
     _dio = Dio(
       BaseOptions(
         baseUrl: _baseUrl,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
-        },
+        headers: {'Content-Type': 'application/json'},
       ),
     );
+    token = _storageService.getString('token') ?? '';
   }
 
   factory ApiService() {
@@ -27,10 +36,13 @@ class ApiService {
   // Generic GET request
   Future<Map<String, dynamic>> get(String endpoint) async {
     try {
-      final response = await _dio.get(endpoint);
+      final response = await _dio.get(
+        endpoint,
+        options: Options(headers: _getHeaders(endpoint)),
+      );
       return response.data;
     } on DioException catch (e) {
-      throw Exception('Network error: ${e.message}');
+      return e.response?.data;
     }
   }
 
@@ -38,10 +50,14 @@ class ApiService {
   Future<Map<String, dynamic>> post(
       String endpoint, Map<String, dynamic> body) async {
     try {
-      final response = await _dio.post(endpoint, data: body);
-      return response.data;
+      final response = await _dio.post(
+        endpoint,
+        data: body,
+        options: Options(headers: _getHeaders(endpoint)),
+      );
+      return  response.data;
     } on DioException catch (e) {
-      throw Exception('Network error: ${e.message}');
+      return e.response?.data;
     }
   }
 
@@ -49,20 +65,27 @@ class ApiService {
   Future<Map<String, dynamic>> put(
       String endpoint, Map<String, dynamic> body) async {
     try {
-      final response = await _dio.put(endpoint, data: body);
+      final response = await _dio.put(
+        endpoint,
+        data: body,
+        options: Options(headers: _getHeaders(endpoint)),
+      );
       return response.data;
     } on DioException catch (e) {
-      throw Exception('Network error: ${e.message}');
+      return e.response?.data;
     }
   }
 
   // Generic DELETE request
-  Future<bool> delete(String endpoint) async {
+  Future<Map<String, dynamic>> delete(String endpoint) async {
     try {
-      final response = await _dio.delete(endpoint);
-      return response.statusCode == 200 || response.statusCode == 204;
+      final response = await _dio.delete(
+        endpoint,
+        options: Options(headers: _getHeaders(endpoint)),
+      );
+      return response.data;
     } on DioException catch (e) {
-      throw Exception('Network error: ${e.message}');
+      return e.response?.data;
     }
   }
 }

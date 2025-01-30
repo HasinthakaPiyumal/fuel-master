@@ -7,7 +7,7 @@ class LoginController extends GetxController {
   final AuthService _authService = AuthService();
   final StorageService _storageService = StorageService();
   
-  final emailController = TextEditingController();
+  final phoneNumberController = TextEditingController();
   final passwordController = TextEditingController();
   
   final _isLoading = false.obs;
@@ -23,16 +23,16 @@ class LoginController extends GetxController {
     _error = null;
 
     try {
-      final email = emailController.text.trim();
+      final phoneNumber = phoneNumberController.text.trim();
       final password = passwordController.text.trim();
       
       final success = await _authService.signInWithEmailAndPassword(
-        email,
+        phoneNumber,
         password,
       );
 
-      if (success) {
-        await _storageService.setString('email', email);
+      if (!success) {
+        _error = 'Invalid phone number or password';
       }
       _isLoading.value = false;
       return success;
@@ -44,13 +44,13 @@ class LoginController extends GetxController {
   }
 
   bool _validateInput() {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    if (phoneNumberController.text.isEmpty || passwordController.text.isEmpty) {
       _error = 'Please fill in all fields';
       return false;
     }
     
-    if (!emailController.text.contains('@')) {
-      _error = 'Please enter a valid email';
+    if (phoneNumberController.text.length < 10) {
+      _error = 'Please enter a valid phone number';
       return false;
     }
     
@@ -63,7 +63,7 @@ class LoginController extends GetxController {
   }
 
   void dispose() {
-    emailController.dispose();
+    phoneNumberController.dispose();
     passwordController.dispose();
   }
 } 

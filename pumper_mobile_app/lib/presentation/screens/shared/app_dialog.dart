@@ -5,11 +5,13 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 
 class AppDialog {
+    static int lastDialogId = 0;
   static void _showBaseDialog({
     required Widget content,
     bool barrierDismissible = true,
     Duration? autoCloseDuration = const Duration(seconds: 3),
   }) {
+    lastDialogId++;
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(
@@ -39,9 +41,11 @@ class AppDialog {
       transitionDuration: const Duration(milliseconds: 200),
     );
 
+    int currentDialogId = lastDialogId;
+
     if (autoCloseDuration != null) {
       Future.delayed(autoCloseDuration, () {
-        if (Get.isDialogOpen ?? false) {
+        if ((Get.isDialogOpen ?? false) && currentDialogId == lastDialogId) {
           Get.back();
         }
       });
