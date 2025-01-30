@@ -1,13 +1,13 @@
-import React from 'react';
-import VehicleReportTable from './vehicle-report-table';
+import React from "react";
+import VehicleReportTable from "./vehicle-report-table";
 
 const VehicleReport = () => {
-    return (
-        <div className="vehicle-report">
-            <h1>Vehicle Reports</h1>
-            <VehicleReportTable />
-        </div>
-    );
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Vehicle Reports</h1>
+      <VehicleReportTable />
+    </div>
+  );
 };
 
-export default VehicleReport; 
+export default VehicleReport;
