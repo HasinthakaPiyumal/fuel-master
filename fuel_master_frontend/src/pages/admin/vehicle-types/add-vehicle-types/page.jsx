@@ -27,19 +27,17 @@ const AddVehicleTypes = () => {
 
   const onSubmit = (data) => {
     console.log(data);
-    // Handle form submission
   };
 
-  // Custom handler for Select component
   const handleFuelTypeChange = (value) => {
     setValue("fuelType", value);
     trigger("fuelType");
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
+    <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Add Vehicle Type</h1>
-      <Card>
+      <Card className="max-w-md">
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
@@ -96,14 +94,8 @@ const AddVehicleTypes = () => {
                 placeholder="Enter default quota"
                 {...register("defaultQuota", {
                   required: "Default quota is required",
-                  min: {
-                    value: 1,
-                    message: "Default quota must be greater than 0",
-                  },
-                  max: {
-                    value: 1000,
-                    message: "Default quota cannot exceed 1000",
-                  },
+                  validate: (value) =>
+                    value > 0 || "Default quota must be greater than 0",
                 })}
               />
               {errors.defaultQuota && (
