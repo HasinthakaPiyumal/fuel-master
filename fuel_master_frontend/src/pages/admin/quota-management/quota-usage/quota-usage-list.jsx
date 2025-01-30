@@ -73,8 +73,32 @@ const QuotaUsageList = () => {
         return matchesSearch && matchesStatus;
     });
 
- 
-           
+    return (
+        <div className="p-6">
+
+
+            <div className="mb-6 flex gap-4">
+                <input
+                    type="text"
+                    placeholder="Search by station name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="p-2 border rounded-md w-64"
+                />
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="p-2 border rounded-md"
+                >
+                    <option value="">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            </div>
+
+         
+    );
 };
 
 export default QuotaUsageList; 
