@@ -10,6 +10,7 @@ import com.uokse.fuelmaster.service.JwtService;
 import jakarta.validation.Valid;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -102,4 +103,16 @@ public class UserController {
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
+
+    //remove user
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> removeUser(@PathVariable Long id){
+        try{
+        userIMPL.removeUser(id);
+         return ResponseEntity.ok(new SuccessResponse("User deleted successfully",true,null));
+    }catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+        }
+        }
 }
