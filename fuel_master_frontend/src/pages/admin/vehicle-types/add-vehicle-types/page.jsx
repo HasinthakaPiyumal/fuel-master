@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,11 +17,9 @@ const AddVehicleTypes = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Add Vehicle Type</h1>
       <Card>
-        <CardHeader>
-          <CardTitle>Add Vehicle Type</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="vehicleType" className="text-sm font-medium">
