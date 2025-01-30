@@ -54,7 +54,7 @@ const AddEmployee = () => {
 
   function onSubmit(values) {
     console.log(values);
-    // Handle form submission here
+    
   }
 
   return (
