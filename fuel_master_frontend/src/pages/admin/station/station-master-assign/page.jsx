@@ -72,13 +72,9 @@ export default function StationMasterAssign() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-80px)]">
-      <Card className="max-w-xl w-full mx-4">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Assign Station Master
-          </CardTitle>
-        </CardHeader>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Assign Station Master</h1>
+      <Card className="max-w-xl w-full">
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
