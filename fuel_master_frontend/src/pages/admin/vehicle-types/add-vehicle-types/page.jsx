@@ -8,11 +8,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useForm } from "react-hook-form";
 
 const AddVehicleTypes = () => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    trigger,
+  } = useForm({
+    defaultValues: {
+      vehicleType: "",
+      fuelType: "",
+      defaultQuota: "",
+    },
+  });
+
+  const onSubmit = (data) => {
+    console.log(data);
     // Handle form submission
+  };
+
+  // Custom handler for Select component
+  const handleFuelTypeChange = (value) => {
+    setValue("fuelType", value);
+    trigger("fuelType");
   };
 
   return (
@@ -20,19 +41,34 @@ const AddVehicleTypes = () => {
       <h1 className="text-2xl font-bold mb-6">Add Vehicle Type</h1>
       <Card>
         <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="vehicleType" className="text-sm font-medium">
                 Vehicle Type
               </label>
-              <Input id="vehicleType" placeholder="Enter vehicle type" />
+              <Input
+                id="vehicleType"
+                placeholder="Enter vehicle type"
+                {...register("vehicleType", {
+                  required: "Vehicle type is required",
+                  minLength: {
+                    value: 2,
+                    message: "Vehicle type must be at least 2 characters",
+                  },
+                })}
+              />
+              {errors.vehicleType && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.vehicleType.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <label htmlFor="fuelType" className="text-sm font-medium">
                 Fuel Type
               </label>
-              <Select>
+              <Select onValueChange={handleFuelTypeChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select fuel type" />
                 </SelectTrigger>
@@ -43,6 +79,11 @@ const AddVehicleTypes = () => {
                   <SelectItem value="hybrid">Hybrid</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.fuelType && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.fuelType.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -53,7 +94,23 @@ const AddVehicleTypes = () => {
                 id="defaultQuota"
                 type="number"
                 placeholder="Enter default quota"
+                {...register("defaultQuota", {
+                  required: "Default quota is required",
+                  min: {
+                    value: 1,
+                    message: "Default quota must be greater than 0",
+                  },
+                  max: {
+                    value: 1000,
+                    message: "Default quota cannot exceed 1000",
+                  },
+                })}
               />
+              {errors.defaultQuota && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.defaultQuota.message}
+                </p>
+              )}
             </div>
 
             <Button type="submit" className="w-full">
