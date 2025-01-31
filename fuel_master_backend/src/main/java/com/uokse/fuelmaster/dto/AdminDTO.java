@@ -30,8 +30,6 @@ public class AdminDTO {
         this.updatedAt = updatedAt;
     }
 
-    public AdminDTO() {
-    }
 
     public Long getId() {
         return id;

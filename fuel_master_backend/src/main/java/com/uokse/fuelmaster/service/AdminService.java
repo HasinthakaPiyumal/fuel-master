@@ -5,6 +5,7 @@ import com.uokse.fuelmaster.dto.Response.AdminViewDTO;
 import com.uokse.fuelmaster.model.Admin;
 import com.uokse.fuelmaster.repository.AdminRepository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,11 @@ public class AdminService {
 
 
     // Method to add an admin
+    @Transactional
     public String addAdmin(AdminDTO adminDTO) {
 
         if(adminRepository.findByNic(adminDTO.getNic()).isPresent()){
-            throw new IllegalArgumentException("NIC already registered" +adminDTO.getNic());
+            throw new IllegalArgumentException("NIC already registered: " +adminDTO.getNic());
         }
         if (adminRepository.findByPhone(adminDTO.getPhone()).isPresent()) {
             throw new IllegalArgumentException("Phone number already registered: " + adminDTO.getPhone());

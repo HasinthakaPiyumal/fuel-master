@@ -37,9 +37,9 @@ public class UserIMPL {
 
         String hashedPassword = PasswordUtil.hashPassword(userDTO.getPassword());
         if(userRepo.findByNic(userDTO.getNic()).isPresent()){
-            throw new IllegalArgumentException("NIC already registered" +userDTO.getNic());
+            throw new IllegalArgumentException("NIC already registered: " +userDTO.getNic());
         } else if (userRepo.findByPhone(userDTO.getPhone()).isPresent()){
-            throw new IllegalArgumentException("Phone number already registered" +userDTO.getPhone());
+            throw new IllegalArgumentException("Phone number already registered: " +userDTO.getPhone());
         }
         User user = new User(
                 userDTO.getId(),
