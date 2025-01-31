@@ -34,6 +34,9 @@ public class Admin {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+    public Admin() {
+
+   }
 
     public Long getId() {
         return id;
