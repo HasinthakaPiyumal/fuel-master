@@ -28,18 +28,14 @@ public class FuelTransaction {
     @Column(nullable = false)
     private LocalDateTime transactionDate;
 
-    @Column(nullable = false)
-    private Double availableQuota;
 
-
-    public FuelTransaction(Long id, Vehicle vehicle, Employee employee, FuelStation fuelStation, Double pumpedQuantity, LocalDateTime transactionDate, Double availableQuantity) {
+    public FuelTransaction(Long id, Vehicle vehicle, Employee employee, FuelStation fuelStation, Double pumpedQuantity, LocalDateTime transactionDate) {
         this.id = id;
         this.vehicle = vehicle;
         this.employee = employee;
         this.fuelStation = fuelStation;
         this.pumpedQuantity = pumpedQuantity;
         this.transactionDate = transactionDate;
-        this.availableQuota = availableQuantity;
     }
 
     public FuelTransaction() {
@@ -94,13 +90,6 @@ public class FuelTransaction {
         this.transactionDate = transactionDate;
     }
 
-    public Double getAvailableQuota() {
-        return availableQuota;
-    }
-
-    public void setAvailableQuota(Double availableQuota) {
-        this.availableQuota = availableQuota;
-    }
 
     @Override
     public String toString() {
@@ -111,7 +100,6 @@ public class FuelTransaction {
                 ", fuelStation=" + fuelStation +
                 ", pumpedQuantity=" + pumpedQuantity +
                 ", transactionDate=" + transactionDate +
-                ", availableQuota=" + availableQuota +
                 '}';
     }
 }

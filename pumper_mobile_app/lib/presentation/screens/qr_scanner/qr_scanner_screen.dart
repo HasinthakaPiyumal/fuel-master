@@ -1,9 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:pumper_mobile_app/data/models/customer_fuel_data.dart';
-import 'package:pumper_mobile_app/presentation/screens/customer_quota/customer_quota_screen.dart';
+import 'package:pumper_mobile_app/presentation/screens/qr_scanner/qr_scanner_controller.dart';
 
 class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({super.key});
@@ -14,14 +12,14 @@ class QRScannerScreen extends StatefulWidget {
 
 class _QRScannerScreenState extends State<QRScannerScreen> {
   late MobileScannerController controller;
+  final QrScannerController qrScannerController = QrScannerController();
   final RxBool isTorchOn = false.obs;
   final Rx<CameraFacing> cameraFacing = CameraFacing.back.obs;
 
   @override
   void initState() {
     super.initState();
-    controller = MobileScannerController(
-    );
+    controller = MobileScannerController();
   }
 
   @override
@@ -69,25 +67,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           MobileScanner(
             controller: controller,
             onDetect: (capture) {
-              final List<Barcode> barcodes = capture.barcodes;
-              for (final barcode in barcodes) {
-                if (barcode.rawValue != null) {
-                  debugPrint('Barcode found! ${barcode.rawValue}');
-                  // Mock customer data - replace with actual API call
-                  final customerData = CustomerFuelData(
-                    id: barcode.rawValue!,
-                    name: 'John Doe',
-                    vehicleNumber: 'ABC-1234',
-                    totalQuota: 100,
-                    usedQuota: 35,
-                    lastPurchase: DateTime.now().subtract(const Duration(days: 2)),
-                    fuelType: 'Diesel',
-                    vehicleType: 'Heavy Truck',
-                  );
-                  Get.off(() => CustomerQuotaScreen(customerData: customerData));
-                  break;
-                }
-              }
+              qrScannerController.onDetect(controller,capture);
             },
           ),
           CustomPaint(
@@ -185,16 +165,18 @@ class ScannerOverlayPainter extends CustomPainter {
     // Bottom right corner
     canvas.drawLine(
       Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize),
-      Offset(scanAreaLeft + scanAreaSize - markerLength, scanAreaTop + scanAreaSize),
+      Offset(scanAreaLeft + scanAreaSize - markerLength,
+          scanAreaTop + scanAreaSize),
       markerPaint,
     );
     canvas.drawLine(
       Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize),
-      Offset(scanAreaLeft + scanAreaSize, scanAreaTop + scanAreaSize - markerLength),
+      Offset(scanAreaLeft + scanAreaSize,
+          scanAreaTop + scanAreaSize - markerLength),
       markerPaint,
     );
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-} 
+}

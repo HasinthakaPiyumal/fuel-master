@@ -1,5 +1,6 @@
 package com.uokse.fuelmaster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ public class Employee implements UserDetails {
     private String nic;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @ManyToOne
@@ -92,7 +94,7 @@ public class Employee implements UserDetails {
 
     @Override
     public String getUsername() {
-        return phone;
+        return id.toString();
     }
 
     public void setPassword(String password) {

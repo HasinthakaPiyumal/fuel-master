@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pumper_mobile_app/core/constants/app_colors.dart';
+import 'package:pumper_mobile_app/core/utils/date_time_util.dart';
 
 class FuelTransactionCard extends StatelessWidget {
   final int transactionNumber;
@@ -20,26 +22,30 @@ class FuelTransactionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: const CircleAvatar(
-          backgroundColor: Colors.blue,
+          backgroundColor: AppColors.primary,
           child: Icon(Icons.local_gas_station, color: Colors.white),
         ),
         title: Text('Transaction #$transactionNumber'),
         subtitle: Text('Vehicle: $vehicleNumber'),
+
+
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '$fuelAmount L',
+              '${fuelAmount.toStringAsFixed(2)} L',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
             ),
+
             Text(
-              '${timestamp.hour}:${timestamp.minute}',
+              '${DateTimeUtils.formatTimestamp12Hour(timestamp)}',
               style: const TextStyle(fontSize: 12),
             ),
+
           ],
         ),
       ),

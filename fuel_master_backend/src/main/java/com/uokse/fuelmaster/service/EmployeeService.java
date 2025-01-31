@@ -78,8 +78,8 @@ public class EmployeeService {
             return null;
         }
     }
-    public Optional<Employee> getEmployee(String phone) {
-        Optional<Employee> employeeOptional = employeeRepo.findByPhone(phone);
+    public Optional<Employee> getEmployee(String id) {
+        Optional<Employee> employeeOptional = employeeRepo.findById(Long.parseLong(id));
         return employeeOptional;
     }
 

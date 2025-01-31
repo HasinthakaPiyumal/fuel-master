@@ -1,5 +1,6 @@
 import 'package:pumper_mobile_app/domain/entities/user.dart';
 import 'package:pumper_mobile_app/data/models/user_model.dart';
+import 'package:pumper_mobile_app/core/services/api_service.dart';
 import 'package:pumper_mobile_app/core/services/storage_service.dart';
 import 'package:pumper_mobile_app/data/repositories/user_repository_impl.dart';
 
@@ -37,11 +38,10 @@ class AuthService {
     if (user != null) {
       UserModel userModel = UserModel.fromMap(user['user']);
       _currentUser = userModel.toEntity();
-      await _storageService.setString('token', user['token']);
-	  print(user['token']);
-	  print(_storageService.getString('token'));
+      ApiService.setToken(user['token']);
     }
     return user != null;
+
   }
 
   Future<bool> signInWithToken() async {
@@ -49,7 +49,7 @@ class AuthService {
     if (user != null) {
       UserModel userModel = UserModel.fromMap(user['user']);
       _currentUser = userModel.toEntity();
-      await _storageService.setString('token', user['token']);
+      ApiService.setToken(user['token']);
     }
     return user != null;
   }

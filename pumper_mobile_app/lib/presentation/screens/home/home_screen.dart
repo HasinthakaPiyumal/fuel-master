@@ -1,6 +1,9 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pumper_mobile_app/core/constants/app_assets.dart';
 import 'package:pumper_mobile_app/core/constants/app_colors.dart';
+import 'package:pumper_mobile_app/data/models/fuel_transaction_model.dart';
+import 'package:pumper_mobile_app/presentation/screens/home/home_controller.dart';
 import 'package:pumper_mobile_app/presentation/screens/shared/primary_button.dart';
 import 'package:pumper_mobile_app/presentation/screens/home/widgets/app_drawer.dart';
 import 'package:pumper_mobile_app/presentation/screens/home/widgets/summary_card.dart';
@@ -8,7 +11,10 @@ import 'package:pumper_mobile_app/presentation/screens/qr_scanner/qr_scanner_scr
 import 'package:pumper_mobile_app/presentation/screens/home/widgets/fuel_transaction_card.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  RxList<FuelTransactionModel> transactions = <FuelTransactionModel>[].obs;
+  final homeController = HomeController();
 
   Future<void> _openQRScanner(BuildContext context) async {
     final result = await Navigator.push<String>(
@@ -19,7 +25,6 @@ class HomeScreen extends StatelessWidget {
     );
 
     if (result != null && context.mounted) {
-      // Handle the scanned QR code result
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Scanned QR Code: $result'),
@@ -31,6 +36,21 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    RxDouble totalFuelAmount = 0.0.obs;
+    void getTransactions() async {
+      List<FuelTransactionModel> transactionsList =
+          await homeController.getFuelTransactions();
+      double totalFuelAmountTmp = 0;
+      for (var transaction in transactionsList) {
+        totalFuelAmountTmp += transaction.pumpedQuantity;
+      }
+      print(totalFuelAmountTmp);
+
+      totalFuelAmount.value = totalFuelAmountTmp;
+      transactions.value = transactionsList;
+    }
+
+    getTransactions();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -65,37 +85,38 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-
-              // Summary Cards Row
               Row(
-                children: const [
+                children: [
                   Expanded(
-                    child: SummaryCard(
-                      title: "Today's Fuel Amount",
-                      value: "1,250 L",
-                      icon: Icons.local_gas_station,
-                      color: Colors.blue,
-                    ),
+                    child: Obx(() {
+                      return SummaryCard(
+                        title: "Today's Fuel Amount",
+                        value: "${totalFuelAmount.value.toStringAsFixed(2)} L",
+                        icon: Icons.local_gas_station,
+                        color: Colors.blue,
+                      );
+                    }),
                   ),
                   SizedBox(width: 16),
                   Expanded(
-                    child: SummaryCard(
-                      title: "Last Fuel Amount",
-                      value: "980 L",
-                      icon: Icons.history,
-                      color: Colors.green,
-                    ),
+                    child: Obx(() {
+                      return SummaryCard(
+                        title: "Last Fuel Amount",
+                        value: "${transactions.isNotEmpty ? transactions[0].pumpedQuantity.toStringAsFixed(2) : 0} L",
+                        icon: Icons.history,
+                        color: Colors.green,
+                      );
+                    }),
                   ),
                 ],
               ),
+
               const SizedBox(height: 16),
               PrimaryButton(
                 onPressed: () => _openQRScanner(context),
                 text: "Scan QR",
               ),
               const SizedBox(height: 24),
-
-              // Today's Fuel List Title
               const Text(
                 "Today's Fuel Transactions",
                 style: TextStyle(
@@ -104,20 +125,21 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Today's Fuel List
               Expanded(
-                child: ListView.builder(
-                  itemCount: 5, // Replace with actual data length
-                  itemBuilder: (context, index) {
-                    return FuelTransactionCard(
-                      transactionNumber: index + 1,
-                      vehicleNumber: 'ABC-${1234 + index}',
-                      fuelAmount: 150 + (index * 50),
-                      timestamp: DateTime.now(),
-                    );
-                  },
-                ),
+                child: Obx(() {
+                  return ListView.builder(
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      return FuelTransactionCard(
+                        transactionNumber: transactions[index].id,
+                        vehicleNumber: transactions[index].vehicleNumber,
+                        fuelAmount: transactions[index].pumpedQuantity,
+                        timestamp:
+                            DateTime.parse(transactions[index].transactionDate),
+                      );
+                    },
+                  );
+                }),
               ),
             ],
           ),
@@ -125,7 +147,7 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openQRScanner(context),
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.primary,
         child: const Icon(Icons.qr_code_scanner),
       ),
     );

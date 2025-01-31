@@ -49,7 +49,7 @@ public class SecurityConfiguration {
                             String path = request.getRequestURI();
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
+                            System.out.println("Unauthorized Path: " + path);
                             ErrorResponse errorResponse = new ErrorResponse(
                                     HttpServletResponse.SC_UNAUTHORIZED,
                                     "Unauthorized");
