@@ -2,11 +2,11 @@ package com.uokse.fuelmaster.response;
 
 public class SuccessResponse {
     private String message;
-    private Boolean status;
+    private int status;
     private Object data;
 
     public SuccessResponse(String message, Boolean status, Object data) {
-        this.status = status;
+        this.status = status?200:500;
         this.message = message;
         this.data = data;
     }
@@ -22,11 +22,11 @@ public class SuccessResponse {
         this.message = message;
     }
 
-    public Boolean getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

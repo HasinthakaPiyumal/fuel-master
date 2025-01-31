@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminService {
@@ -18,11 +19,14 @@ public class AdminService {
 
 
     // Method to add an admin
-    public Long addAdmin(AdminDTO adminDTO) {
-        if(adminRepository.findByNic(adminDTO.getNic()).isPresent()){
-            throw new IllegalArgumentException("NIC already registered"+adminDTO.getNic());
-        }
+    public String addAdmin(AdminDTO adminDTO) {
 
+        if(adminRepository.findByNic(adminDTO.getNic()).isPresent()){
+            throw new IllegalArgumentException("NIC already registered" +adminDTO.getNic());
+        }
+        if (adminRepository.findByPhone(adminDTO.getPhone()).isPresent()) {
+            throw new IllegalArgumentException("Phone number already registered: " + adminDTO.getPhone());
+        }
         // Create an admin object from the DTO
         Admin admin = new Admin(
                 adminDTO.getId(),
@@ -36,7 +40,7 @@ public class AdminService {
 
         // Save the admin object to the database
         adminRepository.save(admin);
-        return admin.getId();
+        return admin.getName();
     }
 
 
@@ -50,7 +54,7 @@ public class AdminService {
     }
 
     public List<AdminViewDTO> getAdminByPhone(String phone) {
-        List<Admin> admins = adminRepository.findByPhone(phone);
+        Optional<Admin> admins = adminRepository.findByPhone(phone);
         return admins.stream().map(admin -> new AdminViewDTO(
                 admin.getName(),
                 admin.getPhone(),

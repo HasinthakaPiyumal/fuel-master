@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,7 +64,9 @@ public class UserController {
 
     }
     @PostMapping(path="/login")
+    @PreAuthorize("true")
     public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO) {
+        System.out.println("login" + loginDTO);
         Optional<User> loggedUser = userIMPL.loginUser(loginDTO);
         if(loggedUser != null){
             String token = jwtService.generateToken(loggedUser.get());

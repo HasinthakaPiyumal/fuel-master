@@ -25,13 +25,14 @@ class _LoginFormState extends State<LoginForm> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
       dynamic res = await widget.controller.login();
+      print(res);
       if (res) {
         if (mounted) {
+          Get.offAll(() => const HomeScreen());
           AppDialog.showSuccess(
             message: 'Login successful!',
             onConfirm: () {
-              // Navigate to home or do something else
-              Get.offAll(() => const HomeScreen());
+              Get.back();
             },
           );
         }
@@ -39,7 +40,7 @@ class _LoginFormState extends State<LoginForm> {
         AppDialog.showError(
           message: widget.controller.error!,
         );
-      }else {
+      } else {
         AppDialog.showError(
           message: 'An error occurred. Please try again later.',
         );
@@ -55,15 +56,16 @@ class _LoginFormState extends State<LoginForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AppTextField(
-            controller: widget.controller.emailController,
-            label: 'Email',
-            hint: 'Enter your email',
-            prefixIcon: const Icon(Icons.email_outlined),
-            keyboardType: TextInputType.emailAddress,
+            controller: widget.controller.phoneNumberController,
+            label: 'Phone Number',
+            hint: 'Enter your phone number',
+            prefixIcon: const Icon(Icons.phone_outlined),
+            keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
             validator: (value) {
-              if (value?.isEmpty ?? true) return 'Email is required';
-              if (!value!.contains('@')) return 'Enter a valid email';
+              if (value?.isEmpty ?? true) return 'Phone number is required';
+              if (value!.length < 10)
+                return 'Phone number must be at least 10 characters';
               return null;
             },
           ),
@@ -85,10 +87,10 @@ class _LoginFormState extends State<LoginForm> {
           ),
           const SizedBox(height: 24),
           Obx(() => PrimaryButton(
-            text: 'Login',
-            onPressed: _handleLogin,
-            isLoading: widget.controller.isLoading,
-          )),
+                text: 'Login',
+                onPressed: _handleLogin,
+                isLoading: widget.controller.isLoading,
+              )),
         ],
       ),
     );
@@ -99,4 +101,4 @@ class _LoginFormState extends State<LoginForm> {
     widget.controller.dispose();
     super.dispose();
   }
-} 
+}

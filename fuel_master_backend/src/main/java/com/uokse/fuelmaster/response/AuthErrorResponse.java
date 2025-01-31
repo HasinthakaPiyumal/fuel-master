@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthErrorResponse {
+public class AuthErrorResponse extends Throwable {
     private int status;
     private String error;
     private String message;

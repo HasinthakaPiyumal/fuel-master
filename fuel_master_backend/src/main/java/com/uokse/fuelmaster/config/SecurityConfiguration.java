@@ -1,5 +1,6 @@
 package com.uokse.fuelmaster.config;
 
+import com.uokse.fuelmaster.response.ErrorResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -31,10 +32,10 @@ public class SecurityConfiguration {
     }
 
     
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-    }
+//    @Bean
+//    public AuthTokenFilter authenticationJwtTokenFilter() {
+//        return new AuthTokenFilter();
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,23 +47,20 @@ public class SecurityConfiguration {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             String path = request.getRequestURI();
-
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-                            AuthErrorResponse errorResponse = new AuthErrorResponse(
+                            ErrorResponse errorResponse = new ErrorResponse(
                                     HttpServletResponse.SC_UNAUTHORIZED,
-                                    "Unauthorized",
-                                    "Authentication failed: " + authException.getMessage(),
-                                    System.currentTimeMillis());
+                                    "Unauthorized");
                             ObjectMapper mapper = new ObjectMapper();
                             mapper.writeValue(response.getOutputStream(), errorResponse);
                         }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/user/save","/api/v1/user/login").permitAll()
+                        .requestMatchers("/api/v1/user/save","/api/v1/user/login","/api/v1/employee/login").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

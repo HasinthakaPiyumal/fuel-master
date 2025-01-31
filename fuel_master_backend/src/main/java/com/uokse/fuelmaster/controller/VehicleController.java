@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("api/vehicle")
+@RequestMapping("/api/v1/vehicle")
 public class VehicleController {
 
     private static final Logger logger = LoggerFactory.getLogger(VehicleController.class);

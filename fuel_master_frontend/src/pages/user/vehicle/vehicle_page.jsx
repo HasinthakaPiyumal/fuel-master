@@ -3,8 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import QRCode from 'qrcode';
+
 export default function VehiclePage() {
-  
+
   const vehicleData = {
     name: "Navon Sanjuni",
     nic: "200173600804",
@@ -24,7 +25,6 @@ export default function VehiclePage() {
 
   const handleQRDownload = async () => {
     try {
-
       const qrData = {
         vehicleNumber: vehicleData.vehicleNumber,
         nic: vehicleData.nic,
@@ -34,22 +34,19 @@ export default function VehiclePage() {
         phoneNumber: vehicleData.phoneNumber
       };
 
-
       const qrCodeURL = await QRCode.toDataURL(JSON.stringify(qrData));
 
-
+     
       const link = document.createElement('a');
       link.href = qrCodeURL;
       link.download = `QR_${vehicleData.vehicleNumber}.png`;
-
-
+      
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
     } catch (error) {
       console.error('Error generating QR code:', error);
-
     }
   };
 

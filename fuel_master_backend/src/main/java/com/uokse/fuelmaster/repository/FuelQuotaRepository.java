@@ -21,4 +21,7 @@ public interface FuelQuotaRepository extends JpaRepository<FuelQuota, Long> {
 
     // Delete FuelQuotas by Vehicle ID
      void deleteByVehicleId(Long vehicleId);
+
+    // Find a FuelQuota by Vehicle QR ID
+    FuelQuota findByVehicleQrId(String qrId);
 }
