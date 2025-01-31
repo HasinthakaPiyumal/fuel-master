@@ -5,10 +5,16 @@ import com.uokse.fuelmaster.repository.EmployeeRepository;
 import com.uokse.fuelmaster.repository.FuelStationRepo;
 import com.uokse.fuelmaster.repository.FuelTransactionRepository;
 import com.uokse.fuelmaster.repository.VehicleRepo;
+import com.uokse.fuelmaster.util.AuthUtil;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FuelTransactionService {
@@ -26,37 +32,40 @@ public class FuelTransactionService {
         this.vehicleRepo = vehicleRepo;
     }
 
-    @Transactional
-    public String addFuelTransaction(Long vehicleId, Long employeeId, Long fuelStationId, Double pumpedQuantity) {
+    public Double getFuelQuantity(Long vehicleId) {
+        Vehicle vehicle = vehicleRepo.findById(vehicleId).orElseThrow(() -> new RuntimeException("Vehicle not found"));
+        LocalDateTime startOfWeek = LocalDateTime.now()
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<FuelTransaction> fuelTransaction = fuelTransactionRepository.findTransactionsForCurrentWeek(vehicle, startOfWeek);
+        double totalUseFuelQuota = 0.0;
+        for (int i = 0; i < fuelTransaction.size() ; i++) {
+            totalUseFuelQuota += fuelTransaction.get(i).getPumpedQuantity();
+        }
+        return totalUseFuelQuota;
+    }
 
+    public Optional<FuelTransaction> getLastTransaction(Long vehicleId) {
+        Vehicle vehicle = vehicleRepo.findById(vehicleId).orElseThrow(() -> new RuntimeException("Vehicle not found"));
+        return fuelTransactionRepository.findFirstByVehicleOrderByTransactionDate(vehicle);
+    }
+
+    public List<FuelTransaction> getEmployeeTransactions() {
+        Long employeeId = Long.parseLong(AuthUtil.getCurrentUserId());
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new RuntimeException("Employee not found"));
+        return fuelTransactionRepository.findByEmployeeAndToday(employee);
+    }
+
+    @Transactional
+    public Object addFuelTransaction(Long vehicleId,  Double pumpedQuantity) {
+        Long employeeId = Long.parseLong(AuthUtil.getCurrentUserId());
         Vehicle vehicle = vehicleRepo.findById(vehicleId).orElseThrow(() -> new RuntimeException("Vehicle not found"));
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new RuntimeException("Employee not found"));
-        FuelStation fuelStation = fuelStationRepo.findById(fuelStationId).orElseThrow(() -> new RuntimeException("Fuel station not found"));
-
-        // Get the last transaction for the vehicle
-        FuelTransaction lastTransaction = (FuelTransaction) fuelTransactionRepository.findFirstByVehicleOrderByTransactionDateDesc(vehicle).orElse(null);
-
-        // Use the availableQuantity from the last transaction, or initialize a default value
-        Double availableQuota = lastTransaction != null ? lastTransaction.getAvailableQuota() : 100.0; // Default to 100.0 if no previous transaction exists
-
-        // Calculate the updated available quota
-        Double updatedAvailableQuota = availableQuota - pumpedQuantity;
-        // Validate if the pumped quantity can be processed
-        if (pumpedQuantity > availableQuota) {
-            throw new RuntimeException("Pumped quantity exceeds available fuel capacity for this week");
+        FuelStation fuelStation = fuelStationRepo.findById(employee.getFuelStation().getId()).orElseThrow(() -> new RuntimeException("Fuel station not found"));
+        double availableFuelQuota = vehicle.getVehicleType().getDefaultQuota() - getFuelQuantity(vehicleId);
+        if (pumpedQuantity > availableFuelQuota) {
+            throw new RuntimeException("Fuel quota exceeded");
         }
-
-        // Create and save the new fuel transaction
-        FuelTransaction newTransaction = new FuelTransaction();
-        newTransaction.setVehicle(vehicle);
-        newTransaction.setEmployee(employee);
-        newTransaction.setFuelStation(fuelStation);
-        newTransaction.setPumpedQuantity(pumpedQuantity);
-        newTransaction.setTransactionDate(LocalDateTime.now());
-        newTransaction.setAvailableQuota(updatedAvailableQuota);
-
-        fuelTransactionRepository.save(newTransaction);
-
-        return "Fuel transaction added successfully for vehicle ID: " + vehicleId;
+        return fuelTransactionRepository.save(new FuelTransaction(null, vehicle, employee, fuelStation, pumpedQuantity, LocalDateTime.now()));
     }
 }

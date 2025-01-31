@@ -126,6 +126,17 @@ public class VehicleIMPL implements VehicleService {
         }
     }
 
+    public Vehicle get(Long id) {
+        return vehicleRepo.findById(id).orElseThrow(() -> new RuntimeException("Vehicle not found"));
+    }
+
+    public Vehicle getByQRId(String qrId) {
+        try {
+            return vehicleRepo.findByQrId(qrId);
+        } catch (Exception e) {
+            throw new RuntimeException("Vehicle not found");
+        }
+    }
 
 
 }

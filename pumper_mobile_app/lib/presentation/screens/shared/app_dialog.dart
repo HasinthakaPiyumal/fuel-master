@@ -9,7 +9,8 @@ class AppDialog {
   static void _showBaseDialog({
     required Widget content,
     bool barrierDismissible = true,
-    Duration? autoCloseDuration = const Duration(seconds: 3),
+    Duration? autoCloseDuration = const Duration(seconds: 5),
+    bool autoClose = false,
   }) {
     lastDialogId++;
     Get.dialog(
@@ -43,7 +44,7 @@ class AppDialog {
 
     int currentDialogId = lastDialogId;
 
-    if (autoCloseDuration != null) {
+    if (autoCloseDuration != null && autoClose) {
       Future.delayed(autoCloseDuration, () {
         if ((Get.isDialogOpen ?? false) && currentDialogId == lastDialogId) {
           Get.back();
@@ -115,9 +116,12 @@ class AppDialog {
     required String message,
     String? title,
     VoidCallback? onConfirm,
+    bool autoClose = false,
+    Duration? autoCloseDuration = const Duration(seconds: 5),
   }) {
     _showBaseDialog(
       content: _buildDialogContent(
+
         message: message,
         title: title ?? 'Oooops!',
         icon: const Icon(
@@ -135,17 +139,22 @@ class AppDialog {
           ),
         ],
       ),
+      autoCloseDuration: autoCloseDuration,
+      autoClose: autoClose,
     );
   }
+
 
   static void showSuccess({
     required String message,
     String? title,
     VoidCallback? onConfirm,
-    Duration? autoCloseDuration = const Duration(seconds: 3),
+    bool autoClose = false,
+    Duration? autoCloseDuration = const Duration(seconds: 5),
   }) {
     _showBaseDialog(
       content: _buildDialogContent(
+
         message: message,
         title: title ?? 'Success',
         icon: const Icon(
@@ -164,8 +173,10 @@ class AppDialog {
         ],
       ),
       autoCloseDuration: autoCloseDuration,
+      autoClose: autoClose,
     );
   }
+
 
   static void showConfirmation({
     required String message,

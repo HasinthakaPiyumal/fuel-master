@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -72,22 +73,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         null,
                         null
                 );
-                System.out.println("AuthToken: " + authToken);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
                 doFilter(request, response, filterChain);
                 return;
             }
             final String jwt = authHeader.substring(7);
-            final String userEmail = jwtService.extractUsername(jwt);
-            System.out.println("JWT:" + jwt);
-            System.out.println("UserEmail: " + userEmail);
-            System.out.println("Authentication: " + authentication);
-            if (userEmail != null && authentication == null) {
+            final String userId = jwtService.extractUsername(jwt);
+            if (userId != null && authentication == null) {
                 System.out.println("Checking user registry" );
                 UserDetails userDetails = null;
                 try {
-                    userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                    userDetails = this.userDetailsService.loadUserByUsername(userId);
                 } catch (UsernameNotFoundException e) {
 //                    throw new RuntimeException(e);
                     System.out.println("User not found: " + e.getMessage());
@@ -95,7 +92,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 try {
                     if(userDetails == null){
-                        Optional<Employee> employeeDetails = employeeService.getEmployee(userEmail);
+                        Optional<Employee> employeeDetails = employeeService.getEmployee(userId);
                         if(employeeDetails.isPresent()){
                            userDetails = employeeDetails.get();
                         }
@@ -104,8 +101,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     System.out.println("Employee not found: " + e.getMessage());
                     throw new RuntimeException(e);
                 }
-                System.out.println("UserDetails: " + userDetails);
-                System.out.println("UserName: " + userEmail);
 
                 if (userDetails == null) {
                     clearContextAndSetUnauthorized(request, response, filterChain, "Provided token is invalid or expired");
@@ -136,6 +131,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("Invalid JWT token: " + e.getMessage());
             clearContextAndSetUnauthorized(request, response, filterChain, "Invalid or Malformed token");
             handlerExceptionResolver.resolveException(request, response, null, e);
+        }catch (MissingServletRequestParameterException e){
+            System.out.println(e);
+            clearContextAndSetInternalServerError(request, response, filterChain, "Bad Request");
+            handlerExceptionResolver.resolveException(request, response, null, e);
         }
         catch (Exception exception) {
             System.out.println(exception);
@@ -158,6 +157,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         ObjectMapper objectMapper = new ObjectMapper();
         ErrorResponse response1 = new ErrorResponse(500, message);
+        objectMapper.writeValue(response.getOutputStream(), response1);
+    }
+    private void clearContextAndSetBadRequest(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String message) throws IOException, ServletException {
+        SecurityContextHolder.clearContext(); // CRITICAL: Clear the context
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setContentType("application/json");
+        ObjectMapper objectMapper = new ObjectMapper();
+        ErrorResponse response1 = new ErrorResponse(400, message);
         objectMapper.writeValue(response.getOutputStream(), response1);
     }
 

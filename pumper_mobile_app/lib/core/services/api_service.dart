@@ -33,8 +33,15 @@ class ApiService {
     return _instance;
   }
 
+  static void setToken(String token) {
+    _instance._storageService.setString('token', token);
+    ApiService.token = token;
+  }
+
+
   // Generic GET request
   Future<Map<String, dynamic>> get(String endpoint) async {
+
     try {
       final response = await _dio.get(
         endpoint,
@@ -42,9 +49,12 @@ class ApiService {
       );
       return response.data;
     } on DioException catch (e) {
+      print("=================== Error ===================");
+      print(e.response?.data);
       return e.response?.data;
     }
   }
+
 
   // Generic POST request
   Future<Map<String, dynamic>> post(

@@ -28,7 +28,7 @@ class _LoginFormState extends State<LoginForm> {
       print(res);
       if (res) {
         if (mounted) {
-          Get.offAll(() => const HomeScreen());
+          Get.offAll(() => HomeScreen());
           AppDialog.showSuccess(
             message: 'Login successful!',
             onConfirm: () {

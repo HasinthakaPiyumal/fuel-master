@@ -1,32 +1,47 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:pumper_mobile_app/data/models/customer_fuel_data.dart';
+import 'package:pumper_mobile_app/domain/entities/customer_fuel_data.dart';
+import 'package:pumper_mobile_app/domain/entities/fuel_transaction_data.dart';
+import 'package:pumper_mobile_app/presentation/screens/customer_quota/customer_quota_controller.dart';
 
 class CustomerQuotaScreen extends StatelessWidget {
   final CustomerFuelData customerData;
+  final String qrId;
 
   const CustomerQuotaScreen({
     super.key,
     required this.customerData,
+    required this.qrId,
   });
 
   @override
   Widget build(BuildContext context) {
+    final controller = CustomerQuotaController(FuelTransactionData(
+      qrId: qrId,
+      vehicleId: customerData.id,
+      fuelType: customerData.fuelType,
+      fuelQuantity: 0,
+      vehicleNumber: customerData.vehicleNumber,
+      availableFuel: customerData.totalQuota! - customerData.usedQuota!,
+    ));
     return Scaffold(
       appBar: AppBar(
         title: const Text('Customer Fuel Quota'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildCustomerInfo(),
-            const SizedBox(height: 24),
-            _buildQuotaCard(),
-            const SizedBox(height: 24),
-            _buildFuelEntrySection(),
-          ],
+        child: Form(
+          key: controller.formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCustomerInfo(),
+              const SizedBox(height: 24),
+              _buildQuotaCard(),
+              const SizedBox(height: 24),
+              _buildFuelEntrySection(controller: controller),
+            ],
+          ),
         ),
       ),
     );
@@ -56,7 +71,7 @@ class CustomerQuotaScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        customerData.name,
+                        customerData.name ?? '',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -64,7 +79,7 @@ class CustomerQuotaScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        customerData.vehicleNumber,
+                        customerData.vehicleNumber ?? '',
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 16,
@@ -96,11 +111,12 @@ class CustomerQuotaScreen extends StatelessWidget {
               ],
             ),
             Text(
-              'Last Purchase: ${_formatDate(customerData.lastPurchase)}',
+              'Last Purchase: ${customerData.lastPurchase!=null?_formatDate(customerData.lastPurchase!):"N/A"}',
               style: TextStyle(
                 color: Colors.grey[600],
               ),
             ),
+
           ],
         ),
       ),
@@ -132,9 +148,10 @@ class CustomerQuotaScreen extends StatelessWidget {
   }
 
   Widget _buildQuotaProgressBar() {
-    final percentage = (customerData.usedQuota / customerData.totalQuota * 100)
-        .clamp(0, 100)
-        .toDouble();
+    final percentage =
+        (customerData.usedQuota! / customerData.totalQuota! * 100)
+            .clamp(0, 100)
+            .toDouble();
 
     return Column(
       children: [
@@ -163,17 +180,17 @@ class CustomerQuotaScreen extends StatelessWidget {
       children: [
         _buildQuotaItem(
           'Total Quota',
-          customerData.totalQuota,
+          customerData.totalQuota ?? 0,
           Colors.blue,
         ),
         _buildQuotaItem(
           'Used',
-          customerData.usedQuota,
+          customerData.usedQuota ?? 0,
           Colors.orange,
         ),
         _buildQuotaItem(
           'Remaining',
-          customerData.remainingQuota,
+          customerData.totalQuota! - customerData.usedQuota!,
           Colors.green,
         ),
       ],
@@ -205,7 +222,7 @@ class CustomerQuotaScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFuelEntrySection() {
+  Widget _buildFuelEntrySection({required CustomerQuotaController controller}) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -220,8 +237,11 @@ class CustomerQuotaScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            TextField(
+            TextFormField(
+              controller: controller.fuelQuantityController,
               keyboardType: TextInputType.number,
+              validator: controller.validateInput,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               decoration: const InputDecoration(
                 labelText: 'Enter Fuel Amount (L)',
                 border: OutlineInputBorder(),
@@ -231,8 +251,7 @@ class CustomerQuotaScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Add fuel entry logic here
-                Get.back(result: true);
+                controller.onSubmit();
               },
               child: const Text('Confirm Fuel Entry'),
             ),
@@ -293,4 +312,4 @@ class CustomerQuotaScreen extends StatelessWidget {
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute}';
   }
-} 
+}
