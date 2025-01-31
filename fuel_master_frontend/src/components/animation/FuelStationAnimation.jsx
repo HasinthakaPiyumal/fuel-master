@@ -1,5 +1,5 @@
 import Lottie from "lottie-react";
-import fuelStationAnimation from "@/assets/animations/fuel-station-animation.json";
+import fuelStationAnimation from "@/assets/animations/fuel-station-animation-large.json";
 
 const FuelStationAnimation = () => {
   return (
