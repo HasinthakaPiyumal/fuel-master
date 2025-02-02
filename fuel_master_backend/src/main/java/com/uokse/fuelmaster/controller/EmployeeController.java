@@ -12,6 +12,7 @@ import com.uokse.fuelmaster.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
@@ -24,7 +25,6 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/employee")
-
 public class EmployeeController {
 
     @Autowired
@@ -37,6 +37,7 @@ public class EmployeeController {
     }
 
     @PostMapping(path="/save")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> saveEmployee(@Valid @RequestBody EmployeeDTO employeeDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // Extract validation error messages
@@ -64,6 +65,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> getAllEmployees() {
         List<EmployeeViewDetailsDTO> employees = employeeService.getAllEmployees();
         if (!employees.isEmpty()) {
@@ -75,6 +77,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{phone}")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> getEmployeeByPhone(@PathVariable String phone) {
         EmployeeViewDetailsDTO employee = employeeService.getEmployeeByPhone(phone);
         if (employee != null) {
@@ -89,7 +92,7 @@ public class EmployeeController {
     public ResponseEntity<?> loginEmployee(@RequestBody LoginDTO loginDTO) {
         Optional<Employee> employee = employeeService.loginEmployee(loginDTO);
         if (employee.isPresent()) {
-            String token = jwtService.generateToken(employee.get());
+            String token = jwtService.generateToken(employee.get(),"EMPLOYEE");
             HashMap<String, Object> data = new HashMap<>();
             data.put("user", employee.get().getCommonData());
             data.put("token", token);
@@ -101,6 +104,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
     public ResponseEntity<?> getEmployeeByToken(@RequestHeader("Authorization") String bearerToken) {
         final String jwt = bearerToken.substring(7);
         String phone = "";

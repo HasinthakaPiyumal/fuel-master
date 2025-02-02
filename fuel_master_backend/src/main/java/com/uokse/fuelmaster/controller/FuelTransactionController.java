@@ -10,6 +10,7 @@ import com.uokse.fuelmaster.service.VehicleService;
 import com.uokse.fuelmaster.service.VehicleTypeService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
@@ -28,6 +29,7 @@ public class FuelTransactionController {
     }
 
     @GetMapping("/employee/today")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN','EMPLOYEE')")
     public ResponseEntity getEmployeeTransactions() {
         try {
             Object result = fuelTransactionService.getEmployeeTransactions();
@@ -40,6 +42,7 @@ public class FuelTransactionController {
     }
 
     @GetMapping("/info/{qrId}")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN','EMPLOYEE')")
     public ResponseEntity getFuelQuantity(@PathVariable String qrId) {
 
         try {
@@ -66,6 +69,7 @@ public class FuelTransactionController {
     }
 
     @PostMapping("/process")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN','EMPLOYEE')")
     public ResponseEntity addTransaction(@RequestBody FuelTransactionDTO fuelTransactionDTO) {
         System.out.println("Vehicle ID: " + fuelTransactionDTO);
         try {

@@ -63,15 +63,15 @@ public class UserController {
         }
 
     }
+
     @PostMapping(path="/login")
-    @PreAuthorize("true")
     public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO) {
         System.out.println("login" + loginDTO);
         Optional<User> loggedUser = userIMPL.loginUser(loginDTO);
         if(loggedUser != null){
             String token = jwtService.generateToken(loggedUser.get());
             HashMap<String, Object> data = new HashMap<>();
-            data.put("user", loggedUser.get().getUserMap());
+            data.put("user", loggedUser.get());
             data.put("token", token);
             SuccessResponse successResponse = new SuccessResponse(
                 "Login Success",
@@ -86,6 +86,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public ResponseEntity<?> getAllUsers() {
         List<UserDTO> users = userIMPL.getAllUsers();
         if (!users.isEmpty()) {
@@ -97,6 +98,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','USER')")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         UserDTO userDTO = userIMPL.getUserById(id);
         if (userDTO != null) {
@@ -109,6 +111,7 @@ public class UserController {
 
     //remove user
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public ResponseEntity<?> removeUser(@PathVariable Long id){
         try{
         userIMPL.removeUser(id);

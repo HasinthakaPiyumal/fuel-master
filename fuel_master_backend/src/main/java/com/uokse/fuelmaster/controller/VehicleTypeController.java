@@ -8,6 +8,7 @@ import com.uokse.fuelmaster.service.VehicleTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class VehicleTypeController {
     private VehicleTypeService vehicleTypeService;
 
     @PostMapping("/add")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public ResponseEntity<?> addVehicleType(@RequestBody VehicleTypeDTO vehicleTypeDTO) {
         try {
             VehicleType savedVehicleType = vehicleTypeService.addVehicleType(vehicleTypeDTO);
@@ -31,6 +33,7 @@ public class VehicleTypeController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public ResponseEntity<?> updateVehicleType(@PathVariable Long id, @RequestBody VehicleType vehicleType) {
         try {
             VehicleType updatedVehicleType = vehicleTypeService.updateVehicleType(id, vehicleType);
@@ -48,6 +51,7 @@ public class VehicleTypeController {
     }
 
     @GetMapping("/view/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public ResponseEntity<?> getVehicleTypeById(@PathVariable Long id) {
         try {
             VehicleType vehicleType = vehicleTypeService.getVehicleTypeById(id);
@@ -59,6 +63,7 @@ public class VehicleTypeController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public ResponseEntity<?> deleteVehicleType(@PathVariable Long id) {
         try {
             vehicleTypeService.deleteVehicleType(id);

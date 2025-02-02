@@ -98,6 +98,11 @@ public class UserIMPL {
         }
     }
 
+    public User findUser(Long id) {
+        Optional<User> userOptional = userRepo.findById(id);
+        return userOptional.orElse(null);
+    }
+
     public User getUserByPhone(String phone) {
         Optional<User> userOptional = userRepo.findByPhone(phone);
         return userOptional.orElse(null);
@@ -119,6 +124,21 @@ public class UserIMPL {
             userRepo.deleteById(id); // Now delete the user
         } else {
             throw new RuntimeException("User not found");
+        }
+    }
+
+    public User updateUser(UserDTO userDTO) {
+        Optional<User> userOptional = userRepo.findById(userDTO.getId());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastName(userDTO.getLastName());
+            user.setPhone(userDTO.getPhone());
+            user.setNic(userDTO.getNic());
+            userRepo.save(user);
+            return user;
+        } else {
+            return null;
         }
     }
 

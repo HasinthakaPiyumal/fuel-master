@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +31,8 @@ public class VehicleController {
     @Autowired
     private VehicleIMPL vehicleIMPL;
 
-
     @PostMapping("/save")
+    @PreAuthorize("hasAnyRole('USER','SUPER_ADMIN')")
     public ResponseEntity<?> saveVehicle(@Valid @RequestBody VehicleDTO vehicleDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // Extract validation error messages
@@ -66,6 +67,7 @@ public class VehicleController {
     }
 
     @GetMapping("/{vehicleId}/info")
+    @PreAuthorize("hasAnyRole('USER','SUPER_ADMIN')")
     public ResponseEntity<VehicleInfoDTO> getVehicleInfo(@PathVariable Long vehicleId) {
         logger.info("Received request to get vehicle info for vehicle ID: {}", vehicleId);
         Vehicle vehicle = vehicleIMPL.getVehicleInfo(vehicleId);
@@ -91,8 +93,8 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleInfo);
     }
 
-    //remove vehicle
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     public ResponseEntity<?> removeVehicle(@PathVariable Long id) {
         try {
             vehicleIMPL.removeVehicle(id);

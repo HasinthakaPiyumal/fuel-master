@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,8 @@ public class FuelStationController {
     @Autowired
     private FuelStationService fuelStationService;
 
-    // Add Fuel Station
     @PostMapping("/save")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> addFuelStation(@Valid @RequestBody FuelStationDTO fuelStationDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // Extract validation error messages
@@ -42,8 +43,8 @@ public class FuelStationController {
         }
     }
 
-    // Update Fuel Station
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> updateFuelStation(@PathVariable Long id, @RequestBody FuelStationDTO fuelStationDTO) {
         try {
             FuelStation updatedFuelStation = fuelStationService.updateFuelStation(id, fuelStationDTO);
@@ -54,15 +55,15 @@ public class FuelStationController {
         }
     }
 
-    // View all Fuel Stations
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> getAllFuelStations() {
         List<FuelStation> fuelStations = fuelStationService.getAllFuelStations();
         return ResponseEntity.ok(new SuccessResponse("Fuel stations retrieved successfully", true, fuelStations));
     }
 
-    // View a specific Fuel Station by ID
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> getFuelStationById(@PathVariable Long id) {
         try {
             FuelStation fuelStation = fuelStationService.getFuelStationById(id);
@@ -72,8 +73,9 @@ public class FuelStationController {
                     .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Fuel station not found"));
         }
     }
-    // Delete Fuel Station
+
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> deleteFuelStation(@PathVariable Long id) {
         try {
             fuelStationService.deleteFuelStation(id);

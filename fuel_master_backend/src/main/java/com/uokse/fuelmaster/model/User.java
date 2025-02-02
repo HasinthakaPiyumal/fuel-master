@@ -28,6 +28,9 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true, length = 10)
     private String phone;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private Boolean isVerified;
+
     @Column(nullable = false, unique = true, length = 12)
     private String nic;
 
@@ -146,5 +149,13 @@ public class User implements UserDetails {
         userMap.put("phone", this.phone);
         userMap.put("nic", this.nic);
         return userMap;
+    }
+
+    public Boolean getVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(Boolean verified) {
+        isVerified = verified;
     }
 }
