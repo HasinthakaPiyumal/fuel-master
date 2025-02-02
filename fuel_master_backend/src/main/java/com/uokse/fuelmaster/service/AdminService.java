@@ -1,16 +1,23 @@
 package com.uokse.fuelmaster.service;
 
 import com.uokse.fuelmaster.dto.AdminDTO;
+import com.uokse.fuelmaster.dto.AdminLoginDTO;
+import com.uokse.fuelmaster.dto.LoginDTO;
 import com.uokse.fuelmaster.dto.Response.AdminViewDTO;
 import com.uokse.fuelmaster.model.Admin;
+import com.uokse.fuelmaster.model.Employee;
+import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.repository.AdminRepository;
 
+import com.uokse.fuelmaster.util.PasswordUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.uokse.fuelmaster.util.PasswordUtil.hashPassword;
 
 @Service
 public class AdminService {
@@ -26,19 +33,15 @@ public class AdminService {
         if(adminRepository.findByNic(adminDTO.getNic()).isPresent()){
             throw new IllegalArgumentException("NIC already registered: " +adminDTO.getNic());
         }
-        if (adminRepository.findByPhone(adminDTO.getPhone()).isPresent()) {
-            throw new IllegalArgumentException("Phone number already registered: " + adminDTO.getPhone());
+        if (adminRepository.findByEmail(adminDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Phone number already registered: " + adminDTO.getEmail());
         }
-        // Create an admin object from the DTO
-        Admin admin = new Admin(
-                adminDTO.getId(),
-                adminDTO.getName(),
-                adminDTO.getPhone(),
-                adminDTO.getNic(),
-                adminDTO.getPassword(),
-                adminDTO.getCreatedAt(),
-                adminDTO.getUpdatedAt()
-        );
+        Admin admin = new Admin();
+        admin.setName(adminDTO.getName());
+        admin.setEmail(adminDTO.getEmail());
+        admin.setNic(adminDTO.getNic());
+        admin.setRole(adminDTO.getRole());
+        admin.setPassword(hashPassword(adminDTO.getPassword()));
 
         // Save the admin object to the database
         adminRepository.save(admin);
@@ -50,17 +53,27 @@ public class AdminService {
         List<Admin> admins = adminRepository.findAll();
         return admins.stream().map(admin -> new AdminViewDTO(
                 admin.getName(),
-                admin.getPhone(),
+                admin.getEmail(),
                 admin.getNic()
         )).toList();
     }
 
-    public List<AdminViewDTO> getAdminByPhone(String phone) {
-        Optional<Admin> admins = adminRepository.findByPhone(phone);
-        return admins.stream().map(admin -> new AdminViewDTO(
-                admin.getName(),
-                admin.getPhone(),
-                admin.getNic()
-        )).toList();
+
+    public Optional<Admin> loginAdmin(AdminLoginDTO loginDTO) {
+        Optional<Admin> user = adminRepository.findByEmail(loginDTO.getEmail());
+        if (user.isPresent()) {
+            String inputPassword = loginDTO.getPassword();
+            String storedPassword = user.get().getPassword();
+            if (PasswordUtil.verifyPassword(inputPassword, storedPassword)) {
+                return user;
+            }
+
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Admin> getAdmin(String id) {
+        Optional<Admin> adminOptional = adminRepository.findById(Long.parseLong(id));
+        return adminOptional;
     }
 }

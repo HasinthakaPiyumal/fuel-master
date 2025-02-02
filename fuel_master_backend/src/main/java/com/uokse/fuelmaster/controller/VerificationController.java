@@ -1,26 +1,55 @@
 package com.uokse.fuelmaster.controller;
 
+import com.uokse.fuelmaster.response.ErrorResponse;
+import com.uokse.fuelmaster.response.SuccessResponse;
+import com.uokse.fuelmaster.service.VerificationCodeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.uokse.fuelmaster.dto.MobileVerificationDTO;
-import com.uokse.fuelmaster.response.VerificationResponse;
 import com.uokse.fuelmaster.service.TwilioService;
 
 @RestController
-@RequestMapping("/api/verification")
+@RequestMapping("/api/v1/verification")
+@PreAuthorize("hasRole('USER')")
 public class VerificationController {
 
-    @Autowired
-    private TwilioService twilioService;
+    final VerificationCodeService verificationCodeService;
 
-    @PostMapping("/send")
-    public ResponseEntity<VerificationResponse> sendVerificationCode(
-            @RequestBody MobileVerificationDTO request) {
-        String status = twilioService.sendSmsNotification(request.getPhoneNumber(), "Your verification code is: ");
-        return ResponseEntity.ok(new VerificationResponse(
-                status,
-                "Verification code sent successfully"));
+    public VerificationController(VerificationCodeService verificationCodeService) {
+        this.verificationCodeService = verificationCodeService;
+    }
+
+    @GetMapping("/resend")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity sendVerificationCode() {
+        Boolean status;
+        try {
+            status = verificationCodeService.sendVerificationCode();
+            SuccessResponse response = new SuccessResponse(status ? "Verification code sent successfully" : "Failed to send verification code", true, null);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("Error sending verification code: " + e.getMessage());
+            ErrorResponse response = new ErrorResponse(400, "Error sending verification code");
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(response);
+        }
+    }
+    @PostMapping("/verify")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity verifyPhoneNumber(@RequestBody @Valid MobileVerificationDTO mobileVerificationDTO) {
+        Boolean status;
+        try {
+            status = verificationCodeService.verifyCode(mobileVerificationDTO.getCode());
+            SuccessResponse response = new SuccessResponse("Successfully verified your phone number", true, null);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("Error " + e.getMessage());
+            ErrorResponse response = new ErrorResponse(400, e.getMessage());
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(response);
+        }
     }
 }

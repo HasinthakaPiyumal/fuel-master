@@ -1,10 +1,13 @@
 package com.uokse.fuelmaster.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uokse.fuelmaster.exception.AccountNotVerifiedException;
 import com.uokse.fuelmaster.model.Employee;
+import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.service.EmployeeService;
 import com.uokse.fuelmaster.service.JwtService;
+import com.uokse.fuelmaster.service.impl.UserIMPL;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,10 +15,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,35 +32,39 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.*;
 
 @Component
+@Order(1)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Autowired
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
 
     private final EmployeeService employeeService;
-    private UserDetails userDetails;
+    private final UserIMPL userService;
+    private final EmployeeService adminService;
 
     public JwtAuthenticationFilter(
             JwtService jwtService,
             UserDetailsService userDetailsService,
-            HandlerExceptionResolver handlerExceptionResolver, EmployeeService employeeService
+            HandlerExceptionResolver handlerExceptionResolver,
+            EmployeeService employeeService,
+            UserIMPL userService, EmployeeService adminService
     ) {
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.employeeService = employeeService;
+        this.userService = userService;
+        this.adminService = adminService;
     }
 
     @Override
     protected void doFilterInternal(
-        @NonNull HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
@@ -67,7 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if(isPermittedEndpoint(request.getRequestURI())){
+            if (isPermittedEndpoint(request.getRequestURI())) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         null,
                         null,
@@ -80,26 +89,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             final String jwt = authHeader.substring(7);
             final String userId = jwtService.extractUsername(jwt);
-            if (userId != null && authentication == null) {
-                System.out.println("Checking user registry" );
+            final Object role = jwtService.extractRole(jwt);
+            if (userId != null && authentication == null && role != null) {
                 UserDetails userDetails = null;
-                try {
-                    userDetails = this.userDetailsService.loadUserByUsername(userId);
-                } catch (UsernameNotFoundException e) {
-//                    throw new RuntimeException(e);
-                    System.out.println("User not found: " + e.getMessage());
+                if (role.toString().equals("ROLE_USER")) {
+                    User user = userService.findUser(Long.parseLong(userId));
+                    userDetails = user;
+                    if (user != null && !request.getRequestURI().startsWith("/api/v1/verification/verify") && !request.getRequestURI().startsWith("/api/v1/verification/resend")) {
+                        if (!user.getVerified())
+                            throw new AccountNotVerifiedException("Your account is not verified");
+                    }
                 }
 
-                try {
-                    if(userDetails == null){
-                        Optional<Employee> employeeDetails = employeeService.getEmployee(userId);
-                        if(employeeDetails.isPresent()){
-                           userDetails = employeeDetails.get();
-                        }
+                if (userDetails == null && role.toString().equals("ROLE_EMPLOYEE")) {
+                    System.out.println("Employee:"+userId);
+                    Optional<Employee> employeeDetails = employeeService.getEmployee(userId);
+                    if (employeeDetails.isPresent()) {
+                        userDetails = employeeDetails.get();
                     }
-                } catch (UsernameNotFoundException e) {
-                    System.out.println("Employee not found: " + e.getMessage());
-                    throw new RuntimeException(e);
+                }
+
+                if (userDetails == null && (role.toString().equals("ROLE_STATION_MANAGER") || role.toString().equals("ROLE_SUPER_ADMIN"))) {
+                    Optional<Employee> employeeDetails = adminService.getEmployee(userId);
+                    if (employeeDetails.isPresent()) {
+                        userDetails = employeeDetails.get();
+                    }
                 }
 
                 if (userDetails == null) {
@@ -107,60 +121,63 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
                 if (jwtService.isTokenValid(jwt, userDetails)) {
-                    System.out.println("Token is valid");
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities()
+                            Collections.singletonList(new SimpleGrantedAuthority(role.toString()))
                     );
-                    System.out.println("AuthToken: " + authToken);
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    System.out.println("Security Context set");
-                }else{
+                } else {
                     clearContextAndSetUnauthorized(request, response, filterChain, "Provided token is invalid or expired");
                     return;
                 }
-            }else {
+            } else {
                 clearContextAndSetUnauthorized(request, response, filterChain, "Provided token is invalid or expired");
                 return;
             }
             System.out.println(request.getHeader("Authorization"));
             filterChain.doFilter(request, response);
-        }catch (MalformedJwtException e){
+        } catch (MalformedJwtException e) {
             System.out.println("Invalid JWT token: " + e.getMessage());
             clearContextAndSetUnauthorized(request, response, filterChain, "Invalid or Malformed token");
             handlerExceptionResolver.resolveException(request, response, null, e);
-        }catch (MissingServletRequestParameterException e){
+        } catch (MissingServletRequestParameterException e) {
             System.out.println(e);
             clearContextAndSetInternalServerError(request, response, filterChain, "Bad Request");
             handlerExceptionResolver.resolveException(request, response, null, e);
-        }
-        catch (Exception exception) {
+        } catch (AccountNotVerifiedException e) {
+            System.out.println(e);
+            clearContextAndSetUnauthorized(request, response, filterChain, e.getMessage());
+            handlerExceptionResolver.resolveException(request, response, null, e);
+        } catch (Exception exception) {
             System.out.println(exception);
             System.out.println("Error processing JWT token:KK" + exception.getMessage());
             clearContextAndSetInternalServerError(request, response, filterChain, "Internal server error");
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }
+
     private void clearContextAndSetUnauthorized(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String message) throws IOException, ServletException {
-        SecurityContextHolder.clearContext(); // CRITICAL: Clear the context
+        SecurityContextHolder.clearContext();
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
         ObjectMapper objectMapper = new ObjectMapper();
         ErrorResponse response1 = new ErrorResponse(401, message);
         objectMapper.writeValue(response.getOutputStream(), response1);
     }
+
     private void clearContextAndSetInternalServerError(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String message) throws IOException, ServletException {
-        SecurityContextHolder.clearContext(); // CRITICAL: Clear the context
+        SecurityContextHolder.clearContext();
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.setContentType("application/json");
         ObjectMapper objectMapper = new ObjectMapper();
         ErrorResponse response1 = new ErrorResponse(500, message);
         objectMapper.writeValue(response.getOutputStream(), response1);
     }
+
     private void clearContextAndSetBadRequest(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String message) throws IOException, ServletException {
-        SecurityContextHolder.clearContext(); // CRITICAL: Clear the context
+        SecurityContextHolder.clearContext();
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         response.setContentType("application/json");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -171,6 +188,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private boolean isPermittedEndpoint(String uri) {
         return uri.startsWith("/api/v1/user/save")
                 || uri.startsWith("/api/v1/user/login")
-                || uri.startsWith("/api/v1/employee/login");
+                || uri.startsWith("/api/v1/employee/login"
+                ) || uri.startsWith("/api/v1/admin/login");
     }
 }

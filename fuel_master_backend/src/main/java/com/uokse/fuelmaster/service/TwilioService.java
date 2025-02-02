@@ -6,22 +6,22 @@ import com.uokse.fuelmaster.config.TwilioConfig;
 import com.twilio.rest.api.v2010.account.Message;
 @Service
 public class TwilioService {
+    private final TwilioConfig twilioConfig;
 
-    @Autowired
-    private TwilioConfig twilioConfig;
+    public TwilioService(TwilioConfig twilioConfig) {
+        this.twilioConfig = twilioConfig;
+    }
 
-    public String sendSmsNotification(String phoneNumber, String message) {
-        System.out.println("Sending SMS notification to: " + phoneNumber);
+    public boolean sendSmsNotification(String phoneNumber, String message) {
         try {
             Message smsMessage = Message.creator(
                 new com.twilio.type.PhoneNumber(phoneNumber),
                 twilioConfig.getVerifyServiceSid(),
                 message
             ).create();
-            System.out.println(smsMessage.getSid());
-            return "Success";
+            return !smsMessage.getStatus().equals(Message.Status.FAILED);
         } catch (Exception e) {
-            throw new RuntimeException("Error sending SMS notification: " + e.getMessage());
+            return false;
         }
     }
-} 
+}

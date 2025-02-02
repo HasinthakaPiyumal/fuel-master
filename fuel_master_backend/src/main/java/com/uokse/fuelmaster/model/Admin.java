@@ -1,9 +1,14 @@
 package com.uokse.fuelmaster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 
 @Entity
-public class Admin {
+public class Admin implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -12,31 +17,43 @@ public class Admin {
     private String name;
 
     @Column(nullable = false,unique = true)
-    private String phone;
-
-    @Column(nullable = false,unique = true)
     private String nic;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
-    @Column(updatable = false)
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AdminType role;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private String createdAt;
 
     private String updatedAt;
 
-    public Admin(Long id, String name, String phone, String nic, String password, String createdAt, String updatedAt) {
+    public Admin(Long id, String name, String nic, String password, AdminType role, String email, String createdAt, String updatedAt) {
         this.id = id;
         this.name = name;
-        this.phone = phone;
         this.nic = nic;
         this.password = password;
+        this.role = role;
+        this.email = email;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+    public Admin(AdminType role, String email) {
+        this.role = role;
+
+        this.email = email;
+    }
+
     public Admin() {
 
-   }
+    }
 
     public Long getId() {
         return id;
@@ -54,13 +71,6 @@ public class Admin {
         this.name = name;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
 
     public String getNic() {
         return nic;
@@ -70,8 +80,18 @@ public class Admin {
         this.nic = nic;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return id.toString();
     }
 
     public void setPassword(String password) {
@@ -83,11 +103,26 @@ public class Admin {
         return "Admin{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
                 ", nic='" + nic + '\'' +
-                ", password='" + password + '\'' +
                 ", createdAt='" + createdAt + '\'' +
                 ", updatedAt='" + updatedAt + '\'' +
                 '}';
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public AdminType getRole() {
+        return role;
+    }
+
+    public void setRole(AdminType role) {
+        this.role = role;
     }
 }
