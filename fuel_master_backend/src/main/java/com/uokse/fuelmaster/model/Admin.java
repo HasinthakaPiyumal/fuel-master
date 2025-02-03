@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Entity
@@ -30,12 +31,14 @@ public class Admin implements UserDetails {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private String createdAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    private String updatedAt;
 
-    public Admin(Long id, String name, String nic, String password, AdminType role, String email, String createdAt, String updatedAt) {
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    public Admin(Long id, String name, String nic, String password, AdminType role, String email, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.nic = nic;
@@ -53,6 +56,19 @@ public class Admin implements UserDetails {
 
     public Admin() {
 
+    }
+
+
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     public Long getId() {
