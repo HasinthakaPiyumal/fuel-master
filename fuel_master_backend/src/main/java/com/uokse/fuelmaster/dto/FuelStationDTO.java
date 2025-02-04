@@ -10,18 +10,15 @@ public class FuelStationDTO {
     private String regNo;
     @NotBlank(message = "FuelStation location is mandatory")
     private String location;
-    @NotBlank(message = "FuelStation owner name is mandatory")
-    private String owner;
-    @NotNull(message = "FuelStation employee count is mandatory")
-    @Min(value = 1, message = "Employee count must be at least 1")
-    private Integer employeeCount;
+    @NotBlank(message = "FuelStation owner Id is mandatory")
+    private Long ownerId;
 
-    public FuelStationDTO(Long id, String regNo, String location, String owner, Integer employeeCount) {
+
+    public FuelStationDTO(Long id, String regNo, String location, Long ownerId) {
         this.id = id;
         this.regNo = regNo;
         this.location = location;
-        this.owner = owner;
-        this.employeeCount = employeeCount;
+        this.ownerId = ownerId;
     }
 
     // Getters and Setters
@@ -49,19 +46,11 @@ public class FuelStationDTO {
         this.location = location;
     }
 
-    public String getOwner() {
-        return owner;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public Integer getEmployeeCount() {
-        return employeeCount;
-    }
-
-    public void setEmployeeCount(Integer employeeCount) {
-        this.employeeCount = employeeCount;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 }

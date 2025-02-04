@@ -48,6 +48,7 @@ public class UserIMPL {
                 userDTO.getPhone(),
                 userDTO.getNic(),
                 hashedPassword);
+        user.setVerified(false);
 
 
         userRepo.save(user);

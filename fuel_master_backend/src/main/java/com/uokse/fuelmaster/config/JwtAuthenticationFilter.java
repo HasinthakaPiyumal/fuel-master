@@ -2,9 +2,11 @@ package com.uokse.fuelmaster.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uokse.fuelmaster.exception.AccountNotVerifiedException;
+import com.uokse.fuelmaster.model.Admin;
 import com.uokse.fuelmaster.model.Employee;
 import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.response.ErrorResponse;
+import com.uokse.fuelmaster.service.AdminService;
 import com.uokse.fuelmaster.service.EmployeeService;
 import com.uokse.fuelmaster.service.JwtService;
 import com.uokse.fuelmaster.service.impl.UserIMPL;
@@ -44,14 +46,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final EmployeeService employeeService;
     private final UserIMPL userService;
-    private final EmployeeService adminService;
+    private final AdminService adminService;
 
     public JwtAuthenticationFilter(
             JwtService jwtService,
             UserDetailsService userDetailsService,
             HandlerExceptionResolver handlerExceptionResolver,
             EmployeeService employeeService,
-            UserIMPL userService, EmployeeService adminService
+            UserIMPL userService, AdminService adminService
     ) {
         this.jwtService = jwtService;
         this.handlerExceptionResolver = handlerExceptionResolver;
@@ -109,8 +111,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
 
+                System.out.println("Role:"+role);
+
                 if (userDetails == null && (role.toString().equals("ROLE_STATION_MANAGER") || role.toString().equals("ROLE_SUPER_ADMIN"))) {
-                    Optional<Employee> employeeDetails = adminService.getEmployee(userId);
+                    Optional<Admin> employeeDetails = adminService.getAdmin(userId);
                     if (employeeDetails.isPresent()) {
                         userDetails = employeeDetails.get();
                     }
