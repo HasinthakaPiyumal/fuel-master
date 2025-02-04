@@ -82,18 +82,25 @@ public class UserIMPL {
         )).toList();
     }
 
-    public UserDTO getUserById(Long id) {
+    public User getUserById(Long id) {
         Optional<User> userOptional = userRepo.findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            return new UserDTO(
-                    user.getId(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getPhone(),
-                    user.getNic(),
-                    null // Exclude password in the response
-            );
+            return user;
+        } else {
+            return null;
+        }
+    }
+
+    public User updateUserPhoneNumber(Long id, String phoneNumber) {
+        Optional<User> userOptional = userRepo.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if(user.getVerified()){
+                throw new IllegalArgumentException("User is verified. Phone number cannot be changed.");
+            }
+            user.setPhone(phoneNumber);
+            return user;
         } else {
             return null;
         }

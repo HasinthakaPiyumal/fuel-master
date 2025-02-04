@@ -2,6 +2,7 @@ package com.uokse.fuelmaster.controller;
 
 
 import com.uokse.fuelmaster.dto.LoginDTO;
+import com.uokse.fuelmaster.dto.Response.PhoneNumberDTO;
 import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.service.impl.UserIMPL;
 import com.uokse.fuelmaster.dto.UserDTO;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -101,9 +103,35 @@ public class UserController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','USER')")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        UserDTO userDTO = userIMPL.getUserById(id);
+        User userDTO = userIMPL.getUserById(id);
         if (userDTO != null) {
             return ResponseEntity.ok(userDTO);
+        } else {
+            ErrorResponse errorResponse = new ErrorResponse(404, "User Not Found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/change-phone")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<?> changePhone(@RequestBody PhoneNumberDTO phoneNumberDTO) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User user = userIMPL.updateUserPhoneNumber(Long.parseLong(userId),phoneNumberDTO.getPhoneNumber());
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            ErrorResponse errorResponse = new ErrorResponse(404, "User Not Found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/authenticate")
+    @PreAuthorize("hasAnyRole('USER')")
+    public ResponseEntity<?> authenticateUser() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User user = userIMPL.getUserById(Long.parseLong(userId));
+        if (user != null) {
+            return ResponseEntity.ok(user);
         } else {
             ErrorResponse errorResponse = new ErrorResponse(404, "User Not Found");
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
