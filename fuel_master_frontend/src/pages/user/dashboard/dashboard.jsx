@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios"; 
 
 const vehicleSchema = z.object({
   vehicleNumber: z.object({
@@ -29,12 +30,7 @@ const vehicleSchema = z.object({
 
 const Dashboard = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-  const [userInfo] = useState({
-    name: "John Deo",
-    nic: "123456789V",
-    phoneNumber: "0123456789",
-  });
+  const [userInfo, setUserInfo] = useState(null); 
 
   const {
     register,
@@ -60,9 +56,35 @@ const Dashboard = () => {
 
   const onSubmit = (data) => {
     console.log(data);
-    setShowSuccessModal(true);
-    reset();
+   
+    axios
+      .post(
+        "http://localhost:8080/api/v1/vehicle/save",
+        {
+          userId: 1, 
+          vehicleType: data.vehicleType === "Car" ? 1 : data.vehicleType === "Bike" ? 2 : 3,
+          vehicleRegistrationPart1: data.vehicleNumber.prefix,
+          vehicleRegistrationPart2: data.vehicleNumber.number,
+          chassisNumber: data.chassisNumber,
+          fuelType: data.fuelType.toUpperCase(),
+        },
+        {
+          headers: {
+            
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response.data);
+        setShowSuccessModal(true);
+        reset();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
+
+  
 
   return (
     <div className="">
@@ -86,39 +108,39 @@ const Dashboard = () => {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto p-8 flex gap-8">
-        <div className="w-1/2">
-          <div className="bg-white rounded-lg p-6">
-            <h2 className="text-[#F84C25] text-xl text-center mb-6">
-              Your Info
-            </h2>
-            <div>
-              <div className="mb-4">
-                <div className="flex">
-                  <span className="text-gray-700">Name:</span>
-                  <span className="ml-auto">{userInfo.name}</span>
-                </div>
-              </div>
-              <div className="mb-4 flex justify-between gap-4">
-                <div className="flex flex-1">
-                  <span className="text-gray-700">NIC:</span>
-                  <span className="ml-auto">{userInfo.nic}</span>
-                </div>
-                <div className="flex flex-1">
-                  <span className="text-gray-700">Phone:</span>
-                  <span className="ml-auto">{userInfo.phoneNumber}</span>
-                </div>
-              </div>
+      <div className="max-w-6xl mx-auto p-8 flex gap-16">
+       
+        <div className="w-full lg:w-1/2">
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <h2 className="text-[#F84C25] text-xl text-center mb-6">Your Info</h2>
+            <div className="space-y-4">
+              {userInfo ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-gray-700 font-medium">Name:</span>
+                    <span>{userInfo.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-700 font-medium">NIC:</span>
+                    <span>{userInfo.nic}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-700 font-medium">Phone:</span>
+                    <span>{userInfo.phoneNumber}</span>
+                  </div>
+                </>
+              ) : (
+                <p>Loading...</p>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="w-1/2">
-          <div className="bg-white rounded-lg p-6">
-            <h2 className="text-[#F84C25] text-xl text-center mb-6">
-              Vehicle Info
-            </h2>
+        <div className="w-[602px] h-[648px] lg:w-1/2">
+          <div className="bg-white rounded-lg p-10 shadow-lg">
+            <h2 className="text-[#F84C25] text-xl text-center mb-6">Vehicle Info</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+             
               <div>
                 <label className="block mb-1">Vehicle Number</label>
                 <div className="flex gap-2">
@@ -148,6 +170,7 @@ const Dashboard = () => {
                 )}
               </div>
 
+             
               <div>
                 <label className="block mb-1">Vehicle Type</label>
                 <select
@@ -181,6 +204,7 @@ const Dashboard = () => {
                 )}
               </div>
 
+           
               <div>
                 <label className="block mb-1">Select Fuel Type</label>
                 <div className="flex gap-2">
@@ -214,6 +238,7 @@ const Dashboard = () => {
                 )}
               </div>
 
+             
               <div className="text-sm">
                 <label className="flex items-center gap-1">
                   <input type="checkbox" {...register("termsAccepted")} />
