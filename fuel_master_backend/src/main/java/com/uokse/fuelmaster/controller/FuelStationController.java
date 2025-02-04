@@ -31,6 +31,7 @@ public class FuelStationController {
             HashMap<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
                     errors.put(error.getField(), error.getDefaultMessage()));
+            ErrorResponse errorResponse = new ErrorResponse(400, errors.get(errors.keySet().toArray()[0]));
 
             return ResponseEntity.badRequest().body(errors);
         }

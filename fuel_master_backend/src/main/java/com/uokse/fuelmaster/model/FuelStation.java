@@ -16,10 +16,10 @@ public class FuelStation {
     private String location;
 
     @Column(nullable = false)
-    private String owner;
+    private Long ownerId;
 
     @Column(nullable = false)
-    private Integer employeeCount;
+    private String ownerName;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -28,12 +28,12 @@ public class FuelStation {
 
     public FuelStation() {
     }
-    public FuelStation(Long id, String regNo, String location, String owner, Integer employeeCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public FuelStation(Long id, String regNo, String location, Long ownerId, String ownerName, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.regNo = regNo;
         this.location = location;
-        this.owner = owner;
-        this.employeeCount = employeeCount;
+        this.ownerId = ownerId;
+        this.ownerName = ownerName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -73,20 +73,20 @@ public class FuelStation {
         this.location = location;
     }
 
-    public String getOwner() {
-        return owner;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
-    public Integer getEmployeeCount() {
-        return employeeCount;
+    public String getOwnerName() {
+        return ownerName;
     }
 
-    public void setEmployeeCount(Integer employeeCount) {
-        this.employeeCount = employeeCount;
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -103,10 +103,10 @@ public class FuelStation {
                 "id=" + id +
                 ", regNo='" + regNo + '\'' +
                 ", location='" + location + '\'' +
-                ", owner='" + owner + '\'' +
-                ", employeeCount=" + employeeCount +
+                ", owner='" + ownerId + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
     }
+
 }
