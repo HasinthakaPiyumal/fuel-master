@@ -84,7 +84,21 @@ const Dashboard = () => {
       });
   };
 
-  
+  useEffect(() => {
+   
+    axios
+      .get("http://localhost:8080/api/v1/user/1", {
+        headers: {
+          
+        },
+      })
+      .then((response) => {
+        setUserInfo(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   return (
     <div className="">
