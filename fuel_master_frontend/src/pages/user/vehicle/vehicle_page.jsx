@@ -3,18 +3,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import QRCode from 'qrcode';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function VehiclePage() {
 
-  const vehicleData = {
-    name: "Navon Sanjuni",
-    nic: "200173600804",
-    phoneNumber: "0123456789",
-    vehicleNumber: "ABC 1234",
-    vehicleType: "Car",
-    chassisNumber: "ABCABC1234...",
-    fuelType: "Diesel"
-  };
+  const [vehicleData, setVehicleData] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVehicleData = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/vehicle/get', {
+          headers: {
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNzYzMjE1Mzg5IiwiaWF0IjoxNzM3OTU1NDYyLCJleHAiOjE3Njk0OTE0NjJ9.r41a8tmy62xwwY-LIm7ePvatPciNkwiC7fLWuWTlHxE`
+          }
+        });
+        setVehicleData(response.data.vehicle);
+        
+      } catch (error) {
+        console.error('Error fetching vehicle data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicleData();
+  }, []);
 
   const quotaData = {
     availableQuota: 5,
@@ -50,6 +66,9 @@ export default function VehiclePage() {
     }
   };
 
+  if (loading) return <div className="text-center text-gray-600">Loading...</div>;
+  if (!vehicleData || !quotaData) return <div className="text-center text-red-500">Failed to load data.</div>;
+
   return (
     <div className="container mx-auto p-4 max-w-6xl">
   <div className="grid md:grid-cols-2 gap-x-20 gap-y-6 justify-center">
@@ -73,6 +92,7 @@ export default function VehiclePage() {
         <h2 className="text-2xl font-semibold text-orange-600 mb-6">Quota Summary</h2>
         <div className="space-y-4">
           <InfoRow label="Available Quota:" value={`${quotaData.availableQuota} L`} />
+
           <InfoRow label="Quota Used:" value={`${quotaData.quotaUsed} L`} />
           <InfoRow label="Total Quota:" value={`${quotaData.totalQuota} L`} />
           <InfoRow label="Renewal Date:" value={quotaData.renewalDate} />
