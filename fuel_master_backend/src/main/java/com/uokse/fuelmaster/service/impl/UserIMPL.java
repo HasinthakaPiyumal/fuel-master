@@ -36,12 +36,13 @@ public class UserIMPL {
     public Long addUser(UserDTO userDTO) {
 
         String hashedPassword = PasswordUtil.hashPassword(userDTO.getPassword());
-        if(userRepo.findByNic(userDTO.getNic()).isPresent()){
-            throw new IllegalArgumentException("NIC already registered: " +userDTO.getNic());
-        } else if (userRepo.findByPhone(userDTO.getPhone()).isPresent()){
+        if (userRepo.findByPhone(userDTO.getPhone()).isPresent()){
             throw new IllegalArgumentException("Phone number already registered: " +userDTO.getPhone());
         }
-        User user = new User(
+        else if(userRepo.findByNic(userDTO.getNic()).isPresent()){
+            throw new IllegalArgumentException("NIC already registered: " +userDTO.getNic());
+        }
+            User user = new User(
                 userDTO.getId(),
                 userDTO.getFirstName(),
                 userDTO.getLastName(),

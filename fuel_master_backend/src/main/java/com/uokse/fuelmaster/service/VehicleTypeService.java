@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -64,4 +65,17 @@ public class VehicleTypeService {
             throw new RuntimeException("Vehicle type not found");
         }
     }
+
+    public VehicleType updateDefaultQuota(Long id, Long newQuota) {
+        // Find the vehicle type by ID
+        VehicleType vehicleType = vehicleTypeRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Vehicle type not found"));
+
+        // Update the default quota
+        vehicleType.setDefaultQuota(newQuota);
+
+        // Save and return the updated entity
+        return vehicleTypeRepository.save(vehicleType);
+    }
+
 }
