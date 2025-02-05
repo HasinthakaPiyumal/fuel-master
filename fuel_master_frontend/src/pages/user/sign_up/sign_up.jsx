@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { showToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import apiService from "@/services/api.service";
+import { Link } from 'react-router-dom';
 
 const signUpFormSchema = z
   .object({
@@ -299,9 +300,9 @@ export default function SignUpPage() {
 
                     <p className="mt-4 text-sm text-center text-gray-600">
                       Already have an account?{" "}
-                      <a href="/login" className="text-orange-600 underline">
+                      <Link to="/login" className="text-orange-600 underline">
                         Sign In
-                      </a>
+                      </Link>
                     </p>
                   </form>
                 </Form>
