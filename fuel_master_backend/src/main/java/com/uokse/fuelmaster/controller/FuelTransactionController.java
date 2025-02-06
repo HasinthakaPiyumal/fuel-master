@@ -8,6 +8,8 @@ import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.FuelTransactionService;
 import com.uokse.fuelmaster.service.VehicleService;
 import com.uokse.fuelmaster.service.VehicleTypeService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
+@Tag(name = "Fuel Transaction", description = "Fuel Transaction API")
+@SecurityRequirement(name = "bearerAuth")
 public class FuelTransactionController {
     private final FuelTransactionService fuelTransactionService;
     private final VehicleService vehicleService;

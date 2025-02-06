@@ -5,6 +5,8 @@ import com.uokse.fuelmaster.model.FuelStation;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.service.FuelStationService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/fuelstation")
+@Tag(name = "Fuel Station", description = "Fuel Station API")
+@SecurityRequirement(name = "bearerAuth")
 public class FuelStationController {
 
     @Autowired

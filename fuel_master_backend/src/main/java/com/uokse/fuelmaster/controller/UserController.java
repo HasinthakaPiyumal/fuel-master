@@ -4,10 +4,12 @@ package com.uokse.fuelmaster.controller;
 import com.uokse.fuelmaster.dto.LoginDTO;
 import com.uokse.fuelmaster.dto.Response.PhoneNumberDTO;
 import com.uokse.fuelmaster.response.ErrorResponse;
+import com.uokse.fuelmaster.service.VerificationCodeService;
 import com.uokse.fuelmaster.service.impl.UserIMPL;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.JwtService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,11 +61,11 @@ public class UserController {
             }
         }
         try{
-            Long id = userIMPL.addUser(userDTO);
+            String token = userIMPL.addUser(userDTO);
             HashMap<String, Object> data = new HashMap<>();
-            data.put("UserId", id);
+            data.put("token", token);
             SuccessResponse successResponse = new SuccessResponse(
-                    "User saved successfully",
+                    "User registration success",
                     true,
                     data
             );
@@ -98,6 +100,7 @@ public class UserController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getAllUsers() {
         List<UserDTO> users = userIMPL.getAllUsers();
         if (!users.isEmpty()) {
@@ -119,6 +122,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','USER')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         User user = userIMPL.getUserById(id);
         if (user != null) {
@@ -140,6 +144,7 @@ public class UserController {
 
     @PostMapping("/change-phone")
     @PreAuthorize("hasAnyRole('USER')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> changePhone(@RequestBody PhoneNumberDTO phoneNumberDTO) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User user = userIMPL.updateUserPhoneNumber(Long.parseLong(userId),phoneNumberDTO.getPhoneNumber());
@@ -161,6 +166,7 @@ public class UserController {
 
     @GetMapping("/authenticate")
     @PreAuthorize("hasAnyRole('USER')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> authenticateUser() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User user = userIMPL.getUserById(Long.parseLong(userId));
@@ -183,6 +189,7 @@ public class UserController {
     //remove user
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> removeUser(@PathVariable Long id){
         try{
         userIMPL.removeUser(id);

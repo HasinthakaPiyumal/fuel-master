@@ -8,12 +8,19 @@ import com.uokse.fuelmaster.repository.UserRepo;
 import com.uokse.fuelmaster.repository.VehicleRepo;
 import com.uokse.fuelmaster.response.LoginResponse;
 
+import com.uokse.fuelmaster.service.JwtService;
+import com.uokse.fuelmaster.service.VerificationCodeService;
 import com.uokse.fuelmaster.util.PasswordUtil;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,10 +37,16 @@ public class UserIMPL {
      private VehicleIMPL vehicleIMPL;
 
 
+    private VerificationCodeService verificationCodeService;
+    private JwtService jwtService;
+
+    public UserIMPL(VerificationCodeService verificationCodeService, JwtService jwtService) {
+        this.verificationCodeService = verificationCodeService;
+        this.jwtService = jwtService;
+    }
 
 
-
-    public Long addUser(UserDTO userDTO) {
+    public String addUser(UserDTO userDTO) {
 
         String hashedPassword = PasswordUtil.hashPassword(userDTO.getPassword());
         if (userRepo.findByPhone(userDTO.getPhone()).isPresent()){
@@ -50,10 +63,15 @@ public class UserIMPL {
                 userDTO.getNic(),
                 hashedPassword);
         user.setVerified(false);
-
-
         userRepo.save(user);
-        return user.getId();
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+        verificationCodeService.sendVerificationCode();
+        return jwtService.generateToken(user);
 
     }
 

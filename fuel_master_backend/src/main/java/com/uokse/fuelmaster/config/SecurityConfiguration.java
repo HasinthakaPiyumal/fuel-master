@@ -64,7 +64,7 @@ public class SecurityConfiguration {
                             mapper.writeValue(response.getOutputStream(), errorResponse);
                         }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/user/save", "/api/v1/user/login", "/api/v1/employee/login","/api/v1/admin/login").permitAll()
+                        .requestMatchers("/api/v1/user/save", "/api/v1/user/login", "/api/v1/employee/login","/api/v1/admin/login","/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(invalidPathFilter, UsernamePasswordAuthenticationFilter.class)

@@ -6,6 +6,8 @@ import com.uokse.fuelmaster.model.VehicleType;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.service.VehicleTypeService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/vehicle-types")
+@Tag(name = "Vehicle Type", description = "Vehicle Type API")
+@SecurityRequirement(name = "bearerAuth")
 public class VehicleTypeController {
 
     @Autowired

@@ -9,6 +9,8 @@ import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.EmployeeService;
 import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
 import com.uokse.fuelmaster.service.JwtService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/employee")
+@Tag(name = "Employee", description = "Employee API")
 public class EmployeeController {
 
     @Autowired
@@ -40,6 +43,7 @@ public class EmployeeController {
 
     @PostMapping(path="/save")
     @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> saveEmployee(@Valid @RequestBody EmployeeDTO employeeDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // Define the expected field order
@@ -77,6 +81,7 @@ public class EmployeeController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getAllEmployees() {
         List<EmployeeViewDetailsDTO> employees = employeeService.getAllEmployees();
         if (!employees.isEmpty()) {
@@ -98,6 +103,7 @@ public class EmployeeController {
 
     @GetMapping("/{phone}")
     @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getEmployeeByPhone(@PathVariable String phone) {
         EmployeeViewDetailsDTO employee = employeeService.getEmployeeByPhone(phone);
         if (employee != null) {
@@ -133,6 +139,7 @@ public class EmployeeController {
 
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getEmployeeByToken(@RequestHeader("Authorization") String bearerToken) {
         final String jwt = bearerToken.substring(7);
         String phone = "";

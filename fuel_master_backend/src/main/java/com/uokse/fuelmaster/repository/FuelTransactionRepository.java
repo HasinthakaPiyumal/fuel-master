@@ -18,6 +18,6 @@ public interface FuelTransactionRepository extends JpaRepository<FuelTransaction
 
     Optional<FuelTransaction> findFirstByVehicleOrderByTransactionDate(Vehicle vehicle);
 
-    @Query("SELECT ft FROM FuelTransaction ft WHERE ft.employee = :employee AND DATE(ft.transactionDate) = CURRENT_DATE")
+    @Query("SELECT ft FROM FuelTransaction ft WHERE ft.employee = :employee AND FUNCTION('DATE', ft.transactionDate) = CURRENT_DATE")
     List<FuelTransaction> findByEmployeeAndToday(@Param("employee") Employee employee);
 }

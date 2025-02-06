@@ -14,6 +14,8 @@ import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.AdminService;
 import com.uokse.fuelmaster.service.EmployeeService;
 import com.uokse.fuelmaster.service.JwtService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -31,6 +33,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/admin")
+@Tag(name = "Admin", description = "Admin API")
 public class AdminController {
 
     private AdminService adminService;
@@ -43,6 +46,7 @@ public class AdminController {
 
     @PostMapping(path="/save")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> saveAdmin(@Valid @RequestBody AdminDTO adminDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // Define the expected field order
@@ -80,6 +84,7 @@ public class AdminController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getAllAdmins() {
         List<AdminViewDTO> admins = adminService.getAllAdmins();
         if (!admins.isEmpty()) {
@@ -100,7 +105,24 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginAdmin(@Valid @RequestBody AdminLoginDTO loginDTO) {
+    public ResponseEntity<?> loginAdmin(@Valid @RequestBody AdminLoginDTO loginDTO,BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // Define the expected field order
+            List<String> fieldOrder = Arrays.asList("name", "email", "nic", "password", "role");
+
+            // Get the first occurring field error based on the expected order
+            for (String field : fieldOrder) {
+                Optional<String> errorMessage = bindingResult.getFieldErrors().stream()
+                        .filter(error -> error.getField().equals(field))
+                        .map(FieldError::getDefaultMessage)
+                        .findFirst();
+
+                if (errorMessage.isPresent()) {
+                    ErrorResponse errorResponse = new ErrorResponse(400, errorMessage.get());
+                    return ResponseEntity.badRequest().body(errorResponse);
+                }
+            }
+        }
         Optional<Admin> admin = adminService.loginAdmin(loginDTO);
         if (admin.isPresent()) {
             String role = admin.get().getRole()== AdminType.SUPER_ADMIN?"SUPER_ADMIN":"STATION_ADMIN";
@@ -117,6 +139,7 @@ public class AdminController {
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getAdminByToken(@RequestHeader("Authorization") String bearerToken) {
         final String jwt = bearerToken.substring(7);
         String id = "";

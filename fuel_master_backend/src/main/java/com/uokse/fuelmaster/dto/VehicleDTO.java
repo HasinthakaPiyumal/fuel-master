@@ -2,13 +2,14 @@ package com.uokse.fuelmaster.dto;
 
 import com.uokse.fuelmaster.model.FuelType;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 
 public class VehicleDTO {
-
+    @Schema(hidden = true)
     private Long id;
 
     @NotNull(message = "User Id is mandatory")

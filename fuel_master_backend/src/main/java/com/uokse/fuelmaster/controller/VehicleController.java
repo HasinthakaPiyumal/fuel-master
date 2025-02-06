@@ -8,6 +8,8 @@ import com.uokse.fuelmaster.model.VehicleType;
 import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.impl.VehicleIMPL;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,8 @@ import java.util.Optional;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/vehicle")
+@Tag(name = "Vehicle", description = "Vehicle API")
+@SecurityRequirement(name = "bearerAuth")
 public class VehicleController {
 
     private static final Logger logger = LoggerFactory.getLogger(VehicleController.class);

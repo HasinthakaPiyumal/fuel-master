@@ -1,12 +1,13 @@
 package com.uokse.fuelmaster.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class UserDTO {
-
+    @Schema(hidden = true)
     private Long id;
     @NotBlank(message = "First name is mandatory")
     private String firstName;
