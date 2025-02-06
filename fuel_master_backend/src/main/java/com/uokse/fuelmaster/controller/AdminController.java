@@ -20,8 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -41,15 +43,23 @@ public class AdminController {
 
     @PostMapping(path="/save")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<?> saveEmployee(@Valid @RequestBody AdminDTO adminDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> saveAdmin(@Valid @RequestBody AdminDTO adminDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Extract validation error messages
-            HashMap<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errors.put(error.getField(), error.getDefaultMessage()));
-            ErrorResponse errorResponse = new ErrorResponse(400, errors.get(errors.keySet().toArray()[0]));
+            // Define the expected field order
+            List<String> fieldOrder = Arrays.asList("name", "email", "nic", "password", "role");
 
-            return ResponseEntity.badRequest().body(errors);
+            // Get the first occurring field error based on the expected order
+            for (String field : fieldOrder) {
+                Optional<String> errorMessage = bindingResult.getFieldErrors().stream()
+                        .filter(error -> error.getField().equals(field))
+                        .map(FieldError::getDefaultMessage)
+                        .findFirst();
+
+                if (errorMessage.isPresent()) {
+                    ErrorResponse errorResponse = new ErrorResponse(400, errorMessage.get());
+                    return ResponseEntity.badRequest().body(errorResponse);
+                }
+            }
         }
         try {
             String name = adminService.addAdmin(adminDTO);
@@ -57,7 +67,7 @@ public class AdminController {
             data.put("name", name);
 
             SuccessResponse successResponse = new SuccessResponse(
-                    "User saved successfully",
+                    "Admin saved successfully",
                     true,
                     data);
             return ResponseEntity.ok(successResponse);
@@ -70,10 +80,19 @@ public class AdminController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<?> getAllEmployees() {
+    public ResponseEntity<?> getAllAdmins() {
         List<AdminViewDTO> admins = adminService.getAllAdmins();
         if (!admins.isEmpty()) {
-            return ResponseEntity.ok(admins);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("allAdmins", admins);
+
+            SuccessResponse successResponse = new SuccessResponse(
+                    "Admins retrieved successfully",
+                    true,
+                    data
+            );
+
+            return ResponseEntity.ok(successResponse);
         } else {
             ErrorResponse errorResponse = new ErrorResponse(404, "No admin found");
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);

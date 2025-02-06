@@ -16,8 +16,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -40,13 +42,21 @@ public class EmployeeController {
     @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
     public ResponseEntity<?> saveEmployee(@Valid @RequestBody EmployeeDTO employeeDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Extract validation error messages
-            HashMap<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errors.put(error.getField(), error.getDefaultMessage()));
-            ErrorResponse errorResponse = new ErrorResponse(400, errors.get(errors.keySet().toArray()[0]));
+            // Define the expected field order
+            List<String> fieldOrder = Arrays.asList("name", "phone", "nic", "password", "fuelStation");
 
-            return ResponseEntity.badRequest().body(errors);
+            // Get the first occurring field error based on the expected order
+            for (String field : fieldOrder) {
+                Optional<String> errorMessage = bindingResult.getFieldErrors().stream()
+                        .filter(error -> error.getField().equals(field))
+                        .map(FieldError::getDefaultMessage)
+                        .findFirst();
+
+                if (errorMessage.isPresent()) {
+                    ErrorResponse errorResponse = new ErrorResponse(400, errorMessage.get());
+                    return ResponseEntity.badRequest().body(errorResponse);
+                }
+            }
         }
         try {
             String name = employeeService.addEmployee(employeeDTO);
@@ -70,7 +80,16 @@ public class EmployeeController {
     public ResponseEntity<?> getAllEmployees() {
         List<EmployeeViewDetailsDTO> employees = employeeService.getAllEmployees();
         if (!employees.isEmpty()) {
-            return ResponseEntity.ok(employees);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("allEmployees", employees);
+
+            SuccessResponse successResponse = new SuccessResponse(
+                    "Employees retrieved successfully",
+                    true,
+                    data
+            );
+
+            return ResponseEntity.ok(successResponse);
         } else {
             ErrorResponse errorResponse = new ErrorResponse(404, "No employees found");
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
@@ -82,7 +101,15 @@ public class EmployeeController {
     public ResponseEntity<?> getEmployeeByPhone(@PathVariable String phone) {
         EmployeeViewDetailsDTO employee = employeeService.getEmployeeByPhone(phone);
         if (employee != null) {
-            return ResponseEntity.ok(employee);
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("user", employee);
+            SuccessResponse successResponse = new SuccessResponse(
+                    "Employee retrieved successfully",
+                    true,
+                    data
+            );
+
+            return ResponseEntity.ok(successResponse);
         } else {
             ErrorResponse errorResponse = new ErrorResponse(404, "No Employee Found");
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
