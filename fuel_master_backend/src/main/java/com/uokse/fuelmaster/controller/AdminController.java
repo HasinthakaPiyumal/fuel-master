@@ -125,7 +125,7 @@ public class AdminController {
         }
         Optional<Admin> admin = adminService.loginAdmin(loginDTO);
         if (admin.isPresent()) {
-            String role = admin.get().getRole()== AdminType.SUPER_ADMIN?"SUPER_ADMIN":"STATION_ADMIN";
+            String role = admin.get().getRole()== AdminType.SUPER_ADMIN?"SUPER_ADMIN":"STATION_MANAGER";
             String token = jwtService.generateToken(admin.get(), role);
             HashMap<String, Object> data = new HashMap<>();
             data.put("user", admin.get());

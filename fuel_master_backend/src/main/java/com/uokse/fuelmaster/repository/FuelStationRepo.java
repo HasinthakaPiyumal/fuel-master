@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface FuelStationRepo extends JpaRepository<FuelStation, Long> {
     boolean existsByRegNo(String regNo);
+    boolean existsByOwnerId(Long ownerId);
 
     Optional<FuelStation> findById(Long id);
 }

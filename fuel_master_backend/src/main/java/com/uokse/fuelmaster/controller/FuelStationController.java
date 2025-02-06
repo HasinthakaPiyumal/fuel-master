@@ -43,8 +43,8 @@ public class FuelStationController {
             FuelStation fuelStation = fuelStationService.addFuelStation(fuelStationDTO);
             return ResponseEntity.ok(new SuccessResponse("Fuel station added successfully", true, fuelStation));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to add fuel station"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         }
     }
 

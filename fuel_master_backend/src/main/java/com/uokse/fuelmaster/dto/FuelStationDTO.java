@@ -12,7 +12,7 @@ public class FuelStationDTO {
     private String regNo;
     @NotBlank(message = "FuelStation location is mandatory")
     private String location;
-    @NotBlank(message = "FuelStation owner Id is mandatory")
+    @NotNull(message = "FuelStation owner Id is mandatory")
     private Long ownerId;
 
 

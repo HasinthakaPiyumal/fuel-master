@@ -28,6 +28,7 @@ public class FuelStationService {
         fuelStation.setOwnerId(fuelStationDTO.getOwnerId());
 
         Optional<Admin> owner = adminRepository.findById(fuelStationDTO.getOwnerId());
+//        Optional<Admin> owner = fuelStation.(fuelStationDTO.getOwnerId());
         if (owner.isPresent()) {
             fuelStation.setOwnerName(owner.get().getName());
         } else {
