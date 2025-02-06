@@ -105,6 +105,3 @@ The entire project (backend, frontend, and mobile app) is contained in a single 
 ## License
 This project is licensed under the MIT License.
 
-## Contact
-For support or inquiries, please contact **your-email@example.com**.
-
