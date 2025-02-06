@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -44,25 +45,21 @@ public class FuelStationService {
         return fuelStationRepository.save(fuelStation);
     }
 
-    public FuelStation updateFuelStation(Long id, FuelStationDTO fuelStationDTO) {
-        Optional<FuelStation> fuelStationOptional = fuelStationRepository.findById(id);
-        if (fuelStationOptional.isPresent()) {
-            FuelStation fuelStation = fuelStationOptional.get();
-            fuelStation.setRegNo(fuelStationDTO.getRegNo());
-            fuelStation.setLocation(fuelStationDTO.getLocation());
-            fuelStation.setOwnerId(fuelStationDTO.getOwnerId());
+    public FuelStation updateFuelStationOwner(Long id, Long ownerId) {
+        // Find the fuel station by ID
+        FuelStation fuelStation = fuelStationRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Fuel station not found"));
 
-            Optional<Admin> owner = adminRepository.findById(fuelStationDTO.getOwnerId());
-            if (owner.isPresent()) {
-                fuelStation.setOwnerName(owner.get().getName());
-            } else {
-                throw new RuntimeException("Owner not found with ID: " + fuelStationDTO.getOwnerId());
-            }
+        // Find the new owner by ownerId
+        Admin owner = adminRepository.findById(ownerId)
+                .orElseThrow(() -> new NoSuchElementException("Owner not found with ID: " + ownerId));
 
-            return fuelStationRepository.save(fuelStation);
-        } else {
-            throw new RuntimeException("Fuel station not found");
-        }
+        // Update only the owner fields
+        fuelStation.setOwnerId(owner.getId());
+        fuelStation.setOwnerName(owner.getName());
+
+        // Save and return the updated entity
+        return fuelStationRepository.save(fuelStation);
     }
 
     public List<FuelStation> getAllFuelStations() {
