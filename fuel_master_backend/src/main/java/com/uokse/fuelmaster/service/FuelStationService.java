@@ -5,7 +5,9 @@ import com.uokse.fuelmaster.dto.FuelStationDTO;
 import com.uokse.fuelmaster.model.Admin;
 import com.uokse.fuelmaster.model.FuelStation;
 import com.uokse.fuelmaster.repository.AdminRepository;
+import com.uokse.fuelmaster.repository.EmployeeRepository;
 import com.uokse.fuelmaster.repository.FuelStationRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,9 @@ public class FuelStationService {
 
     @Autowired
     private AdminRepository adminRepository;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     public FuelStation addFuelStation(FuelStationDTO fuelStationDTO) {
         FuelStation fuelStation = new FuelStation();
@@ -69,7 +74,13 @@ public class FuelStationService {
         return fuelStationOptional.orElseThrow(() -> new RuntimeException("Fuel station not found"));
     }
 
+    @Transactional
     public void deleteFuelStation(Long id) {
-        fuelStationRepository.deleteById(id);
+        if (fuelStationRepository.findById(id).isPresent()) {
+            employeeRepository.deleteByFuelStationId(id);
+            fuelStationRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Fuel Station is not found");
+        }
     }
 }
