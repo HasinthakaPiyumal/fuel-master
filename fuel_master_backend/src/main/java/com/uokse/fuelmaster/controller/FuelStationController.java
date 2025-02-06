@@ -76,7 +76,7 @@ public class FuelStationController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_STATION_MANAGER', 'ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> deleteFuelStation(@PathVariable Long id) {
         try {
             fuelStationService.deleteFuelStation(id);
