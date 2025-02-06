@@ -1,6 +1,7 @@
 package com.uokse.fuelmaster.controller;
 
 import com.uokse.fuelmaster.dto.FuelStationDTO;
+import com.uokse.fuelmaster.dto.Response.OwnerUpdateDTO;
 import com.uokse.fuelmaster.model.FuelStation;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.response.ErrorResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/fuelstation")
@@ -48,15 +50,28 @@ public class FuelStationController {
         }
     }
 
-    @PutMapping("/update/{id}")
-    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
-    public ResponseEntity<?> updateFuelStation(@PathVariable Long id, @RequestBody FuelStationDTO fuelStationDTO) {
+    @PutMapping("/change-owner/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
+    public ResponseEntity<?> changeFuelStationOwner(@PathVariable Long id, @Valid @RequestBody OwnerUpdateDTO ownerUpdateDTO, BindingResult bindingResult) {
+
+        // Validate request body
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            return ResponseEntity.badRequest().body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage));
+        }
+
         try {
-            FuelStation updatedFuelStation = fuelStationService.updateFuelStation(id, fuelStationDTO);
-            return ResponseEntity.ok(new SuccessResponse("Fuel station updated successfully", true, updatedFuelStation));
-        } catch (Exception e) {
+            // Call the service layer to update the fuel station owner
+            FuelStation updatedFuelStation = fuelStationService.updateFuelStationOwner(id, ownerUpdateDTO.getOwnerId());
+
+            // Return success response
+            return ResponseEntity.ok(new SuccessResponse("Fuel station owner updated successfully", true, updatedFuelStation));
+        } catch (NoSuchElementException e) {  // If fuel station or owner ID is not found
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Fuel station not found"));
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+        } catch (Exception e) {  // Handle any unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to update fuel station owner"));
         }
     }
 
