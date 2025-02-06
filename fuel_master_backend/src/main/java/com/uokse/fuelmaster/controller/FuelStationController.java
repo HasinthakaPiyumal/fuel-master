@@ -33,7 +33,7 @@ public class FuelStationController {
                     errors.put(error.getField(), error.getDefaultMessage()));
             ErrorResponse errorResponse = new ErrorResponse(400, errors.get(errors.keySet().toArray()[0]));
 
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(errorResponse);
         }
         try {
             FuelStation fuelStation = fuelStationService.addFuelStation(fuelStationDTO);
