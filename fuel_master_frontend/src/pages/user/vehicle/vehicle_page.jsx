@@ -20,10 +20,19 @@ export default function VehiclePage() {
           throw new Error('No token found');
         }
   const [vehicleData, setVehicleData] = useState(null);
-
+  const [quotaData, setQuotaData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found');
+        }
+
+        
+        const vehicleResponse = await apiService.get('/v1/vehicle/get');
     const fetchVehicleData = async () => {
  
 
