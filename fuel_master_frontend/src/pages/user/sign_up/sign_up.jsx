@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { showToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import apiService from "@/services/api.service";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 
 const signUpFormSchema = z
   .object({
@@ -47,6 +47,7 @@ const signUpFormSchema = z
 export default function SignUpPage() {
   const [showPasswords, setShowPasswords] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm({
     resolver: zodResolver(signUpFormSchema),
@@ -71,7 +72,7 @@ export default function SignUpPage() {
         nic: values.nic,
         password: values.password,
       };
-      const response = await apiService.post("/v1/user/save", data);
+      const response = await apiService.post("/user/save", data);
 
       if (response.status === 200) {
         showToast.success("Account created successfully!");
@@ -91,7 +92,7 @@ export default function SignUpPage() {
         terms: false,
       });
 
-      window.location.href = "/login";
+      navigate("/otp");
     } catch (error) {
       showToast.error(
         error.response.data.message || "Something went wrong. Please try again."
