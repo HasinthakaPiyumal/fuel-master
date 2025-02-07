@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { showToast } from "@/hooks/use-toast";
+import apiService from "@/services/api.service";
 
 const phoneFormSchema = z.object({
   phoneNumber: z
@@ -25,6 +27,14 @@ const phoneFormSchema = z.object({
 
 export default function PhoneNumber() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const form = useForm({
     resolver: zodResolver(phoneFormSchema),
@@ -34,32 +44,33 @@ export default function PhoneNumber() {
   });
 
   async function onSubmit(values) {
+    setLoading(true);
     try {
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      const response = await axios.put(
-        "http://localhost:8080/api/v1/user/change-phone",
-        { phoneNumber: values.phoneNumber },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await apiService.put("/v1/user/change-phone", {
+        phoneNumber: values.phoneNumber,
+      });
 
       if (response.status === 200) {
-        console.log("Phone number updated successfully:", response.data);
+        showToast.success("Phone number updated successfully!");
         navigate(-1);
       }
     } catch (error) {
-      console.error("Error updating phone number:", error);
-      if (error.response?.status === 401) {
-        localStorage.removeItem("token");
-        navigate("/login");
+      if (error.response) {
+        const errorMessage =
+          error.response.data?.message || "Failed to update phone number";
+        showToast.error(errorMessage);
+
+        if (error.response.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      } else if (error.request) {
+        showToast.error("Server not responding. Please try again later.");
+      } else {
+        showToast.error("An error occurred. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -103,8 +114,9 @@ export default function PhoneNumber() {
               <Button
                 type="submit"
                 className="w-full bg-[#FF5733] hover:bg-[#ff5733]/90 text-white py-2 px-4 rounded-md"
+                disabled={loading}
               >
-                Send Verification Code
+                {loading ? "Updating..." : "Send Verification Code"}
               </Button>
             </form>
           </Form>
