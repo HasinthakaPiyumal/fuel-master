@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FuelStationAnimation from "@/components/animation/FuelStationAnimation";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "react-hot-toast";
+import apiService from "@/services/api.service";
 
 const OtpSchema = z.object({
   otp: z
@@ -18,6 +19,7 @@ export default function VerifyOtpPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otpValues, setOtpValues] = useState(new Array(6).fill(""));
+  const [isResending, setIsResending] = useState(false);
 
   const {
     handleSubmit,
@@ -45,6 +47,7 @@ export default function VerifyOtpPage() {
     setIsSubmitting(true);
     const otpString = otpValues.join("");
     const validation = OtpSchema.safeParse({ otp: otpString });
+
     if (!validation.success) {
       setError("otp", {
         type: "manual",
@@ -53,9 +56,85 @@ export default function VerifyOtpPage() {
       setIsSubmitting(false);
       return;
     }
-    toast.success("OTP verified successfully!");
-    navigate("/dashboard");
+
+    try {
+      const response = await apiService.post("/verification/verify", {
+        code: otpString,
+      });
+
+      if (response.status === 200) {
+        toast.success("OTP verified successfully!");
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error.response) {
+        toast.error(error.response.data?.message || "Verification failed");
+        if (error.response.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      } else if (error.request) {
+        toast.error("Server not responding. Please try again later.");
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const handleResendOTP = async () => {
+    setIsResending(true);
+    try {
+      const response = await apiService.get("/verification/resend");
+
+      if (response.status === 200) {
+        toast.success("New OTP has been sent!");
+        setOtpValues(new Array(6).fill(""));
+      }
+    } catch (error) {
+      if (error.response) {
+        toast.error(error.response.data?.message || "Failed to resend OTP");
+        if (error.response.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      } else if (error.request) {
+        toast.error("Server not responding. Please try again later.");
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  useEffect(() => {
+    const sendInitialOTP = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await apiService.get("/verification/resend");
+
+        if (response.status === 200) {
+          toast.success("OTP has been sent to your phone!");
+        }
+      } catch (error) {
+        if (error.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        } else {
+          toast.error("Failed to send OTP. Please try again.");
+        }
+      }
+    };
+
+    sendInitialOTP();
+  }, [navigate]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -63,7 +142,7 @@ export default function VerifyOtpPage() {
         <div className="lg:w-1/2">
           <FuelStationAnimation />
         </div>
-        
+
         <div className="w-[561px] h-[502px] bg-white rounded-xl p-16 shadow-lg">
           <h1 className="text-[#F04A23] text-3xl font-semibold text-center">
             Verify OTP
@@ -117,7 +196,10 @@ export default function VerifyOtpPage() {
 
           <p className="text-right text-sm mt-4 ">
             Didn't receive it?{" "}
-            <span className="text-[#F04A23] cursor-pointer hover:underline">
+            <span
+              className="text-[#F04A23] cursor-pointer hover:underline"
+              onClick={handleResendOTP}
+            >
               Resend
             </span>
           </p>

@@ -11,7 +11,6 @@ import * as z from "zod";
 import { showToast } from "@/hooks/use-toast";
 import apiService from "@/services/api.service";
 
-// Login form validation
 const loginSchema = z.object({
   phone: z
     .string()
@@ -41,7 +40,7 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await apiService.post("/v1/user/login", data);
+      const response = await apiService.post("/user/login", data);
       if (response.status === 200) {
         const token = response.data.data.token;
         localStorage.setItem("token", token);
