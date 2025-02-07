@@ -4,6 +4,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { showToast } from "@/hooks/use-toast";
 import apiService from "@/services/api.service";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Loader2 } from "lucide-react";
+import { Form } from "@/components/ui/form";
+import { Navigate, useNavigate } from "react-router-dom";
+import Loading from "@/components/loading";
 
 const vehicleSchema = z.object({
   vehicleNumber: z.object({
@@ -13,7 +26,10 @@ const vehicleSchema = z.object({
       .regex(/^[A-Z]+$/, "Prefix must be uppercase letters only"),
     number: z.string().min(1, "Number is required"),
   }),
-  vehicleType: z.string().min(1, "Vehicle type is required"),
+  vehicleType: z.number({
+    required_error: "Vehicle type is required",
+    invalid_type_error: "Vehicle type must be a number",
+  }).min(1, "Vehicle type is required"),
   chassisNumber: z
     .string()
     .min(1, "Chassis number is required")
@@ -21,7 +37,7 @@ const vehicleSchema = z.object({
       /^[A-Z0-9]+$/,
       "Chassis number must be uppercase letters and numbers only"
     ),
-  fuelType: z.enum(["Petrol", "Diesel"], {
+  fuelType: z.enum(["PETROL", "DIESEL"], {
     required_error: "Please select a fuel type",
   }),
   termsAccepted: z.literal(true, {
@@ -34,46 +50,85 @@ const Dashboard = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm({
+  const navigate = useNavigate();
+
+  const { data: allData, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const response = await apiService.get("/user/authenticate");
+      return response.data.data;
+    },
+    retry: false,
+  });
+
+  const user = allData?.user;
+
+  const { data: vehicleTypesData, isLoading: isLoadingVehicleTypes, error: vehicleTypesError } = useQuery({
+    queryKey: ["vehicleTypes"],
+    queryFn: async () => {
+      const response = await apiService.get("/vehicle-types/view");
+      if (!response.data.data) {
+        throw new Error("No vehicle types found");
+      }
+      return response.data.data;
+    },
+  });
+
+  const vehicleTypes = vehicleTypesData || [];
+
+  const groupedVehicles = Object.values(
+    vehicleTypes.reduce((acc, { vehicleType, fuelType, defaultQuota, id }) => {
+      if (!acc[vehicleType]) {
+        acc[vehicleType] = { vehicleType, fuelTypes: [], defaultQuota, id };
+      }
+      if (!acc[vehicleType].fuelTypes.includes(fuelType)) {
+        acc[vehicleType].fuelTypes.push(fuelType);
+      }
+      return acc;
+    }, {})
+  );
+
+  const form = useForm({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
-      termsAccepted: false,
-      fuelType: "Petrol",
+      termsAccepted: false
     },
   });
 
   const handleUpperCase = (e, field) => {
     const value = e.target.value.toUpperCase();
-    setValue(field, value);
+    form.setValue(field, value);
   };
 
-  const selectedFuelType = watch("fuelType");
+  const selectedFuelType = form.watch("fuelType");
+
+  const getCurrentVehicleType = () => {
+    if (!form.getValues("vehicleType")) {
+      return null;
+    }
+    const tempVehicleType = vehicleTypes.find(type => type.id === form.getValues("vehicleType"));
+    const currentVehicleType = vehicleTypes.find(type => type.fuelType === form.getValues("fuelType").toUpperCase() && type.vehicleType === tempVehicleType.vehicleType);
+    return currentVehicleType;
+  }
 
   const onSubmit = async (data) => {
     setLoading(true);
     try {
       const vehicleData = {
-        userId: 1,
-        vehicleType: data.vehicleType === "Car" ? 1 : data.vehicleType === "Bike" ? 2 : 3,
+        userId: userInfo?.id,
+        vehicleType: getCurrentVehicleType().id,
         vehicleRegistrationPart1: data.vehicleNumber.prefix,
         vehicleRegistrationPart2: data.vehicleNumber.number,
         chassisNumber: data.chassisNumber,
         fuelType: data.fuelType.toUpperCase(),
       };
 
-      const response = await apiService.post("/v1/vehicle/save", vehicleData);
-      
+      const response = await apiService.post("/vehicle/save", vehicleData);
+
       if (response.status === 200) {
         showToast.success("Vehicle registered successfully!");
         setShowSuccessModal(true);
-        reset();
+        form.reset();
       }
     } catch (error) {
       if (error.response) {
@@ -91,9 +146,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await apiService.get("/v1/user/1");
+        const response = await apiService.get("/user/authenticate");
         if (response.status === 200) {
-          setUserInfo(response.data);
+          setUserInfo(response.data.data.user);
         }
       } catch (error) {
         if (error.response) {
@@ -109,7 +164,27 @@ const Dashboard = () => {
     fetchUserInfo();
   }, []);
 
-  return (
+  const handleVehicleTypeChange = (value) => {
+    form.setValue("vehicleType", parseInt(value));
+    form.setValue("fuelType", undefined);
+    const selectedVehicleType = groupedVehicles.find(type => type.id === parseInt(value));
+    if (selectedVehicleType) {
+      form.setValue("availableFuelTypes", selectedVehicleType.fuelTypes);
+      form.setValue("fuelType", selectedVehicleType.fuelTypes[0]);
+    }
+  }
+
+  if (!isLoading && !user) {
+    return <Navigate to="/login" />;
+  }
+  if (!isLoading && !user.verified) {
+    return <Navigate to="/otp" />;
+  }
+  if (!isLoading && user.verified && allData.vehicleRegistration) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return isLoading ? <Loading /> : (
     <div className="">
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -121,7 +196,7 @@ const Dashboard = () => {
                 Vehicle has been registered successfully.
               </p>
               <button
-                onClick={() => setShowSuccessModal(false)}
+                onClick={() => { setShowSuccessModal(false); navigate('/dashboard') }}
                 className="bg-[#F84C25] text-white px-6 py-2 rounded hover:bg-[#e64421]"
               >
                 Close
@@ -140,7 +215,7 @@ const Dashboard = () => {
                 <>
                   <div className="flex justify-between">
                     <span className="text-gray-700 font-medium">Name:</span>
-                    <span>{userInfo.name}</span>
+                    <span>{userInfo.firstName} {userInfo.lastName}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-700 font-medium">NIC:</span>
@@ -148,7 +223,7 @@ const Dashboard = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-700 font-medium">Phone:</span>
-                    <span>{userInfo.phoneNumber}</span>
+                    <span>{userInfo.phone}</span>
                   </div>
                 </>
               ) : (
@@ -161,127 +236,140 @@ const Dashboard = () => {
         <div className="w-[602px] h-[648px] lg:w-1/2">
           <div className="bg-white rounded-lg p-10 shadow-lg">
             <h2 className="text-[#F84C25] text-xl text-center mb-6">Vehicle Info</h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label className="block mb-1">Vehicle Number</label>
-                <div className="flex gap-2">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <label className="block mb-1">Vehicle Number</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Ex: ABC"
+                      className="border rounded p-1.5 w-1/3 text-sm uppercase"
+                      {...form.register("vehicleNumber.prefix")}
+                      onChange={(e) => handleUpperCase(e, "vehicleNumber.prefix")}
+                    />
+                    <input
+                      type="number"
+                      placeholder="Ex: 8822"
+                      className="border rounded p-1.5 w-2/3 text-sm"
+                      {...form.register("vehicleNumber.number")}
+                    />
+                  </div>
+                  {form.formState.errors.vehicleNumber?.prefix && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.vehicleNumber.prefix.message}
+                    </p>
+                  )}
+                  {form.formState.errors.vehicleNumber?.number && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.vehicleNumber.number.message}
+                    </p>
+                  )}
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="vehicleType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vehicle Type</FormLabel>
+                      <Select
+                        onValueChange={handleVehicleTypeChange}
+                        defaultValue={field.value?.toString()}
+                        disabled={isLoadingVehicleTypes || vehicleTypesError}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            {isLoadingVehicleTypes ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <SelectValue placeholder="Select a vehicle type" />
+                            )}
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {groupedVehicles.map((type) => (
+                            <SelectItem key={type.id} value={type.id.toString()}>
+                              {type.vehicleType}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div>
+                  <label className="block mb-1">Chassis Number</label>
                   <input
                     type="text"
-                    placeholder="Ex: ABC"
-                    className="border rounded p-1.5 w-1/3 text-sm uppercase"
-                    {...register("vehicleNumber.prefix")}
-                    onChange={(e) => handleUpperCase(e, "vehicleNumber.prefix")}
+                    placeholder="Ex: NHKSCM2"
+                    className="w-full border rounded p-1.5 text-sm uppercase"
+                    {...form.register("chassisNumber")}
+                    onChange={(e) => handleUpperCase(e, "chassisNumber")}
                   />
-                  <input
-                    type="number"
-                    placeholder="Ex: 8822"
-                    className="border rounded p-1.5 w-2/3 text-sm"
-                    {...register("vehicleNumber.number")}
-                  />
+                  {form.formState.errors.chassisNumber && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.chassisNumber.message}
+                    </p>
+                  )}
                 </div>
-                {errors.vehicleNumber?.prefix && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.vehicleNumber.prefix.message}
-                  </p>
-                )}
-                {errors.vehicleNumber?.number && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.vehicleNumber.number.message}
-                  </p>
-                )}
-              </div>
 
-              <div>
-                <label className="block mb-1">Vehicle Type</label>
-                <select
-                  className="w-full border rounded p-1.5 text-sm text-gray-500"
-                  {...register("vehicleType")}
+                {
+                  form.getValues("availableFuelTypes") && <div>
+                    <label className="block mb-1">Select Fuel Type</label>
+                    <div className="flex gap-2">
+                      {
+                        form.getValues("availableFuelTypes")
+                          ?.map((fuelType) => (
+                            <button
+                              key={fuelType}
+                              type="button"
+                              onClick={() => form.setValue("fuelType", fuelType)}
+                              className={`px-4 py-1 rounded text-sm ${selectedFuelType === fuelType
+                                ? "bg-[#F84C25] text-white"
+                                : "border"
+                                }`}
+                            >
+                              {fuelType.charAt(0) + fuelType.slice(1).toLowerCase()}
+                            </button>
+                          ))
+                      }
+                    </div>
+                    {form.formState.errors.fuelType && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {form.formState.errors.fuelType.message}
+                      </p>
+                    )}
+                  </div>}
+
+                <div className="text-sm">
+                  <label className="flex items-center gap-1">
+                    <input type="checkbox" {...form.register("termsAccepted")} />
+                    <span>
+                      I agree to{" "}
+                      <a href="#" className="text-[#F84C25]">
+                        Terms and Conditions
+                      </a>
+                    </span>
+                  </label>
+                  {form.formState.errors.termsAccepted && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.termsAccepted.message}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#F84C25] text-white rounded py-2 text-sm cursor-pointer hover:bg-[#e64421] disabled:opacity-50"
                 >
-                  <option value="Car">Car</option>
-                  <option value="Bike">Bike</option>
-                  <option value="Van">Van</option>
-                </select>
-                {errors.vehicleType && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.vehicleType.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block mb-1">Chassis Number</label>
-                <input
-                  type="text"
-                  placeholder="Ex: NHKSCM2"
-                  className="w-full border rounded p-1.5 text-sm uppercase"
-                  {...register("chassisNumber")}
-                  onChange={(e) => handleUpperCase(e, "chassisNumber")}
-                />
-                {errors.chassisNumber && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.chassisNumber.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block mb-1">Select Fuel Type</label>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setValue("fuelType", "Petrol")}
-                    className={`px-4 py-1 rounded text-sm ${
-                      selectedFuelType === "Petrol"
-                        ? "bg-[#F84C25] text-white"
-                        : "border"
-                    }`}
-                  >
-                    Petrol
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setValue("fuelType", "Diesel")}
-                    className={`px-4 py-1 rounded text-sm ${
-                      selectedFuelType === "Diesel"
-                        ? "bg-[#F84C25] text-white"
-                        : "border"
-                    }`}
-                  >
-                    Diesel
-                  </button>
-                </div>
-                {errors.fuelType && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.fuelType.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="text-sm">
-                <label className="flex items-center gap-1">
-                  <input type="checkbox" {...register("termsAccepted")} />
-                  <span>
-                    I agree to{" "}
-                    <a href="#" className="text-[#F84C25]">
-                      Terms and Conditions
-                    </a>
-                  </span>
-                </label>
-                {errors.termsAccepted && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.termsAccepted.message}
-                  </p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#F84C25] text-white rounded py-2 text-sm cursor-pointer hover:bg-[#e64421] disabled:opacity-50"
-              >
-                {loading ? "Registering..." : "Register Vehicle"}
-              </button>
-            </form>
+                  {loading ? "Registering..." : "Register Vehicle"}
+                </button>
+              </form>
+            </Form>
           </div>
         </div>
       </div>

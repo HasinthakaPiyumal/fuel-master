@@ -48,6 +48,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        System.out.println("MethodArgumentTypeMismatchException: " + ex.getMessage());
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Invalid fuel type. Allowed values: PETROL, DIESEL"

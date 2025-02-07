@@ -17,7 +17,9 @@ import { Input } from "@/components/ui/input";
 import { showToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import apiService from "@/services/api.service";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import Loading from "@/components/loading";
+import { useQuery } from "@tanstack/react-query";
 
 const signUpFormSchema = z
   .object({
@@ -49,6 +51,17 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { data: allData, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const response = await apiService.get("/user/authenticate");
+      return response.data.data;
+    },
+    retry: false,
+  });
+
+  const user = allData?.user;
+
   const form = useForm({
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
@@ -75,6 +88,7 @@ export default function SignUpPage() {
       const response = await apiService.post("/user/save", data);
 
       if (response.status === 200) {
+        localStorage.setItem("token", response?.data?.data?.token);
         showToast.success("Account created successfully!");
       } else {
         showToast.error(
@@ -106,7 +120,11 @@ export default function SignUpPage() {
     setShowPasswords((prev) => !prev);
   };
 
-  return (
+  if (!isLoading && user) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return isLoading ? <Loading /> : (
     <div>
       <div className="container">
         <div className="flex items-center justify-between">

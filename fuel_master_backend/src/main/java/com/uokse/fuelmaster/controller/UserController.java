@@ -3,12 +3,17 @@ package com.uokse.fuelmaster.controller;
 
 import com.uokse.fuelmaster.dto.LoginDTO;
 import com.uokse.fuelmaster.dto.Response.PhoneNumberDTO;
+import com.uokse.fuelmaster.model.Vehicle;
+import com.uokse.fuelmaster.repository.VehicleRepo;
 import com.uokse.fuelmaster.response.ErrorResponse;
+import com.uokse.fuelmaster.service.FuelTransactionService;
+import com.uokse.fuelmaster.service.VehicleService;
 import com.uokse.fuelmaster.service.VerificationCodeService;
 import com.uokse.fuelmaster.service.impl.UserIMPL;
 import com.uokse.fuelmaster.dto.UserDTO;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.JwtService;
+import com.uokse.fuelmaster.service.impl.VehicleIMPL;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.apache.http.entity.ContentType;
@@ -35,14 +40,22 @@ public class UserController {
     @Autowired
     private UserIMPL userIMPL;
 
-    private final JwtService jwtService;
+    @Autowired
+    VehicleIMPL vehicleService;
 
-    public UserController(JwtService jwtService) {
+    @Autowired
+    FuelTransactionService fuelTransactionService;
+
+    private final JwtService jwtService;
+    private final VehicleRepo vehicleRepo;
+
+    public UserController(JwtService jwtService, VehicleRepo vehicleRepo) {
         this.jwtService = jwtService;
+        this.vehicleRepo = vehicleRepo;
     }
 
-    @PostMapping(path="/save")
-    public ResponseEntity<?> saveUser(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult ){
+    @PostMapping(path = "/save")
+    public ResponseEntity<?> saveUser(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             // Define the expected field order
             List<String> fieldOrder = Arrays.asList("firstName", "lastName", "phone", "nic", "password");
@@ -60,7 +73,7 @@ public class UserController {
                 }
             }
         }
-        try{
+        try {
             String token = userIMPL.addUser(userDTO);
             HashMap<String, Object> data = new HashMap<>();
             data.put("token", token);
@@ -70,26 +83,26 @@ public class UserController {
                     data
             );
             return ResponseEntity.ok(successResponse);
-        }catch (IllegalArgumentException e) {  // Catch the specific exception
+        } catch (IllegalArgumentException e) {  // Catch the specific exception
             ErrorResponse errorResponse = new ErrorResponse(400, e.getMessage());
             return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
 
     }
 
-    @PostMapping(path="/login")
+    @PostMapping(path = "/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginDTO loginDTO) {
         System.out.println("login" + loginDTO);
         Optional<User> loggedUser = userIMPL.loginUser(loginDTO);
-        if(loggedUser != null){
+        if (loggedUser != null) {
             String token = jwtService.generateToken(loggedUser.get());
             HashMap<String, Object> data = new HashMap<>();
             data.put("user", loggedUser.get());
             data.put("token", token);
             SuccessResponse successResponse = new SuccessResponse(
-                "Login Success",
-                true,
-                data
+                    "Login Success",
+                    true,
+                    data
             );
             return ResponseEntity.ok(successResponse);
         } else {
@@ -146,13 +159,43 @@ public class UserController {
     @PreAuthorize("hasAnyRole('USER')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> changePhone(@RequestBody PhoneNumberDTO phoneNumberDTO) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userIMPL.updateUserPhoneNumber(Long.parseLong(userId),phoneNumberDTO.getPhoneNumber());
+        try {
+            User c = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userIMPL.updateUserPhoneNumber(c.getId(), phoneNumberDTO.getPhoneNumber());
+            if (user != null) {
+                HashMap<String, Object> data = new HashMap<>();
+                data.put("user", user);
+                SuccessResponse successResponse = new SuccessResponse(
+                        "Phone number updated successfully",
+                        true,
+                        data
+                );
+
+                return ResponseEntity.ok(successResponse);
+            } else {
+                ErrorResponse errorResponse = new ErrorResponse(404, "User Not Found");
+                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+            }
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(400, e.getMessage());
+            return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/authenticate")
+    @PreAuthorize("hasAnyRole('USER')")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<?> authenticateUser() {
+        User tokenizedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userIMPL.getUserById(tokenizedUser.getId());
         if (user != null) {
+             boolean haveAVehicle = vehicleRepo.existsByUser(user);
             HashMap<String, Object> data = new HashMap<>();
             data.put("user", user);
+            data.put("vehicleRegistration", haveAVehicle);
+
             SuccessResponse successResponse = new SuccessResponse(
-                    "Phone number updated successfully",
+                    "User authenticated successfully",
                     true,
                     data
             );
@@ -164,15 +207,28 @@ public class UserController {
         }
     }
 
-    @GetMapping("/authenticate")
+    @GetMapping("/vehicle")
     @PreAuthorize("hasAnyRole('USER')")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<?> authenticateUser() {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userIMPL.getUserById(Long.parseLong(userId));
+    public ResponseEntity<?> vehicle() {
+        User tokenizedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userIMPL.getUserById(tokenizedUser.getId());
         if (user != null) {
             HashMap<String, Object> data = new HashMap<>();
             data.put("user", user);
+            Vehicle vehicle = null;
+            try {
+                vehicle = vehicleService.getByUser(user);
+            } catch (Exception e) {
+                System.out.println(e);
+                ErrorResponse errorResponse = new ErrorResponse(404, "Vehicle Not Found");
+                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+            }
+            Double usedQuota = fuelTransactionService.getFuelQuantity(vehicle.getId());
+            data.put("vehicle", vehicle);
+            data.put("defaultQuota", vehicle.getVehicleType().getDefaultQuota());
+            data.put("usedQuota", usedQuota);
+            data.put("availableQuota", vehicle.getVehicleType().getDefaultQuota() - usedQuota);
             SuccessResponse successResponse = new SuccessResponse(
                     "User authenticated successfully",
                     true,
@@ -190,9 +246,9 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<?> removeUser(@PathVariable Long id){
-        try{
-        userIMPL.removeUser(id);
+    public ResponseEntity<?> removeUser(@PathVariable Long id) {
+        try {
+            userIMPL.removeUser(id);
             List<UserDTO> allUsers = userIMPL.getAllUsers(); // Fetch updated user list
             HashMap<String, Object> data = new HashMap<>();
             data.put("allUsers", allUsers);
@@ -203,9 +259,10 @@ public class UserController {
             );
 
             return ResponseEntity.ok(successResponse);
-    }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
         }
-        }
+    }
+
 }

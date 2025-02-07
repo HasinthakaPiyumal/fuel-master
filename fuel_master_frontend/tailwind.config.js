@@ -62,6 +62,10 @@ export default {
 				}
 			},
 			keyframes: {
+				"caret-blink": {
+					"0%,70%,100%": { opacity: "1" },
+					"20%,50%": { opacity: "0" },
+				},
 				'accordion-down': {
 					from: {
 						height: '0'
@@ -97,6 +101,7 @@ export default {
 				'float-1': 'float1 4s ease-in-out infinite',
 				'float-2': 'float2 3.5s ease-in-out infinite',
 				'float-3': 'float3 4.5s ease-in-out infinite',
+				"caret-blink": "caret-blink 1.25s ease-out infinite",
 			}
 		}
 	},

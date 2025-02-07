@@ -76,6 +76,12 @@ public class VehicleIMPL implements VehicleService {
         User user = userRepo.findById(vehicleDTO.getUserId()).orElse(null);
         VehicleType vehicleType = vehicleTypeRepo.findById(vehicleDTO.getVehicleType()).orElse(null);
 
+        boolean isUserVehicleExists = vehicleRepo.existsByUser(user);
+        if (isUserVehicleExists) {
+            logger.error("User already has a vehicle registered: {}", user);
+            return "Error: User already has a vehicle registered.";
+        }
+
         if (user == null || vehicleType == null) {
             logger.error("Invalid user or vehicle type information. User: {}, VehicleType: {}", user, vehicleType);
             return "Error: Invalid user or vehicle type information.";
@@ -134,6 +140,16 @@ public class VehicleIMPL implements VehicleService {
         try {
             return vehicleRepo.findByQrId(qrId);
         } catch (Exception e) {
+            throw new RuntimeException("Vehicle not found");
+        }
+    }
+
+    @Override
+    public Vehicle getByUser(User user) {
+        try {
+            return vehicleRepo.findFirstByUser(user);
+        } catch (Exception e) {
+            System.out.println(e);
             throw new RuntimeException("Vehicle not found");
         }
     }

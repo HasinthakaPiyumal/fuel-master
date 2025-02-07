@@ -98,7 +98,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (role.toString().equals("ROLE_USER")) {
                     User user = userService.findUser(Long.parseLong(userId));
                     userDetails = user;
-                    if (user != null && !request.getRequestURI().startsWith("/api/v1/verification/verify") && !request.getRequestURI().startsWith("/api/v1/verification/resend")) {
+                    if (user != null && !request.getRequestURI().startsWith("/api/v1/verification/verify") && !request.getRequestURI().startsWith("/api/v1/user/authenticate") && !request.getRequestURI().startsWith("/api/v1/user/change-phone") && !request.getRequestURI().startsWith("/api/v1/verification/resend")) {
                         if (!user.getVerified())
                             throw new AccountNotVerifiedException("Your account is not verified");
                     }

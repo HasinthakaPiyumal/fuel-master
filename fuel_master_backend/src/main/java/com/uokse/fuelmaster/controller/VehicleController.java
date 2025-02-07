@@ -67,16 +67,23 @@ public class VehicleController {
             // Handle error messages returned by the service
             if (registrationMessage.startsWith("Error:")) {
                 logger.error("Vehicle registration failed: {}", registrationMessage);
-                return ResponseEntity.badRequest().body(registrationMessage); // Return 400 with error message
+                ErrorResponse errorResponse = new ErrorResponse(400, registrationMessage);
+                return ResponseEntity.badRequest().body(errorResponse); // Return 400 with error message
             }
 
             // Return success message
             logger.info("Vehicle registered successfully: {}", registrationMessage);
-            return ResponseEntity.ok("Vehicle registered successfully with " + registrationMessage);
+            SuccessResponse successResponse = new SuccessResponse(
+                    "Vehicle registered successfully",
+                    true,
+                    null
+            );
+            return ResponseEntity.ok(successResponse);
         } catch (Exception e) {
             // Log and handle unexpected errors
             logger.error("An error occurred while saving the vehicle: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+            ErrorResponse errorResponse = new ErrorResponse(500, "An error occurred while saving the vehicle");
+            return ResponseEntity.badRequest().body(errorResponse);
         }
 
 

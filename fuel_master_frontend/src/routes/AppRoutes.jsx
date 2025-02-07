@@ -8,6 +8,7 @@ import VerifyOtpPage from "../pages/user/otp/otp_verification";
 import AppLayout from "@/layouts/AppLayout";
 import NotFound from "@/pages/error/NotFound";
 import VehiclePage from "@/pages/user/vehicle/vehicle_page";
+import ProtectedRoute from "./UserProtectedRoutes";
 
 const AppRoutes = () => {
   return (
@@ -17,9 +18,11 @@ const AppRoutes = () => {
         <Route path="signup" element={<SignUpPage />} />
         <Route path="otp" element={<VerifyOtpPage />} />
         <Route path="phone" element={<PhoneNumber />} />
-        <Route path="dashboard" element={<VehicleRegistration />} />
+        <Route path="vehicle" element={<VehicleRegistration />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="dashboard" element={<VehiclePage />} />
+        </Route>
         <Route path="*" element={<NotFound />} />
-        <Route path="vehicle" element={<VehiclePage />} />
       </Routes>
     </AppLayout>
   );

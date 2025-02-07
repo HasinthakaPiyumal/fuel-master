@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FuelStationAnimation from "@/components/animation/FuelStationAnimation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import {
   Form,
   FormControl,
@@ -13,21 +13,33 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { showToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 import apiService from "@/services/api.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { alert } from "@/lib/alert";
+import Loading from "@/components/loading";
 
 const phoneFormSchema = z.object({
   phoneNumber: z
     .string()
     .min(10, "Phone number must be at least 10 digits")
     .max(15, "Phone number must not exceed 15 digits")
-    .regex(/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"),
+    .regex(/^[0]\d{9}$/, "Please enter a valid phone number"),
 });
 
 export default function PhoneNumber() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+
+  const { data: allData, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const response = await apiService.get("/user/authenticate");
+      return response.data.data;
+    },
+    retry: false,
+  });
+
+  const user = allData?.user;
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -43,38 +55,27 @@ export default function PhoneNumber() {
     },
   });
 
-  async function onSubmit(values) {
-    setLoading(true);
-    try {
-      const response = await apiService.put("/user/change-phone", {
-        phoneNumber: values.phoneNumber,
-      });
+  const { mutate: updatePhoneNumber, isPending } = useMutation({
+    mutationFn: (values) => apiService.post("/user/change-phone", {
+      phoneNumber: values.phoneNumber,
+    }),
+    onSuccess: () => {
+      navigate("/otp");
+    },
+    onError: (error) => {
+      alert.error(error?.response?.data?.message || "Failed to update phone number");
+    },
+  });
 
-      if (response.status === 200) {
-        showToast.success("Phone number updated successfully!");
-        navigate(-1);
-      }
-    } catch (error) {
-      if (error.response) {
-        const errorMessage =
-          error.response.data?.message || "Failed to update phone number";
-        showToast.error(errorMessage);
-
-        if (error.response.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/login");
-        }
-      } else if (error.request) {
-        showToast.error("Server not responding. Please try again later.");
-      } else {
-        showToast.error("An error occurred. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
+  if (!isLoading && !user) {
+    return <Navigate to="/login" />;
   }
 
-  return (
+  if (!isLoading && user.verified) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return isLoading ? <Loading /> : (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
         <div className="lg:w-1/2">
@@ -92,7 +93,7 @@ export default function PhoneNumber() {
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(updatePhoneNumber)} className="space-y-6">
               <FormField
                 control={form.control}
                 name="phoneNumber"
@@ -114,9 +115,9 @@ export default function PhoneNumber() {
               <Button
                 type="submit"
                 className="w-full bg-[#FF5733] hover:bg-[#ff5733]/90 text-white py-2 px-4 rounded-md"
-                disabled={loading}
+                loading={isPending}
               >
-                {loading ? "Updating..." : "Send Verification Code"}
+                Send Verification Code
               </Button>
             </form>
           </Form>

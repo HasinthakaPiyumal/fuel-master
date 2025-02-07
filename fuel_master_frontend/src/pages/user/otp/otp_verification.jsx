@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 import FuelStationAnimation from "@/components/animation/FuelStationAnimation";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "react-hot-toast";
 import apiService from "@/services/api.service";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { alert } from "@/lib/alert";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { getUserPhone } from "@/services/user.service";
+import Loading from "@/components/loading";
 
 const OtpSchema = z.object({
   otp: z
@@ -17,126 +22,81 @@ const OtpSchema = z.object({
 
 export default function VerifyOtpPage() {
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [otpValues, setOtpValues] = useState(new Array(6).fill(""));
-  const [isResending, setIsResending] = useState(false);
 
-  const {
-    handleSubmit,
-    formState: { errors },
-    setError,
-    clearErrors,
-  } = useForm({
-    resolver: zodResolver(OtpSchema),
-    defaultValues: { otp: "" },
+  const { data: allData, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const response = await apiService.get("/user/authenticate");
+      return response.data.data;
+    },
+    retry: false,
   });
 
-  const handleOtpChange = (index, value) => {
-    if (value && !/^[0-9]$/.test(value)) return;
-    const newOtpValues = [...otpValues];
-    newOtpValues[index] = value;
-    setOtpValues(newOtpValues);
-    clearErrors("otp");
+  const user = allData?.user;
 
-    if (value && index < 5) {
-      document.querySelector(`input[name=otp-${index + 1}]`)?.focus();
-    }
-  };
+  const { data: userPhone } = useQuery({
+    queryKey: ["userPhone"],
+    queryFn: getUserPhone,
+  });
 
-  const onSubmit = async () => {
-    setIsSubmitting(true);
-    const otpString = otpValues.join("");
-    const validation = OtpSchema.safeParse({ otp: otpString });
+  const { mutate: verifyOtp, isPending: isVerifying } = useMutation({
+    mutationFn: (data) => apiService.post("/verification/verify", { code: data.otp }),
+    onSuccess: () => {
+      alert.success("OTP verified successfully!");
+      navigate("/dashboard");
+    },
+    onError: (error) => {
+      alert.error(error.response.data?.message || "Verification failed");
+    },
+  });
 
-    if (!validation.success) {
-      setError("otp", {
-        type: "manual",
-        message: validation.error.errors[0].message,
-      });
-      setIsSubmitting(false);
-      return;
-    }
+  const { mutate: resendOtp } = useMutation({
+    mutationFn: () => apiService.get("/verification/resend"),
+    onSuccess: () => {
+      alert.success("New OTP has been sent!");
+      form.reset();
+    },
+    onError: (error) => {
+      console.log(error);
+      alert.error(error.response.data?.message || "Failed to resend OTP");
+    },
+  });
 
-    try {
-      const response = await apiService.post("/verification/verify", {
-        code: otpString,
-      });
 
-      if (response.status === 200) {
-        toast.success("OTP verified successfully!");
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data?.message || "Verification failed");
-        if (error.response.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/login");
-        }
-      } else if (error.request) {
-        toast.error("Server not responding. Please try again later.");
-      } else {
-        toast.error("An error occurred. Please try again.");
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+  const form = useForm({
+    resolver: zodResolver(OtpSchema),
+    defaultValues: {
+      otp: "",
+    },
+  });
+
+  const onSubmit = async (data) => {
+    verifyOtp(data);
   };
 
   const handleResendOTP = async () => {
-    setIsResending(true);
-    try {
-      const response = await apiService.get("/verification/resend");
-
-      if (response.status === 200) {
-        toast.success("New OTP has been sent!");
-        setOtpValues(new Array(6).fill(""));
-      }
-    } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data?.message || "Failed to resend OTP");
-        if (error.response.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/login");
-        }
-      } else if (error.request) {
-        toast.error("Server not responding. Please try again later.");
-      } else {
-        toast.error("An error occurred. Please try again.");
-      }
-    } finally {
-      setIsResending(false);
-    }
+    resendOtp();
   };
 
   useEffect(() => {
+
     const sendInitialOTP = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
-
-        const response = await apiService.get("/verification/resend");
-
-        if (response.status === 200) {
-          toast.success("OTP has been sent to your phone!");
-        }
-      } catch (error) {
-        if (error.response?.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/login");
-        } else {
-          toast.error("Failed to send OTP. Please try again.");
-        }
-      }
+      const token = localStorage.getItem("token");
+      if (!token) navigate("/login");
     };
 
     sendInitialOTP();
   }, [navigate]);
 
-  return (
+  if (!isLoading && !user) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!isLoading && user.verified) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return isLoading ? <Loading /> : (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
         <div className="lg:w-1/2">
@@ -148,11 +108,11 @@ export default function VerifyOtpPage() {
             Verify OTP
           </h1>
           <p className="font-normal text-center mt-4 text-sm">
-            We've sent a 6-digit verification code to 076 321 5389. Please enter
+            We&apos;ve sent a 6-digit verification code to {userPhone}. Please enter
             the OTP below.
           </p>
           <p className="text-center mt-2 text-sm">
-            If this isn't your number?{" "}
+            If this isn&apos;t your number?{" "}
             <span
               className="text-[#F04A23] cursor-pointer hover:underline"
               onClick={() => navigate("/phone")}
@@ -161,41 +121,42 @@ export default function VerifyOtpPage() {
             </span>
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
-            <label className="font-medium text-sm block text-center">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6">
+            <label className="font-medium text-sm block text-center mb-8">
               Verification code
             </label>
-            <div className="flex gap-2 mt-2 justify-center">
-              {otpValues.map((value, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  name={`otp-${index}`}
-                  maxLength={1}
-                  value={value}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  className="w-12 h-12 border-2 rounded-lg text-center text-lg focus:ring-[#F04A23] focus:border-[#F04A23]"
-                  disabled={isSubmitting}
-                />
-              ))}
+            <div className="flex justify-center mb-4">
+              <InputOTP
+                maxLength={6}
+                {...form.register("otp")}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
             </div>
-            {errors.otp && (
+            {form.formState.errors.otp && (
               <p className="text-red-500 text-sm mt-2 text-center">
-                {errors.otp.message}
+                {form.formState.errors.otp.message}
               </p>
             )}
 
-            <button
+            <Button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-[#F04A23] text-white py-3 rounded-md hover:bg-[#d43d1a] transition-colors mt-6"
+              loading={isVerifying}
+              className="w-full mt-4"
             >
-              {isSubmitting ? "Verifying..." : "Verify"}
-            </button>
+              Verify
+            </Button>
           </form>
 
           <p className="text-right text-sm mt-4 ">
-            Didn't receive it?{" "}
+            Didn&apos;t receive it?{" "}
             <span
               className="text-[#F04A23] cursor-pointer hover:underline"
               onClick={handleResendOTP}

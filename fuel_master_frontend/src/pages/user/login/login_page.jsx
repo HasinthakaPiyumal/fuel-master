@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import FuelStationAnimation from "@/components/animation/FuelStationAnimation";
@@ -10,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { showToast } from "@/hooks/use-toast";
 import apiService from "@/services/api.service";
+import { useQuery } from "@tanstack/react-query";
+import Loading from "@/components/loading";
 
 const loginSchema = z.object({
   phone: z
@@ -24,6 +26,17 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  const { data: allData, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const response = await apiService.get("/user/authenticate");
+      return response.data.data;
+    },
+    retry: false,
+  });
+
+  const user = allData?.user;
 
   const {
     register,
@@ -49,7 +62,6 @@ const LoginPage = () => {
         }
         showToast.success("Login successful!");
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
         navigate("/dashboard");
       } else {
         showToast.error(
@@ -71,7 +83,11 @@ const LoginPage = () => {
     }
   };
 
-  return (
+  if (!isLoading && user) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return isLoading ? <Loading /> : (
     <React.Fragment>
       <div className="flex flex-col lg:flex-row items-center justify-center">
         <div className="lg:w-1/2 hidden lg:flex justify-center">
@@ -118,9 +134,8 @@ const LoginPage = () => {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
-                    className={`h-12 pr-10 ${
-                      errors.password ? "border-red-500" : ""
-                    }`}
+                    className={`h-12 pr-10 ${errors.password ? "border-red-500" : ""
+                      }`}
                     {...register("password")}
                     disabled={isSubmitting}
                   />

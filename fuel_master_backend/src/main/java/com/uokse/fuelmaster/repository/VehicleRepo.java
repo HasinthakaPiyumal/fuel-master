@@ -13,9 +13,6 @@ import java.util.Optional;
 @EnableJpaRepositories
 @Repository
 public interface VehicleRepo extends JpaRepository<Vehicle, Long> {
-    List<Vehicle> findByUser(User user);
-
-
    Optional<Vehicle> findByChassisNumber(String chassisNumber);
 
 
@@ -25,5 +22,9 @@ public interface VehicleRepo extends JpaRepository<Vehicle, Long> {
     Vehicle findByUserId(Long userId);
 
     Vehicle findByQrId(String qrId);
+
+    Vehicle findFirstByUser(User user);
+
+    boolean existsByUser(User user);
 
 }

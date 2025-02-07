@@ -118,7 +118,19 @@ public class UserIMPL {
             if(user.getVerified()){
                 throw new IllegalArgumentException("User is verified. Phone number cannot be changed.");
             }
+            Optional<User> userSearch = userRepo.findByPhone(phoneNumber);
+            if (userSearch.isPresent()) {
+                throw new IllegalArgumentException("Phone number already registered: " + phoneNumber);
+            }
             user.setPhone(phoneNumber);
+            userRepo.save(user);
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    user,
+                    null,
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            verificationCodeService.sendVerificationCode();
             return user;
         } else {
             return null;
