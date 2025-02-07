@@ -19,6 +19,13 @@ export default function VehiclePage() {
         if (!token) {
           throw new Error('No token found');
         }
+  const [vehicleData, setVehicleData] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVehicleData = async () => {
+ 
 
         
         const vehicleResponse = await apiService.get('/vehicle/get');
@@ -111,6 +118,39 @@ export default function VehiclePage() {
               >
                 Download QR
               </Button>
+  <div className="grid md:grid-cols-2 gap-x-20 gap-y-6 justify-center">
+    <Card className="bg-white shadow-lg">
+      <CardContent className="p-6">
+        <h2 className="text-2xl font-semibold text-orange-600 mb-6">Your Vehicle</h2>
+        <div className="space-y-4">
+          <InfoRow label="Name:" value={vehicleData.name} />
+          <InfoRow label="NIC:" value={vehicleData.nic} />
+          <InfoRow label="Phone Number:" value={vehicleData.phoneNumber} />
+          <InfoRow label="Vehicle Number:" value={vehicleData.vehicleNumber} />
+          <InfoRow label="Vehicle Type:" value={vehicleData.vehicleType} />
+          <InfoRow label="Chassis Number:" value={vehicleData.chassisNumber} />
+          <InfoRow label="Fuel Type:" value={vehicleData.fuelType} />
+        </div>
+      </CardContent>
+    </Card>
+
+    <Card className="bg-white shadow-lg">
+      <CardContent className="p-6">
+        <h2 className="text-2xl font-semibold text-orange-600 mb-6">Quota Summary</h2>
+        <div className="space-y-4">
+          <InfoRow label="Available Quota:" value={`${quotaData.availableQuota} L`} />
+
+          <InfoRow label="Quota Used:" value={`${quotaData.quotaUsed} L`} />
+          <InfoRow label="Total Quota:" value={`${quotaData.totalQuota} L`} />
+          <InfoRow label="Renewal Date:" value={quotaData.renewalDate} />
+
+          <div className="mt-6">
+            <Progress 
+              value={(quotaData.quotaUsed / quotaData.totalQuota) * 100} 
+              className="h-2 bg-gray-200"
+            />
+            <div className="text-right text-sm text-gray-600 mt-1">
+              {quotaData.quotaUsed}L / {quotaData.totalQuota}L
             </div>
           </CardContent>
         </Card>

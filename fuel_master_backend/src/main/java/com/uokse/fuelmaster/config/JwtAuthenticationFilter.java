@@ -11,6 +11,7 @@ import com.uokse.fuelmaster.service.EmployeeService;
 import com.uokse.fuelmaster.service.JwtService;
 import com.uokse.fuelmaster.service.impl.UserIMPL;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.io.DecodingException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -154,7 +155,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println(e);
             clearContextAndSetUnauthorized(request, response, filterChain, e.getMessage());
             handlerExceptionResolver.resolveException(request, response, null, e);
-        } catch (Exception exception) {
+        }catch (DecodingException e){
+            System.out.println(e);
+            clearContextAndSetUnauthorized(request, response, filterChain, "Invalid token");
+            handlerExceptionResolver.resolveException(request, response, null, e);
+        }
+        catch (Exception exception) {
             System.out.println(exception);
             System.out.println("Error processing JWT token:KK" + exception.getMessage());
             clearContextAndSetInternalServerError(request, response, filterChain, "Internal server error");

@@ -1,11 +1,19 @@
 package com.uokse.fuelmaster.dto;
 
 import com.uokse.fuelmaster.model.FuelType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class VehicleTypeDTO {
+    @Schema(hidden = true)
     private Long id;
+
+    @NotBlank(message = "Vehicle type is mandatory")
     private String vehicleType;
+    @NotNull(message = "Fuel type is mandatory")
     private FuelType fuelType;
+    @NotNull(message = "Default quota is required")
     private Long defaultQuota;
     public Long getId() {
         return id;

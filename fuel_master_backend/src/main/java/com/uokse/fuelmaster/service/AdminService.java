@@ -52,6 +52,16 @@ public class AdminService {
     public List<AdminViewDTO> getAllAdmins() {
         List<Admin> admins = adminRepository.findAll();
         return admins.stream().map(admin -> new AdminViewDTO(
+                admin.getId(),
+                admin.getName(),
+                admin.getEmail(),
+                admin.getNic()
+        )).toList();
+    }
+    public List<AdminViewDTO> getUnassignedStationManagers() {
+        List<Admin> admins = adminRepository.findUnassignedStationManagers();
+        return admins.stream().map(admin -> new AdminViewDTO(
+                admin.getId(),
                 admin.getName(),
                 admin.getEmail(),
                 admin.getNic()

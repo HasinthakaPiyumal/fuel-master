@@ -1,16 +1,18 @@
 package com.uokse.fuelmaster.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class FuelStationDTO {
+    @Schema(hidden = true)
     private Long id;
     @NotBlank(message = "FuelStation registration Number  is mandatory")
     private String regNo;
     @NotBlank(message = "FuelStation location is mandatory")
     private String location;
-    @NotBlank(message = "FuelStation owner Id is mandatory")
+    @NotNull(message = "FuelStation owner Id is mandatory")
     private Long ownerId;
 
 

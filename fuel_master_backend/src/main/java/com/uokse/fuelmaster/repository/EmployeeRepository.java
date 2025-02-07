@@ -14,4 +14,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByNic(String nic);
 
     Optional<Employee> findOneByPhoneAndPassword(String phone, String password);
+
+    void deleteByFuelStationId(Long id);
 }

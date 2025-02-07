@@ -8,6 +8,8 @@ import com.uokse.fuelmaster.model.VehicleType;
 import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.impl.VehicleIMPL;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +18,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/vehicle")
+@Tag(name = "Vehicle", description = "Vehicle API")
+@SecurityRequirement(name = "bearerAuth")
 public class VehicleController {
 
     private static final Logger logger = LoggerFactory.getLogger(VehicleController.class);
@@ -35,13 +42,21 @@ public class VehicleController {
     @PreAuthorize("hasAnyRole('USER','SUPER_ADMIN')")
     public ResponseEntity<?> saveVehicle(@Valid @RequestBody VehicleDTO vehicleDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Extract validation error messages
-            HashMap<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errors.put(error.getField(), error.getDefaultMessage()));
-            ErrorResponse errorResponse = new ErrorResponse(400, errors.get(errors.keySet().toArray()[0]));
+            // Define the expected field order
+            List<String> fieldOrder = Arrays.asList("userId", "vehicleType", "vehicleRegistrationPart1", "vehicleRegistrationPart2", "chassisNumber", "fuelType");
 
-            return ResponseEntity.badRequest().body(errors);
+            // Get the first occurring field error based on the expected order
+            for (String field : fieldOrder) {
+                Optional<String> errorMessage = bindingResult.getFieldErrors().stream()
+                        .filter(error -> error.getField().equals(field))
+                        .map(FieldError::getDefaultMessage)
+                        .findFirst();
+
+                if (errorMessage.isPresent()) {
+                    ErrorResponse errorResponse = new ErrorResponse(400, errorMessage.get());
+                    return ResponseEntity.badRequest().body(errorResponse);
+                }
+            }
         }
         logger.info("Received request to save vehicle: {}", vehicleDTO);
 
@@ -69,13 +84,13 @@ public class VehicleController {
 
     @GetMapping("/{vehicleId}/info")
     @PreAuthorize("hasAnyRole('USER','SUPER_ADMIN')")
-    public ResponseEntity<VehicleInfoDTO> getVehicleInfo(@PathVariable Long vehicleId) {
+    public ResponseEntity<?> getVehicleInfo(@PathVariable Long vehicleId) {
         logger.info("Received request to get vehicle info for vehicle ID: {}", vehicleId);
         Vehicle vehicle = vehicleIMPL.getVehicleInfo(vehicleId);
 
         if (vehicle == null) {
             logger.error("No vehicle found for ID: {}", vehicleId);
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(new ErrorResponse(404, "Vehicle not found with ID: " + vehicleId));
         }
 
         User user = vehicle.getUser ();
@@ -91,7 +106,13 @@ public class VehicleController {
         vehicleInfo.setChassisNumber(vehicle.getChassisNumber());
 
         logger.info("Vehicle info retrieved successfully for vehicle ID: {}", vehicleId);
-        return ResponseEntity.ok(vehicleInfo);
+        SuccessResponse successResponse = new SuccessResponse(
+                "Vehicle info retrieved successfully",
+                true,
+                vehicleInfo
+        );
+
+        return ResponseEntity.ok(successResponse);
     }
 
     @DeleteMapping("/delete/{id}")

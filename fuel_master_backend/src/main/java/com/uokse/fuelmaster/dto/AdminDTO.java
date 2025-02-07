@@ -1,12 +1,16 @@
 package com.uokse.fuelmaster.dto;
 
 import com.uokse.fuelmaster.model.AdminType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class AdminDTO {
+    @Schema(hidden = true)
     private Long id;
     @NotBlank(message = "Name is mandatory")
     private String name;

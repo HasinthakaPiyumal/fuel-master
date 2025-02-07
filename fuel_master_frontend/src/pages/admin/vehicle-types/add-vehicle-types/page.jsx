@@ -9,24 +9,57 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import apiService from "@/services/api.service";
 
 const AddVehicleTypes = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     trigger,
+    reset,
   } = useForm({
     defaultValues: {
       vehicleType: "",
-      fuelType: "",
+      fuelType: "PETROL",
       defaultQuota: "",
     },
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await apiService.post("/vehicle-types/add", {
+        vehicleType: data.vehicleType,
+        fuelType: data.fuelType.toUpperCase(),
+        defaultQuota: parseInt(data.defaultQuota),
+      });
+
+      if (response.data.status !== 200) {
+        throw new Error(response.data.message);
+      }
+
+      reset();
+      toast({
+        title: "Success",
+        description: "Vehicle type added successfully",
+        variant: "default",
+      });
+      reset();
+    } catch (error) {
+      toast({
+        title: "Failed to add vehicle type",
+        description: error.response?.data?.message || "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFuelTypeChange = (value) => {
@@ -66,15 +99,13 @@ const AddVehicleTypes = () => {
               <label htmlFor="fuelType" className="text-sm font-medium">
                 Fuel Type
               </label>
-              <Select onValueChange={handleFuelTypeChange}>
+              <Select onValueChange={handleFuelTypeChange} defaultValue="PETROL">
                 <SelectTrigger>
                   <SelectValue placeholder="Select fuel type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="petrol">Petrol</SelectItem>
-                  <SelectItem value="diesel">Diesel</SelectItem>
-                  <SelectItem value="electric">Electric</SelectItem>
-                  <SelectItem value="hybrid">Hybrid</SelectItem>
+                  <SelectItem value="PETROL">Petrol</SelectItem>
+                  <SelectItem value="DIESEL">Diesel</SelectItem>
                 </SelectContent>
               </Select>
               {errors.fuelType && (
@@ -105,8 +136,8 @@ const AddVehicleTypes = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full">
-              Add Vehicle Type
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Adding..." : "Add Vehicle Type"}
             </Button>
           </form>
         </CardContent>
