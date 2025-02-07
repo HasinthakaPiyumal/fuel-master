@@ -46,7 +46,7 @@ export default function PhoneNumber() {
   async function onSubmit(values) {
     setLoading(true);
     try {
-      const response = await apiService.put("/v1/user/change-phone", {
+      const response = await apiService.put("/user/change-phone", {
         phoneNumber: values.phoneNumber,
       });
 
