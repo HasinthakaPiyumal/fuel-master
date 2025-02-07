@@ -12,8 +12,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import apiService from "@/services/api.service";
+import { toast } from "@/hooks/use-toast";
 
 const formSchema = z
   .object({
@@ -21,6 +24,8 @@ const formSchema = z
       .string()
       .min(2, "Name must be at least 2 characters")
       .regex(/^[A-Za-z\s]+$/, "Name can only contain letters and spaces"),
+    nic: z.string().min(2, "Name must be at least 2 characters"),
+    // .regex(/^[A-Za-z\s]+$/, "Name can only contain letters and spaces"),
 
     email: z
       .string()
@@ -44,27 +49,43 @@ const formSchema = z
 
 export default function AddStationMaster() {
   const [showPasswords, setShowPasswords] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
+      nic: "",
       password: "",
       confirmPassword: "",
     },
   });
 
+  const { mutate, isLoading } = useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Station Manager added successfully",
+        variant: "default",
+      });
+      form.reset();
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed",
+        description: error.response.data.message,
+        variant: "destructive",
+      });
+    },
+    mutationFn: async (values) => {
+      return await apiService.post("/admin/save", values);
+    },
+  });
+
   async function onSubmit(values) {
-    setLoading(true);
-    try {
-      console.log(values);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    const data = { ...values, role: "STATION_MANAGER" };
+    console.log(data);
+    mutate(data);
   }
 
   return (
@@ -100,6 +121,20 @@ export default function AddStationMaster() {
                         placeholder="john@example.com"
                         {...field}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>NIC</FormLabel>
+                    <FormControl>
+                      <Input placeholder="123456789v" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,8 +205,8 @@ export default function AddStationMaster() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Adding..." : "Add Station Master"}
+              <Button type="submit" className="w-full" loading={isLoading}>
+                Add Station Master
               </Button>
             </form>
           </Form>
