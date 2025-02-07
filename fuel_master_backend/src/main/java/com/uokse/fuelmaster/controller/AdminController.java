@@ -104,6 +104,25 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/unassigned-station-managers")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','STATION_MANAGER')")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<?> getUnassignedStationManager() {
+        List<AdminViewDTO> admins = adminService.getUnassignedStationManagers();
+        if (!admins.isEmpty()) {
+            SuccessResponse successResponse = new SuccessResponse(
+                    "Admins retrieved successfully",
+                    true,
+                    admins
+            );
+
+            return ResponseEntity.ok(successResponse);
+        } else {
+            ErrorResponse errorResponse = new ErrorResponse(404, "No admin found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginAdmin(@Valid @RequestBody AdminLoginDTO loginDTO,BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

@@ -150,7 +150,7 @@ public class EmployeeController {
         }
         Optional<Employee> employee = employeeService.getEmployee(phone);
         if (employee.isPresent()) {
-            String token = jwtService.generateToken(employee.get());
+            String token = jwtService.generateToken(employee.get(),"EMPLOYEE");
             HashMap<String, Object> data = new HashMap<>();
             data.put("user", employee.get().getCommonData());
             data.put("token", token);

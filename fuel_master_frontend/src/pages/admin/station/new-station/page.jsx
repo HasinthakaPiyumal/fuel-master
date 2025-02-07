@@ -19,6 +19,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import apiService from "@/services/api.service";
+import { toast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   regNo: z
@@ -31,18 +35,10 @@ const formSchema = z.object({
   location: z.string().min(2, {
     message: "Location must be at least 2 characters.",
   }),
-  owner: z.string({
+  ownerId: z.number({
     required_error: "Please select an owner.",
-  }),
-  employeeCount: z
-    .string()
-    .transform((val) => parseInt(val) || 0)
-    .pipe(
-      z
-        .number()
-        .int("Employee count must be a whole number")
-        .min(0, "Employee count cannot be negative")
-    ),
+    invalid_type_error: "Please select an owner.",
+  }).positive("Please select an owner."),
 });
 
 const NewStation = () => {
@@ -51,20 +47,50 @@ const NewStation = () => {
     defaultValues: {
       regNo: "",
       location: "",
-      owner: "",
+      ownerId: 0,
       employeeCount: "",
     },
   });
 
-  function onSubmit(values) {
-    console.log(values);
+  const { data: managers, isLoading: isLoadingManagers, refetch, error: errorManagers } = useQuery({
+    queryKey: ["unassigned-station-managers"],
+    queryFn: () => apiService.get("/admin/unassigned-station-managers"),
+  });
+
+  const { mutate, isLoading } = useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Station added successfully",
+        variant: "default",
+      });
+      refetch();
+      form.reset();
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed",
+        description: error.response.data.message,
+        variant: "destructive",
+      });
+    },
+    mutationFn: async (values) => { return await apiService.post("/fuelstation/save", values) },
+  });
+
+  const onSubmit = async (values) => {
+    mutate(values);
   }
 
-  const owners = [
-    { id: "1", name: "John" },
-    { id: "2", name: "Jane" },
-    { id: "3", name: "Bob" },
-  ];
+  const owners = errorManagers ? [] : managers?.data?.data?.map((manager) => ({
+    id: manager.id,
+    name: manager.name,
+  })) || [];
+
+  const handleOwnerChange = (value) => {
+    form.setValue("ownerId", parseInt(value));
+    form.trigger("ownerId");
+  };
+
 
   return (
     <div className="space-y-6">
@@ -102,75 +128,43 @@ const NewStation = () => {
 
             <FormField
               control={form.control}
-              name="owner"
-              render={({ field }) => (
+              name="ownerId"
+              render={() => (
                 <FormItem>
                   <FormLabel>Owner</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    onValueChange={handleOwnerChange}
+                    disabled={owners.length === 0}
+                    value={errorManagers ? 0 : form.getValues("ownerId")}
                   >
-                    <FormControl>
+                    <FormControl >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select an owner" />
+                        {owners.length === 0 && "No Active Station Managers"}
+                        <SelectValue value={0} placeholder={"Select an owner"} />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      {owners.map((owner) => (
-                        <SelectItem key={owner.id} value={owner.id}>
-                          {owner.name}
+                    {(!isLoadingManagers || owners.length > 0) ? <SelectContent>
+                      {owners.map((manager) => (
+                        <SelectItem key={manager.id} value={manager.id}>
+                          {manager.name}
                         </SelectItem>
                       ))}
-                    </SelectContent>
+                    </SelectContent> : <SelectContent>
+                      <SelectItem key={0} value="0">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      </SelectItem>
+                    </SelectContent>}
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="employeeCount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Employee Count</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="1"
-                      placeholder="10"
-                      onKeyDown={(e) => {
-                        if (
-                          e.key === "-" ||
-                          e.key === "." ||
-                          e.key === "e" ||
-                          e.key === "E"
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value === "" || parseInt(value) < 0) {
-                          field.onChange("0");
-                        } else {
-                          field.onChange(value);
-                        }
-                      }}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit">Create Station</Button>
+            <Button type="submit" loading={isLoading}>Create Station</Button>
           </form>
         </Form>
       </Card>
-    </div>
+    </div >
   );
 };
 export default NewStation;

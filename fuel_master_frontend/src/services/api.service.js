@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://api-fuel-master-fbc37438737d.herokuapp.com/api';
+// const API_BASE_URL = 'https://api-fuel-master-fbc37438737d.herokuapp.com/api';
+const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 const apiService = {
     init() {
@@ -25,7 +26,6 @@ const apiService = {
     },
 
     get(resource) {
-        console.log(API_BASE_URL + resource);
         return axios.get(API_BASE_URL + resource);
     },
 

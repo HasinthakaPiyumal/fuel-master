@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api/fuelstation")
+@RequestMapping("/api/v1/fuelstation")
 @Tag(name = "Fuel Station", description = "Fuel Station API")
 @SecurityRequirement(name = "bearerAuth")
 public class FuelStationController {
@@ -95,7 +95,7 @@ public class FuelStationController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_STATION_MANAGER', 'ROLE_SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER', 'SUPER_ADMIN')")
     public ResponseEntity<?> deleteFuelStation(@PathVariable Long id) {
         try {
             fuelStationService.deleteFuelStation(id);

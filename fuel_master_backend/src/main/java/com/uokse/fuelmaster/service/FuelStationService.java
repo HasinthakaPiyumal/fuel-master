@@ -9,6 +9,7 @@ import com.uokse.fuelmaster.repository.EmployeeRepository;
 import com.uokse.fuelmaster.repository.FuelStationRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,15 +35,27 @@ public class FuelStationService {
         fuelStation.setOwnerId(fuelStationDTO.getOwnerId());
 
         Optional<Admin> owner = adminRepository.findById(fuelStationDTO.getOwnerId());
-//        Optional<Admin> owner = fuelStation.(fuelStationDTO.getOwnerId());
         if (owner.isPresent()) {
+            boolean isAssignedOwner = fuelStationRepository.existsByOwnerId(owner.get().getId());
+            if (isAssignedOwner) {
+                throw new RuntimeException("Owner already assigned to another fuel station");
+            }
             fuelStation.setOwnerName(owner.get().getName());
         } else {
             throw new RuntimeException("Owner not found with ID: " + fuelStationDTO.getOwnerId());
         }
 
 
-        return fuelStationRepository.save(fuelStation);
+        try {
+            return fuelStationRepository.save(fuelStation);
+        } catch (DataIntegrityViolationException ex) {
+            if (ex.getMessage().contains("Duplicate entry")) {
+                throw new RuntimeException("Fuel Station with Register Number " + fuelStation.getRegNo() + " already exists.");
+            }
+            throw ex;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save fuel station");
+        }
     }
 
     public FuelStation updateFuelStationOwner(Long id, Long ownerId) {
