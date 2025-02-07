@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FuelStationAnimation from "@/components/animation/FuelStationAnimation";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "react-hot-toast";
+import { showToast } from "@/hooks/use-toast";
+import axios from "axios";
 
 const OtpSchema = z.object({
   otp: z
@@ -17,7 +18,15 @@ const OtpSchema = z.object({
 export default function VerifyOtpPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [otpValues, setOtpValues] = useState(new Array(6).fill(""));
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const {
     handleSubmit,
@@ -44,17 +53,82 @@ export default function VerifyOtpPage() {
   const onSubmit = async () => {
     setIsSubmitting(true);
     const otpString = otpValues.join("");
-    const validation = OtpSchema.safeParse({ otp: otpString });
-    if (!validation.success) {
-      setError("otp", {
-        type: "manual",
-        message: validation.error.errors[0].message,
-      });
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/v1/verification/verify",
+        { code: otpString },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        showToast.success("OTP verified successfully!");
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error.response) {
+        const errorMessage =
+          error.response.data?.message || "Verification failed";
+        showToast.error(errorMessage);
+
+        if (error.response.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      } else if (error.request) {
+        showToast.error("Server not responding. Please try again later.");
+      } else {
+        showToast.error("An error occurred. Please try again.");
+      }
+    } finally {
       setIsSubmitting(false);
-      return;
     }
-    toast.success("OTP verified successfully!");
-    navigate("/dashboard");
+  };
+
+  const handleResendOTP = async () => {
+    setIsResending(true);
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/v1/verification/resend",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        showToast.success("New OTP has been sent!");
+        setOtpValues(new Array(6).fill(""));
+      }
+    } catch (error) {
+      if (error.response) {
+        const errorMessage =
+          error.response.data?.message || "Failed to resend OTP";
+        showToast.error(errorMessage);
+
+        if (error.response.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
+      } else if (error.request) {
+        showToast.error("Server not responding. Please try again later.");
+      } else {
+        showToast.error("An error occurred. Please try again.");
+      }
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -63,14 +137,13 @@ export default function VerifyOtpPage() {
         <div className="lg:w-1/2">
           <FuelStationAnimation />
         </div>
-        
+
         <div className="w-[561px] h-[502px] bg-white rounded-xl p-16 shadow-lg">
           <h1 className="text-[#F04A23] text-3xl font-semibold text-center">
             Verify OTP
           </h1>
           <p className="font-normal text-center mt-4 text-sm">
-            We've sent a 6-digit verification code to 076 321 5389. Please enter
-            the OTP below.
+            We've sent a 6-digit verification code to your phone number.
           </p>
           <p className="text-center mt-2 text-sm">
             If this isn't your number?{" "}
@@ -109,17 +182,22 @@ export default function VerifyOtpPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#F04A23] text-white py-3 rounded-md hover:bg-[#d43d1a] transition-colors mt-6"
+              className="w-full bg-[#F04A23] text-white py-3 rounded-md hover:bg-[#d43d1a] transition-colors mt-6 disabled:opacity-50"
             >
               {isSubmitting ? "Verifying..." : "Verify"}
             </button>
           </form>
 
-          <p className="text-right text-sm mt-4 ">
+          <p className="text-right text-sm mt-4">
             Didn't receive it?{" "}
-            <span className="text-[#F04A23] cursor-pointer hover:underline">
-              Resend
-            </span>
+            <button
+              type="button"
+              onClick={handleResendOTP}
+              disabled={isResending}
+              className="text-[#F04A23] cursor-pointer hover:underline disabled:opacity-50"
+            >
+              {isResending ? "Resending..." : "Resend"}
+            </button>
           </p>
         </div>
       </div>
