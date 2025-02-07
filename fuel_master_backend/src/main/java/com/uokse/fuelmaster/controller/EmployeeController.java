@@ -42,7 +42,7 @@ public class EmployeeController {
     }
 
     @PostMapping(path="/save")
-    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> saveEmployee(@Valid @RequestBody EmployeeDTO employeeDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

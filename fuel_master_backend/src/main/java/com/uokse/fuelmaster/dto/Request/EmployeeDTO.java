@@ -21,8 +21,6 @@ public class EmployeeDTO {
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
-    @NotNull(message = "FuelStation Id is mandatory")
-    private Long fuelStation;
 
     public EmployeeDTO(String id, String name, String phone, String nic, String password, Long fuelStation) {
         this.id = id;
@@ -30,7 +28,6 @@ public class EmployeeDTO {
         this.phone = phone;
         this.nic = nic;
         this.password = password;
-        this.fuelStation= fuelStation;
     }
 
     public EmployeeDTO() {
@@ -76,11 +73,4 @@ public class EmployeeDTO {
         this.password = password;
     }
 
-    public Long getFuelStation() {
-        return fuelStation;
-    }
-
-    public void setFuelStation(Long fuelStation) {
-        this.fuelStation = fuelStation;
-    }
 }

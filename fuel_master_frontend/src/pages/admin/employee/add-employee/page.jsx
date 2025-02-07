@@ -13,13 +13,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import apiService from '@/services/api.service';
+import { useMutation } from '@tanstack/react-query';
+import { alert } from '@/lib/alert';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -29,9 +25,6 @@ const formSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain uppercase, lowercase and numbers"),
   confirmPassword: z.string(),
-  fuelStation: z.string({
-    required_error: "Please select a fuel station",
-  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -39,6 +32,19 @@ const formSchema = z.object({
 
 const AddEmployee = () => {
   const [showPassword, setShowPassword] = React.useState(false);
+
+  const { mutate: addEmployee, isPending } = useMutation({
+    mutationFn: async (data) => {
+      const response = await apiService.post("/employee/save", data);
+      return response.data.data;
+    },
+    onSuccess: () => {
+      alert.success("Employee added successfully");
+    },
+    onError: (error) => {
+      alert.error(error.response.data.data.message);
+    },
+  });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -48,19 +54,17 @@ const AddEmployee = () => {
       nic: "",
       password: "",
       confirmPassword: "",
-      fuelStation: "",
     },
   });
 
   function onSubmit(values) {
-    console.log(values);
-    
+    addEmployee(values);
   }
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Add New Employee</h1>
-      
+
       <div className="w-[400px] border rounded-lg p-6 shadow-md bg-white">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -114,10 +118,10 @@ const AddEmployee = () => {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input 
-                        type={showPassword ? "text" : "password"} 
-                        placeholder="Enter password" 
-                        {...field} 
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter password"
+                        {...field}
                       />
                       <button
                         type="button"
@@ -145,10 +149,10 @@ const AddEmployee = () => {
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input 
-                        type={showPassword ? "text" : "password"} 
-                        placeholder="Confirm password" 
-                        {...field} 
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Confirm password"
+                        {...field}
                       />
                       <button
                         type="button"
@@ -168,30 +172,7 @@ const AddEmployee = () => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="fuelStation"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Fuel Station</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a fuel station" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="station1">Station 1</SelectItem>
-                      <SelectItem value="station2">Station 2</SelectItem>
-                      <SelectItem value="station3">Station 3</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit" className="w-full mt-6">
+            <Button loading={isPending} type="submit" className="w-full mt-6">
               Add Employee
             </Button>
           </form>

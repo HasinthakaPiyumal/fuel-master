@@ -10,4 +10,6 @@ public interface FuelStationRepo extends JpaRepository<FuelStation, Long> {
     boolean existsByOwnerId(Long ownerId);
 
     Optional<FuelStation> findById(Long id);
+
+    Optional<FuelStation> findByOwnerId(Long id);
 }

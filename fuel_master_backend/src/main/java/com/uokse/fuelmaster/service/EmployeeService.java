@@ -3,6 +3,7 @@ package com.uokse.fuelmaster.service;
 import com.uokse.fuelmaster.dto.EmployeeViewDetailsDTO;
 import com.uokse.fuelmaster.dto.LoginDTO;
 import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
+import com.uokse.fuelmaster.model.Admin;
 import com.uokse.fuelmaster.model.Employee;
 import com.uokse.fuelmaster.model.FuelStation;
 import com.uokse.fuelmaster.model.User;
@@ -11,6 +12,7 @@ import com.uokse.fuelmaster.repository.FuelStationRepo;
 import com.uokse.fuelmaster.util.PasswordUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,8 +36,10 @@ public class EmployeeService {
             throw new IllegalArgumentException("NIC already registered: " + employeeDTO.getNic());
         }
 
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         // Check if Fuel Station exists
-        FuelStation fuelStation = fuelStationRepo.findById(employeeDTO.getFuelStation())
+        FuelStation fuelStation = fuelStationRepo.findByOwnerId(admin.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Fuel Station not found"));
 
         String hashedPassword = PasswordUtil.hashPassword(employeeDTO.getPassword());
