@@ -72,8 +72,7 @@ public class VerificationCodeService {
         try {
             String code = generateVerificationCode();
             System.out.println("Verification code: "+code);
-            return true;
-//            return  notificationStrategy.sendNotification(phoneNumber, "Your verification code is: "+code);
+            return  notificationStrategy.sendNotification(phoneNumber, "Your verification code is: "+code);
         } catch (Exception e) {
             System.out.println("Error sending verification code: " + e.getMessage());
             return false;

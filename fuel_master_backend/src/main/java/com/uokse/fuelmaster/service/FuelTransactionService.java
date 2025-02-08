@@ -5,8 +5,10 @@ import com.uokse.fuelmaster.repository.EmployeeRepository;
 import com.uokse.fuelmaster.repository.FuelStationRepo;
 import com.uokse.fuelmaster.repository.FuelTransactionRepository;
 import com.uokse.fuelmaster.repository.VehicleRepo;
+import com.uokse.fuelmaster.service.notification.NotificationStrategy;
 import com.uokse.fuelmaster.util.AuthUtil;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,9 @@ public class FuelTransactionService {
     private EmployeeRepository employeeRepository;
     private FuelStationRepo fuelStationRepo;
     private VehicleRepo vehicleRepo;
+
+    @Autowired
+    NotificationStrategy notificationStrategy;
 
 
     public FuelTransactionService(FuelTransactionRepository fuelTransactionRepository, EmployeeRepository employeeRepository, FuelStationRepo fuelStationRepo, VehicleRepo vehicleRepo) {
@@ -117,6 +122,9 @@ public class FuelTransactionService {
         if (pumpedQuantity > availableFuelQuota) {
             throw new RuntimeException("Fuel quota exceeded");
         }
-        return fuelTransactionRepository.save(new FuelTransaction(null, vehicle, employee, fuelStation, pumpedQuantity, LocalDateTime.now()));
+
+        Object obj =  fuelTransactionRepository.save(new FuelTransaction(null, vehicle, employee, fuelStation, pumpedQuantity, LocalDateTime.now()));
+        notificationStrategy.sendNotification(vehicle.getUser().getPhone(), "Your "+vehicle.getVehicleType().getVehicleType() + " has been fueled with " + pumpedQuantity + "L @ " + fuelStation.getLocation());
+        return obj;
     }
 }
