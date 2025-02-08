@@ -57,7 +57,6 @@ export default function VerifyOtpPage() {
       form.reset();
     },
     onError: (error) => {
-      console.log(error);
       alert.error(error.response.data?.message || "Failed to resend OTP");
     },
   });

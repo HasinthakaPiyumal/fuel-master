@@ -51,6 +51,10 @@ public class FuelTransactionController {
 
         try {
             Vehicle vehicle = vehicleService.getByQRId(qrId);
+            if(vehicle == null) {
+                ErrorResponse response = new ErrorResponse(400, "Vehicle not found. Please check the QR code and try again.");
+                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(response);
+            }
             Double usedQuota = fuelTransactionService.getFuelQuantity(vehicle.getId());
             HashMap responseData = new HashMap();
             responseData.put("vehicle", vehicle);

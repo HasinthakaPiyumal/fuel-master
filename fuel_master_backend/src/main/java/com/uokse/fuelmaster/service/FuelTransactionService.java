@@ -11,10 +11,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class FuelTransactionService {
@@ -54,6 +55,56 @@ public class FuelTransactionService {
         Long employeeId = Long.parseLong(AuthUtil.getCurrentUserId());
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new RuntimeException("Employee not found"));
         return fuelTransactionRepository.findByEmployeeAndToday(employee);
+    }
+
+    public double getTodayTransaction() {
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = LocalDateTime.of(today, LocalTime.MIN);
+        LocalDateTime endOfDay = LocalDateTime.of(today.plusDays(1), LocalTime.MIN);
+        if(admin.getRole() == AdminType.SUPER_ADMIN) {
+            return fuelTransactionRepository.getTodayTransaction(startOfDay, endOfDay);
+        }
+        FuelStation fuelStation = fuelStationRepo.findByOwnerId(admin.getId()).orElseThrow(() -> new RuntimeException("Fuel station not found"));
+        return fuelTransactionRepository.getTodayTransactionByFuelStation(fuelStation, startOfDay, endOfDay);
+    }
+
+    public List<FuelTransaction> getTodayTransactionObj() {
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = LocalDateTime.of(today, LocalTime.MIN);
+        LocalDateTime endOfDay = LocalDateTime.of(today.plusDays(1), LocalTime.MIN);
+        if(admin.getRole() == AdminType.SUPER_ADMIN) {
+            return fuelTransactionRepository.getTodayTransactionObj(startOfDay, endOfDay);
+        }
+        FuelStation fuelStation = fuelStationRepo.findByOwnerId(admin.getId()).orElseThrow(() -> new RuntimeException("Fuel station not found"));
+        return fuelTransactionRepository.getTodayTransactionByFuelStationObj(fuelStation, startOfDay, endOfDay);
+    }
+
+    public Object getCurrentWeekReport() {
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = LocalDateTime.of(today.minusDays(7), LocalTime.MIN);
+        LocalDateTime endOfDay = LocalDateTime.of(today.plusDays(1), LocalTime.MIN);
+        List<FuelTransaction> transactions;
+        if(admin.getRole() == AdminType.SUPER_ADMIN) {
+            transactions = fuelTransactionRepository.findTransactionsLast7Days(startOfDay);
+        }else{
+            FuelStation fuelStation = fuelStationRepo.findByOwnerId(admin.getId()).orElseThrow(() -> new RuntimeException("Fuel station not found"));
+            transactions = fuelTransactionRepository.findTransactionsLast7DaysByFuelStation(startOfDay,fuelStation);
+        }
+
+        Map<String, Double> weeklyReport = new HashMap<>();
+
+        for (DayOfWeek day : DayOfWeek.values()) {
+            weeklyReport.put(day.name().toLowerCase(), 0.0);
+        }
+
+        for (FuelTransaction transaction : transactions) {
+            String day = transaction.getTransactionDate().getDayOfWeek().name().toLowerCase();
+            weeklyReport.put(day, weeklyReport.get(day) + transaction.getPumpedQuantity());
+        }
+        return weeklyReport;
     }
 
     @Transactional

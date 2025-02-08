@@ -61,7 +61,7 @@ export default function AddStationMaster() {
     },
   });
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending: isLoading } = useMutation({
     onSuccess: () => {
       toast({
         title: "Success",
@@ -84,7 +84,6 @@ export default function AddStationMaster() {
 
   async function onSubmit(values) {
     const data = { ...values, role: "STATION_MANAGER" };
-    console.log(data);
     mutate(data);
   }
 

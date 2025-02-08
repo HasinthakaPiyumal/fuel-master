@@ -2,6 +2,8 @@ package com.uokse.fuelmaster.controller;
 
 import com.uokse.fuelmaster.dto.EmployeeViewDetailsDTO;
 import com.uokse.fuelmaster.dto.LoginDTO;
+import com.uokse.fuelmaster.model.Admin;
+import com.uokse.fuelmaster.model.AdminType;
 import com.uokse.fuelmaster.model.Employee;
 import com.uokse.fuelmaster.model.User;
 import com.uokse.fuelmaster.response.ErrorResponse;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
@@ -80,18 +83,16 @@ public class EmployeeController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','STATION_MANAGER')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getAllEmployees() {
-        List<EmployeeViewDetailsDTO> employees = employeeService.getAllEmployees();
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Employee> employees = admin.getRole() == AdminType.SUPER_ADMIN?employeeService.getAllEmployees():employeeService.getMyStationEmployees();
         if (!employees.isEmpty()) {
-            HashMap<String, Object> data = new HashMap<>();
-            data.put("allEmployees", employees);
-
             SuccessResponse successResponse = new SuccessResponse(
                     "Employees retrieved successfully",
                     true,
-                    data
+                    employees
             );
 
             return ResponseEntity.ok(successResponse);
@@ -159,6 +160,24 @@ public class EmployeeController {
         } else {
             ErrorResponse errorResponse = new ErrorResponse(404, "No Employee Found");
             return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('STATION_MANAGER','SUPER_ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<?> deleteEmployee(@PathVariable String id) {
+        try {
+            employeeService.deleteEmployee(id);
+            SuccessResponse successResponse = new SuccessResponse(
+                    "Employee deleted successfully",
+                    true,
+                    null
+            );
+            return ResponseEntity.ok(successResponse);
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(400, "This employee cannot be deleted");
+            return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
 

@@ -242,6 +242,43 @@ public class UserController {
         }
     }
 
+
+    @GetMapping("/reset/qr")
+    @PreAuthorize("hasAnyRole('USER')")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<?> resetQr() {
+        User tokenizedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userIMPL.getUserById(tokenizedUser.getId());
+        if (user != null) {
+            HashMap<String, Object> data = new HashMap<>();
+            data.put("user", user);
+            Vehicle vehicle = null;
+            try {
+                vehicle = vehicleService.getByUser(user);
+                vehicleService.resetQR(vehicle);
+            } catch (Exception e) {
+                System.out.println(e);
+                ErrorResponse errorResponse = new ErrorResponse(404, "Vehicle Not Found");
+                return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+            }
+            Double usedQuota = fuelTransactionService.getFuelQuantity(vehicle.getId());
+            data.put("vehicle", vehicle);
+            data.put("defaultQuota", vehicle.getVehicleType().getDefaultQuota());
+            data.put("usedQuota", usedQuota);
+            data.put("availableQuota", vehicle.getVehicleType().getDefaultQuota() - usedQuota);
+            SuccessResponse successResponse = new SuccessResponse(
+                    "User authenticated successfully",
+                    true,
+                    data
+            );
+
+            return ResponseEntity.ok(successResponse);
+        } else {
+            ErrorResponse errorResponse = new ErrorResponse(404, "User Not Found");
+            return ResponseEntity.status(404).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
+        }
+    }
+
     //remove user
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
@@ -261,7 +298,7 @@ public class UserController {
             return ResponseEntity.ok(successResponse);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "This user cannot be deleted"));
         }
     }
 

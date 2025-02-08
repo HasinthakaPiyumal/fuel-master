@@ -227,7 +227,7 @@ const Dashboard = () => {
                   </div>
                 </>
               ) : (
-                <p>Loading...</p>
+                <Loading />
               )}
             </div>
           </div>

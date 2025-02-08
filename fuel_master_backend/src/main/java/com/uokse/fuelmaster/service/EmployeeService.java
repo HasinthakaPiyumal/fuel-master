@@ -3,10 +3,7 @@ package com.uokse.fuelmaster.service;
 import com.uokse.fuelmaster.dto.EmployeeViewDetailsDTO;
 import com.uokse.fuelmaster.dto.LoginDTO;
 import com.uokse.fuelmaster.dto.Request.EmployeeDTO;
-import com.uokse.fuelmaster.model.Admin;
-import com.uokse.fuelmaster.model.Employee;
-import com.uokse.fuelmaster.model.FuelStation;
-import com.uokse.fuelmaster.model.User;
+import com.uokse.fuelmaster.model.*;
 import com.uokse.fuelmaster.repository.EmployeeRepository;
 import com.uokse.fuelmaster.repository.FuelStationRepo;
 import com.uokse.fuelmaster.util.PasswordUtil;
@@ -57,12 +54,20 @@ public class EmployeeService {
 
     }
 
-    public List<EmployeeViewDetailsDTO> getAllEmployees() {
-        List<Employee> employees = employeeRepo.findAll();
-        return employees.stream().map(employee -> new EmployeeViewDetailsDTO(
-                employee.getName(),
-                employee.getPhone(),
-                employee.getNic())).toList();
+    public List<Employee> getAllEmployees() {
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (admin.getRole() == AdminType.SUPER_ADMIN) {
+            return employeeRepo.findAll();
+        }
+        FuelStation fuelStation = fuelStationRepo.findByOwnerId(admin.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Fuel Station not found"));
+        return employeeRepo.findAllByFuelStation(fuelStation);
+    }
+    public List<Employee> getMyStationEmployees() {
+        Admin admin = (Admin) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        FuelStation fuelStation = fuelStationRepo.findByOwnerId(admin.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Fuel Station not found"));
+        return employeeRepo.findByFuelStation(fuelStation);
     }
 
     public EmployeeViewDetailsDTO getEmployeeByPhone(String phone) {
@@ -92,5 +97,9 @@ public class EmployeeService {
             }
         }
         return Optional.empty();
+    }
+
+    public void deleteEmployee(String id) {
+        employeeRepo.deleteById(Long.parseLong(id));
     }
 }

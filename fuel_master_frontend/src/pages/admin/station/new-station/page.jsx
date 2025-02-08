@@ -57,7 +57,7 @@ const NewStation = () => {
     queryFn: () => apiService.get("/admin/unassigned-station-managers"),
   });
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending: isLoading } = useMutation({
     onSuccess: () => {
       toast({
         title: "Success",

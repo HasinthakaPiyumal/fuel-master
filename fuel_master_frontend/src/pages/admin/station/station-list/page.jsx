@@ -1,3 +1,4 @@
+import Loading from "@/components/loading";
 import StationTable from "./station-table";
 import apiService from "@/services/api.service";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +11,7 @@ const StationList = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Stations List</h1>
-      {isLoading ? 'Loading...' : <StationTable stations={stations?.data?.data || []} refetch={refetch} />}
+      {isLoading ? <Loading /> : <StationTable stations={stations?.data?.data || []} refetch={refetch} />}
     </div>
   );
 };

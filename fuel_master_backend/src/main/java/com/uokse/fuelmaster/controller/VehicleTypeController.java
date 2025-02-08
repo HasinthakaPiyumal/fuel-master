@@ -116,7 +116,7 @@ public class VehicleTypeController {
             return ResponseEntity.ok(new SuccessResponse("Vehicle type deleted successfully", true, null));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "This vehicle type cannot be deleted"));
         }
     }
 }

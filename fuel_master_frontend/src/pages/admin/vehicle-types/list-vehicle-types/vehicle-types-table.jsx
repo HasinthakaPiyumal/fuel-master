@@ -12,8 +12,11 @@ import { Edit } from "lucide-react";
 import apiService from '@/services/api.service';
 import DialogDelete from '@/components/dialog-delete';
 import { toast } from '@/hooks/use-toast';
+import UpdateQuota from './update-quota';
+import { z } from 'zod';
 
 const VehicleTypesTable = ({ data, refetch }) => {
+
 
   const handleDelete = async (id) => {
     try {
@@ -60,9 +63,7 @@ const VehicleTypesTable = ({ data, refetch }) => {
               <TableCell>{item.fuelType}</TableCell>
               <TableCell>{item.defaultQuota}</TableCell>
               <TableCell className="text-right space-x-2">
-                <Button variant="ghost" size="icon">
-                  <Edit className="h-4 w-4" />
-                </Button>
+                <UpdateQuota id={item.id} quota={item.defaultQuota} refetch={refetch} />
                 <DialogDelete onDelete={() => handleDelete(item.id)} />
               </TableCell>
             </TableRow>

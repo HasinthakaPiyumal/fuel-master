@@ -32,7 +32,6 @@ import java.util.Optional;
 @Tag(name = "Vehicle", description = "Vehicle API")
 @SecurityRequirement(name = "bearerAuth")
 public class VehicleController {
-
     private static final Logger logger = LoggerFactory.getLogger(VehicleController.class);
 
     @Autowired

@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input"
 import apiService from '@/services/api.service';
 import { useMutation } from '@tanstack/react-query';
 import { alert } from '@/lib/alert';
+import { Card } from '@/components/ui/card';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -65,7 +66,7 @@ const AddEmployee = () => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Add New Employee</h1>
 
-      <div className="w-[400px] border rounded-lg p-6 shadow-md bg-white">
+      <Card className="max-w-xl p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -177,7 +178,7 @@ const AddEmployee = () => {
             </Button>
           </form>
         </Form>
-      </div>
+      </Card>
     </div>
   );
 };

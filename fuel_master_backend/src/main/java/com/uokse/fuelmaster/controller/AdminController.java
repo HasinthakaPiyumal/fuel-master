@@ -9,6 +9,8 @@ import com.uokse.fuelmaster.dto.Response.AdminViewDTO;
 import com.uokse.fuelmaster.model.Admin;
 import com.uokse.fuelmaster.model.AdminType;
 import com.uokse.fuelmaster.model.Employee;
+import com.uokse.fuelmaster.model.FuelStation;
+import com.uokse.fuelmaster.repository.FuelStationRepo;
 import com.uokse.fuelmaster.response.ErrorResponse;
 import com.uokse.fuelmaster.response.SuccessResponse;
 import com.uokse.fuelmaster.service.AdminService;
@@ -39,9 +41,12 @@ public class AdminController {
     private AdminService adminService;
     private final JwtService jwtService;
 
-    public AdminController(AdminService adminService, JwtService jwtService) {
+    private final FuelStationRepo fuelStationRepo;
+
+    public AdminController(AdminService adminService, JwtService jwtService, FuelStationRepo fuelStationRepo) {
         this.adminService = adminService;
         this.jwtService = jwtService;
+        this.fuelStationRepo = fuelStationRepo;
     }
 
     @PostMapping(path="/save")
@@ -144,6 +149,13 @@ public class AdminController {
         }
         Optional<Admin> admin = adminService.loginAdmin(loginDTO);
         if (admin.isPresent()) {
+            boolean isSuperAdmin = admin.get().getRole() == AdminType.SUPER_ADMIN;
+            if(!isSuperAdmin){
+                 boolean isAssigned =fuelStationRepo.existsByOwnerId(admin.get().getId());
+                 if(!isAssigned){
+                     return ResponseEntity.status(401).contentType(MediaType.APPLICATION_JSON).body(new ErrorResponse(401, "Station Manager not assigned to any station. Please contact the Admin"));
+                 }
+            }
             String role = admin.get().getRole()== AdminType.SUPER_ADMIN?"SUPER_ADMIN":"STATION_MANAGER";
             String token = jwtService.generateToken(admin.get(), role);
             HashMap<String, Object> data = new HashMap<>();
@@ -157,7 +169,7 @@ public class AdminController {
     }
 
     @GetMapping("/me")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','STATION_MANAGER')")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getAdminByToken(@RequestHeader("Authorization") String bearerToken) {
         final String jwt = bearerToken.substring(7);

@@ -36,7 +36,7 @@ export function NavMain({
           <Collapsible
             key={item.title}
             asChild
-            defaultOpen={isActive(item.items) || activeUrl.includes(item.url)}
+            defaultOpen={true}
             className="group/collapsible"
           >
             <SidebarMenuItem>
@@ -69,14 +69,10 @@ export function NavMain({
                   </CollapsibleContent>
                 </React.Fragment>
               ) : (
-                <SidebarMenuButton tooltip={item.title} isActive={isActive(item.items) || activeUrl.includes(item.url)}>
+                <Link to={item.url}><SidebarMenuButton tooltip={item.title} isActive={isActive(item.items) || activeUrl.includes(item.url)}>
                   {item.icon && <item.icon />}
-                  <Link to={item.url}>{item.title}</Link>
-                </SidebarMenuButton>
-
-
-
-
+                  {item.title}
+                </SidebarMenuButton></Link>
               )}
             </SidebarMenuItem>
           </Collapsible>

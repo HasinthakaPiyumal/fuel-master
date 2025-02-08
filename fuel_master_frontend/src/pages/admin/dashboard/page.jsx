@@ -1,61 +1,89 @@
-import { Card } from "@/components/ui/card"
+import Loading from "@/components/loading"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import apiService from "@/services/api.service"
+import { useQuery } from "@tanstack/react-query"
 import {
-    LineChart,
-    BarChart,
     UserIcon,
-    DollarSign,
-    ShoppingCart,
-    Activity
+    Building2,
+    Car,
+    Fuel
 } from "lucide-react"
+import { Overview } from "./overview"
+import { RecentActivity } from "./quota"
 
 export default function Dashboard() {
+    const { data, isLoading } = useQuery({
+        queryKey: ["dashboard"],
+        queryFn: () => apiService.get("/report/dashboard")
+    })
+
+    const dashboardData = data?.data?.data;
+
     return (
-        <div className="space-y-6">
+        isLoading ? <Loading /> : <div className="space-y-6">
             <h1 className="text-3xl font-bold">Dashboard</h1>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+
+                <Card className="p-6">
+                    <div className="flex items-center space-x-4">
+                        <Fuel className="h-10 w-10 text-purple-500" />
+                        <div>
+                            <p className="text-sm text-gray-500">Today Used Fuel Amount</p>
+                            <h3 className="text-2xl font-bold">{dashboardData.todayUsedFuelAmount} L</h3>
+                        </div>
+                    </div>
+                </Card>
+
+                <Card className="p-6">
+                    <div className="flex items-center space-x-4">
+                        <Building2 className="h-10 w-10 text-green-500" />
+                        <div>
+                            <p className="text-sm text-gray-500">Total Station</p>
+                            <h3 className="text-2xl font-bold">{dashboardData.station}</h3>
+                        </div>
+                    </div>
+                </Card>
+
                 <Card className="p-6">
                     <div className="flex items-center space-x-4">
                         <UserIcon className="h-10 w-10 text-blue-500" />
                         <div>
-                            <p className="text-sm text-gray-500">Total Users</p>
-                            <h3 className="text-2xl font-bold">1,234</h3>
+                            <p className="text-sm text-gray-500">Total Employee</p>
+                            <h3 className="text-2xl font-bold">{dashboardData.employee}</h3>
                         </div>
                     </div>
                 </Card>
 
                 <Card className="p-6">
                     <div className="flex items-center space-x-4">
-                        <ShoppingCart className="h-10 w-10 text-green-500" />
+                        <Car className="h-10 w-10 text-yellow-500" />
                         <div>
-                            <p className="text-sm text-gray-500">Total Orders</p>
-                            <h3 className="text-2xl font-bold">856</h3>
-                        </div>
-                    </div>
-                </Card>
-
-                <Card className="p-6">
-                    <div className="flex items-center space-x-4">
-                        <DollarSign className="h-10 w-10 text-yellow-500" />
-                        <div>
-                            <p className="text-sm text-gray-500">Revenue</p>
-                            <h3 className="text-2xl font-bold">$12,345</h3>
-                        </div>
-                    </div>
-                </Card>
-
-                <Card className="p-6">
-                    <div className="flex items-center space-x-4">
-                        <Activity className="h-10 w-10 text-purple-500" />
-                        <div>
-                            <p className="text-sm text-gray-500">Active Users</p>
-                            <h3 className="text-2xl font-bold">432</h3>
+                            <p className="text-sm text-gray-500">Vehicle</p>
+                            <h3 className="text-2xl font-bold">{dashboardData.vehicle}</h3>
                         </div>
                     </div>
                 </Card>
             </div>
-
-            {/* Add more dashboard content as needed */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <Card className="col-span-4">
+                    <CardHeader>
+                        <CardTitle>Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pl-2">
+                        <Overview data={dashboardData.weeklyReport} />
+                    </CardContent>
+                </Card>
+                <Card className="col-span-3">
+                    <CardHeader>
+                        <CardTitle>Recent Activity</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <RecentActivity todayTransaction={dashboardData.todayTransaction} />
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     )
 } 

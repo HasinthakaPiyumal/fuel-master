@@ -6,15 +6,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Edit } from "lucide-react";
 import PropTypes from "prop-types";
 import apiService from "@/services/api.service";
 import { toast } from "@/hooks/use-toast";
 import DialogDelete from "@/components/dialog-delete";
-const StationsTable = ({ stations, refetch }) => {
+const UserTable = ({ users, refetch }) => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await apiService.delete(`/fuelstation/delete/${id}`);
+      const response = await apiService.delete(`/user/delete/${id}`);
       if (response.data.status === 200) {
         toast({
           title: 'Success',
@@ -44,22 +46,18 @@ const StationsTable = ({ stations, refetch }) => {
         <TableHeader>
           <TableRow>
             <TableHead>#</TableHead>
-            <TableHead>Station Name</TableHead>
-            <TableHead>Owner</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Phone</TableHead>
+            <TableHead>NIC</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {stations.map((station) => (
-            <TableRow key={station.id}>
-              <TableCell className="font-medium">{station.id}</TableCell>
-              <TableCell>{station.location}</TableCell>
-              <TableCell>{station.ownerName}</TableCell>
-              <TableCell>{new Date(station.createdAt).toLocaleDateString()}</TableCell>
-              <TableCell className="text-right">
-                <DialogDelete onDelete={() => handleDelete(station.id)} />
-              </TableCell>
+          {users.map((user) => (
+            <TableRow key={user.id}>
+              <TableCell className="font-medium">{user.id}</TableCell>
+              <TableCell>{user.firstName} {user.lastName}</TableCell>
+              <TableCell>{user.phone}</TableCell>
+              <TableCell>{user.nic}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -68,9 +66,9 @@ const StationsTable = ({ stations, refetch }) => {
   );
 };
 
-StationsTable.propTypes = {
-  stations: PropTypes.array.isRequired,
+UserTable.propTypes = {
+  users: PropTypes.array.isRequired,
   refetch: PropTypes.func.isRequired,
 };
 
-export default StationsTable;
+export default UserTable;

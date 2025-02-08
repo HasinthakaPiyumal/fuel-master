@@ -24,7 +24,6 @@ const loginSchema = z.object({
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const { data: allData, isLoading } = useQuery({
@@ -35,6 +34,8 @@ const LoginPage = () => {
     },
     retry: false,
   });
+
+  const navigate = useNavigate();
 
   const user = allData?.user;
 

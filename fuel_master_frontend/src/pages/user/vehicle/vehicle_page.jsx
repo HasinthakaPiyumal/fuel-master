@@ -4,29 +4,50 @@ import { Button } from "@/components/ui/button";
 import QRCode from 'qrcode';
 import apiService from "@/services/api.service";
 import { showToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import PropTypes from 'prop-types';
+import { useEffect, useState } from "react";
+import { alert } from "@/lib/alert";
+import Loading from "@/components/loading";
 export default function VehiclePage() {
+  const [qr, setQr] = useState(null);
 
-
-  const { data: fetchedVehicleData, loading } = useQuery({
+  const { data: fetchedVehicleData, loading, refetch } = useQuery({
     queryKey: ['vehicle'],
     queryFn: () => apiService.get('/user/vehicle')
   })
 
+  const { mutate: resetQR, isPending } = useMutation({
+    mutationFn: () => apiService.get('/user/reset/qr'),
+    onSuccess: () => {
+      alert.success('QR code reset successfully');
+      refetch();
+    },
+    onError: () => {
+      alert.error('Failed to reset QR code');
+    }
+  })
+
   const vehicleData = fetchedVehicleData?.data?.data;
+
+  useEffect(() => {
+    getQRCode();
+  }, [vehicleData]);
+
+
+  const getQRCode = async () => {
+    const qrData = {
+      qrId: vehicleData.vehicle.qrId,
+      numberPlate: vehicleData.vehicle.vehicleRegistrationPart1 + " " + vehicleData.vehicle.vehicleRegistrationPart2,
+    };
+    const qrCodeURL = await QRCode.toDataURL(JSON.stringify(qrData));
+    setQr(qrCodeURL);
+  }
 
   const handleQRDownload = async () => {
     try {
-      const qrData = {
-        qrId: vehicleData.vehicle.qrId,
-        numberPlate: vehicleData.vehicle.vehicleRegistrationPart1 + " " + vehicleData.vehicle.vehicleRegistrationPart2,
-      };
-
-      const qrCodeURL = await QRCode.toDataURL(JSON.stringify(qrData));
-
       const link = document.createElement('a');
-      link.href = qrCodeURL;
+      link.href = qr;
       link.download = `QR_${vehicleData.vehicle.vehicleRegistrationPart1 + " " + vehicleData.vehicle.vehicleRegistrationPart2}.png`;
 
       document.body.appendChild(link);
@@ -39,12 +60,13 @@ export default function VehiclePage() {
     }
   };
 
-  if (loading) return <div className="text-center text-gray-600">Loading...</div>;
-  if (!vehicleData) return <div className="text-center text-red-500">Failed to load data.</div>;
+  if (loading) return <Loading />;
+  if (!vehicleData) return <Loading />;
+
 
 
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
+    <div className="container mx-auto p-4 max-w-6xl mb-12">
       <div className="grid md:grid-cols-2 gap-x-20 gap-y-6 justify-center">
         <Card className="bg-white shadow-lg">
           <CardContent className="p-6">
@@ -66,9 +88,8 @@ export default function VehiclePage() {
             <h2 className="text-2xl font-semibold text-orange-600 mb-6">Quota Summary</h2>
             <div className="space-y-4">
               <InfoRow label="Available Quota:" value={`${vehicleData.availableQuota} L`} />
-              <InfoRow label="Quota Used:" value={`${vehicleData.usedQuota} L`} />
+              {/* <InfoRow label="Quota Used:" value={`${vehicleData.usedQuota} L`} /> */}
               <InfoRow label="Total Quota:" value={`${vehicleData.defaultQuota} L`} />
-              <InfoRow label="Renewal Date:" value={vehicleData.renewalDate} />
 
               <div className="mt-6">
                 <Progress
@@ -79,12 +100,23 @@ export default function VehiclePage() {
                   {vehicleData.usedQuota}L / {vehicleData.defaultQuota}L
                 </div>
               </div>
-              <Button
-                className="w-full mt-4 bg-orange-600 hover:bg-orange-700 text-white"
-                onClick={handleQRDownload}
-              >
-                Download QR
-              </Button>
+              <div className="flex justify-center items-center">
+                {qr && <img src={qr} alt="QR Code" className="w-60 h-60" />}
+              </div>
+              <div className="flex justify-center items-center gap-4">
+                <Button
+                  onClick={resetQR}
+                  loading={isPending}
+                  variant="outline"
+                >
+                  Reset QR
+                </Button>
+                <Button
+                  onClick={handleQRDownload}
+                >
+                  Download QR
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

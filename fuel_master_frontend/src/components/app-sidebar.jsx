@@ -2,12 +2,8 @@
 
 import {
   BarChart3,
-  Fuel,
   GaugeCircle,
   Home,
-  LineChart,
-  Settings2,
-  Store,
   Truck,
   Users,
 } from "lucide-react"
@@ -21,32 +17,11 @@ import {
 import { NavMain } from "./nav-main"
 import { NavUser } from "./nav-user"
 import NavHeader from "./nav-header"
+import PropTypes from 'prop-types'
 
 // This is sample data.
 const data = {
-  user: {
-    name: "Admin",
-    email: "admin@fuelapp.com",
-    avatar: "/avatars/admin.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: Store,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: Truck,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Users,
-      plan: "Free",
-    },
-  ],
-  navMain: [
+  navSuperAdmin: [
     {
       title: "Dashboard",
       url: "/admin/dashboard",
@@ -56,16 +31,6 @@ const data = {
       title: "Employee Management",
       url: "/admin/employee-list",
       icon: Users,
-      items: [
-        {
-          title: "All Employees",
-          url: "/admin/employee-list",
-        },
-        {
-          title: "Add Employee",
-          url: "/admin/employee-add",
-        },
-      ],
     },
     {
       title: "Vehicle Management",
@@ -79,10 +44,6 @@ const data = {
         {
           title: "Add Vehicle Type",
           url: "/admin/vehicle-type-add",
-        },
-        {
-          title: "Vehicle Reports",
-          url: "/admin/vehicle-type-report",
         },
       ],
     },
@@ -103,71 +64,59 @@ const data = {
           title: "Station Master Add",
           url: "/admin/station-master-add",
         },
-        {
-          title: "Station Master Assign",
-          url: "/admin/station-master-assign",
-        },
       ],
     },
     {
-      title: "Quota Management",
-      url: "/admin/quota-management-list",
-      icon: Fuel,
-      items: [
-        {
-          title: "Quota Usage",
-          url: "/admin/quota-management-list",
-        },
-        {
-          title: "Settings",
-          url: "/admin/quota-management-settings",
-        },
-      ],
-    },
-    {
-      title: "Reports",
-      url: "/admin/user-report",
-      icon: BarChart3,
-      items: [
-        {
-          title: "User Reports",
-          url: "/admin/user-report",
-        },
-      ],
+      title: "Users",
+      url: "/admin/user-list",
+      icon: BarChart3
     },
   ],
-  projects: [
+  navStationManager: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Settings2,
+      title: "Dashboard",
+      url: "/admin/dashboard",
+      icon: Home,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: BarChart3,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: LineChart,
-    },
-  ],
+      title: "Employee Management",
+      url: "/admin/employee-list",
+      icon: Users,
+      items: [
+        {
+          title: "All Employees",
+          url: "/admin/employee-list",
+        },
+        {
+          title: "Add Employee",
+          url: "/admin/employee-add",
+        },
+      ],
+    }
+  ]
 }
 
-export function AppSidebar({ ...props }) {
+export function AppSidebar({ user, userRole, ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <NavHeader />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={userRole === "SUPER_ADMIN" ? data.navSuperAdmin : data.navStationManager} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser role={userRole} user={{ name: user.name, email: user.email, avatar: "/avatars/admin.jpg", role: userRole }} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
+}
+
+AppSidebar.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+  }).isRequired,
+  userRole: PropTypes.string.isRequired
 }

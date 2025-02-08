@@ -1,12 +1,8 @@
 "use client"
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react"
 import PropTypes from 'prop-types';
 
@@ -18,7 +14,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -30,11 +25,23 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function NavUser({
   user,
+  role,
 }) {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+
+  const logout = () => {
+    queryClient.removeQueries(["user"]);
+    localStorage.removeItem("token");
+    navigate("/admin-login");
+  }
 
   return (
     <SidebarMenu>
@@ -47,7 +54,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{user.name.charAt(0) + user.name.charAt(1)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
@@ -71,33 +78,13 @@ export function NavUser({
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs">{role == "SUPER_ADMIN" ? "Super Admin" : "Station Manager"}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { logout() }}>
               <LogOut />
               Log out
             </DropdownMenuItem>
@@ -113,5 +100,6 @@ NavUser.propTypes = {
     name: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
     avatar: PropTypes.string.isRequired
-  }).isRequired
+  }).isRequired,
+  role: PropTypes.string.isRequired
 };

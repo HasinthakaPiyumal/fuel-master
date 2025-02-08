@@ -7,6 +7,7 @@ import AppLayout from "./layouts/AppLayout";
 import NotFound from "./pages/error/NotFound";
 import AdminLogin from "./pages/admin/login/page";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ProtectedRoute from "./routes/AdminProtectedRoutes";
 
 
 const queryClient = new QueryClient()
@@ -17,7 +18,9 @@ const App = () => {
         <Routes>
           <Route index element={<AppLayout><HomePage /></AppLayout>} />
           <Route path="/*" element={<AppRoutes />} />
-          <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin/*" element={<AdminRoutes />} />
+          </Route>
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

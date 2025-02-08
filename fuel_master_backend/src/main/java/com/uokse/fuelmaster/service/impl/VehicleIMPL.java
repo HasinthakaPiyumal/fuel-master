@@ -145,11 +145,27 @@ public class VehicleIMPL implements VehicleService {
     }
 
     @Override
+    public List<Vehicle> getAll() {
+        return vehicleRepo.findAll();
+    }
+
+    @Override
     public Vehicle getByUser(User user) {
         try {
             return vehicleRepo.findFirstByUser(user);
         } catch (Exception e) {
             System.out.println(e);
+            throw new RuntimeException("Vehicle not found");
+        }
+    }
+
+    @Override
+    public Vehicle resetQR(Vehicle vehicle) {
+        try {
+            String qr = generateUniqueQRId(vehicle.getChassisNumber(), vehicle.getVehicleRegistrationPart1() + vehicle.getVehicleRegistrationPart2());
+            vehicle.setQrId(qr);
+            return vehicleRepo.save(vehicle);
+        } catch (Exception e) {
             throw new RuntimeException("Vehicle not found");
         }
     }

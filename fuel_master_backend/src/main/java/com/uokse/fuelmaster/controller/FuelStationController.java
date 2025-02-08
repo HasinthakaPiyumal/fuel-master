@@ -101,8 +101,8 @@ public class FuelStationController {
             fuelStationService.deleteFuelStation(id);
             return ResponseEntity.ok(new SuccessResponse("Fuel station deleted successfully", true, null));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Fuel station not found"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "This fuel station cannot be deleted"));
         }
     }
 }
