@@ -7,7 +7,8 @@ class ApiService {
   static final ApiService _instance = ApiService._internal();
   static String token = '';
 
-  static const String _baseUrl = 'http://192.168.8.116:8080/api/v1';
+  // static const String _baseUrl = 'http://192.168.8.116:8080/api/v1';
+  static const String _baseUrl = 'https://api-fuel-master-fbc37438737d.herokuapp.com/api/v1';
 
   late final Dio _dio;
 

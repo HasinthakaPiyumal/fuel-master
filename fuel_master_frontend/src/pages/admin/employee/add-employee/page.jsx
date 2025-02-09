@@ -34,19 +34,6 @@ const formSchema = z.object({
 const AddEmployee = () => {
   const [showPassword, setShowPassword] = React.useState(false);
 
-  const { mutate: addEmployee, isPending } = useMutation({
-    mutationFn: async (data) => {
-      const response = await apiService.post("/employee/save", data);
-      return response.data.data;
-    },
-    onSuccess: () => {
-      alert.success("Employee added successfully");
-    },
-    onError: (error) => {
-      alert.error(error.response.data.data.message);
-    },
-  });
-
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,6 +42,20 @@ const AddEmployee = () => {
       nic: "",
       password: "",
       confirmPassword: "",
+    },
+  });
+
+  const { mutate: addEmployee, isPending } = useMutation({
+    mutationFn: async (data) => {
+      const response = await apiService.post("/employee/save", data);
+      return response.data.data;
+    },
+    onSuccess: () => {
+      alert.success("Employee added successfully");
+      form.reset();
+    },
+    onError: (error) => {
+      alert.error(error.response.data.data.message);
     },
   });
 

@@ -46,10 +46,13 @@ public class UserController {
     @Autowired
     FuelTransactionService fuelTransactionService;
 
+    final VerificationCodeService verificationCodeService;
+
     private final JwtService jwtService;
     private final VehicleRepo vehicleRepo;
 
-    public UserController(JwtService jwtService, VehicleRepo vehicleRepo) {
+    public UserController(VerificationCodeService verificationCodeService, JwtService jwtService, VehicleRepo vehicleRepo) {
+        this.verificationCodeService = verificationCodeService;
         this.jwtService = jwtService;
         this.vehicleRepo = vehicleRepo;
     }
@@ -106,7 +109,7 @@ public class UserController {
             );
             return ResponseEntity.ok(successResponse);
         } else {
-            ErrorResponse errorResponse = new ErrorResponse(401, "Login Failed");
+            ErrorResponse errorResponse = new ErrorResponse(401, "Invalid Phone Number or Password");
             return ResponseEntity.status(401).contentType(MediaType.APPLICATION_JSON).body(errorResponse);
         }
     }
@@ -165,6 +168,7 @@ public class UserController {
             if (user != null) {
                 HashMap<String, Object> data = new HashMap<>();
                 data.put("user", user);
+                verificationCodeService.sendVerificationCode();
                 SuccessResponse successResponse = new SuccessResponse(
                         "Phone number updated successfully",
                         true,

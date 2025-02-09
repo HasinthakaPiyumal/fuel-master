@@ -11,6 +11,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { getUserPhone } from "@/services/user.service";
 import Loading from "@/components/loading";
+import { Loader, Loader2 } from "lucide-react";
 
 const OtpSchema = z.object({
   otp: z
@@ -50,7 +51,7 @@ export default function VerifyOtpPage() {
     },
   });
 
-  const { mutate: resendOtp } = useMutation({
+  const { mutate: resendOtp, isPending: isResending } = useMutation({
     mutationFn: () => apiService.get("/verification/resend"),
     onSuccess: () => {
       alert.success("New OTP has been sent!");
@@ -154,13 +155,13 @@ export default function VerifyOtpPage() {
             </Button>
           </form>
 
-          <p className="text-right text-sm mt-4 ">
+          <p className="text-right text-sm mt-4 flex justify-end">
             Didn&apos;t receive it?{" "}
             <span
-              className="text-[#F04A23] cursor-pointer hover:underline"
-              onClick={handleResendOTP}
+              className="text-[#F04A23] cursor-pointer hover:underline w-12"
+              onClick={isResending ? undefined : handleResendOTP}
             >
-              Resend
+              {isResending ? <Loader2 className="w-12 h-4 animate-spin" /> : "Resend"}
             </span>
           </p>
         </div>

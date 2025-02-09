@@ -34,7 +34,7 @@ public class AdminService {
             throw new IllegalArgumentException("NIC already registered: " +adminDTO.getNic());
         }
         if (adminRepository.findByEmail(adminDTO.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Phone number already registered: " + adminDTO.getEmail());
+            throw new IllegalArgumentException("Email address already registered: " + adminDTO.getEmail());
         }
         Admin admin = new Admin();
         admin.setName(adminDTO.getName());
