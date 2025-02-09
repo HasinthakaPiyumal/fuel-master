@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const API_BASE_URL = "https://api-fuel-master-fbc37438737d.herokuapp.com/api/v1";
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL = "https://api-fuel-master-fbc37438737d.herokuapp.com/api/v1";
+// const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 const apiService = {
   init() {
